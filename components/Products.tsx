@@ -13,19 +13,14 @@ function ProductCard({ product }: { product: typeof products[0] }) {
   const [hovered, setHovered] = useState(false)
 
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ position: 'relative' }}
-    >
+    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <div style={{
         aspectRatio: '3/4', position: 'relative', overflow: 'hidden',
         marginBottom: '1rem', background: 'var(--light-gold)', borderRadius: 2,
       }}>
         <div style={{
-          position: 'absolute', inset: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '5rem',
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 'clamp(3rem, 6vw, 5rem)',
           transition: 'transform .5s ease',
           transform: hovered ? 'scale(1.08)' : 'scale(1)',
         }}>{product.icon}</div>
@@ -56,7 +51,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
       </div>
 
       <div style={{ fontSize: '.68rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--mid)', marginBottom: '.25rem' }}>{product.cat}</div>
-      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.15rem', fontWeight: 400, color: 'var(--deep)', marginBottom: '.5rem' }}>{product.name}</div>
+      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(1rem, 2vw, 1.15rem)', fontWeight: 400, color: 'var(--deep)', marginBottom: '.5rem' }}>{product.name}</div>
       <div style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--terracotta)' }}>
         {product.oldPrice && <span style={{ textDecoration: 'line-through', color: 'var(--blush)', marginRight: '.5rem' }}>{product.oldPrice}</span>}
         {product.price}
@@ -67,15 +62,17 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
 export default function Products() {
   return (
-    <section id="new" style={{ padding: '6rem 5rem', background: 'var(--cream)', position: 'relative', zIndex: 1 }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '3.5rem' }}>
+    <section id="new" className="section-pad" style={{ background: 'var(--cream)', position: 'relative', zIndex: 1 }}>
+      <div className="section-header">
         <div>
-          <div style={{ fontSize: '.72rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--terracotta)', marginBottom: '.6rem' }}>New In</div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--deep)', lineHeight: 1.1 }}>Fresh Picks</h2>
+          <div className="section-label">New In</div>
+          <h2 className="section-title">Fresh Picks</h2>
         </div>
-        <a href="#" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>View all →</a>
+        <a href="#" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
+          View all →
+        </a>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '1.8rem' }}>
+      <div className="product-grid">
         {products.map(p => <ProductCard key={p.id} product={p} />)}
       </div>
     </section>

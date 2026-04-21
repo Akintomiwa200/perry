@@ -7,14 +7,13 @@ const contactLinks = ['Sango Ota, Ogun State', '@perrycollectibles', 'DM to Orde
 
 export default function Footer() {
   return (
-    <footer id="contact" style={{ background: 'var(--deep)', color: 'rgba(253,248,242,.7)', padding: '4rem 5rem 2rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '3rem', marginBottom: '3rem' }}>
-        {/* Brand */}
+    <footer id="contact" style={{ background: 'var(--deep)', color: 'rgba(253,248,242,.7)', padding: 'clamp(2.5rem,5vw,4rem) clamp(1.5rem,5vw,5rem) 2rem' }}>
+      <div className="footer-grid">
         <div>
           <Link href="/" style={{
             display: 'block', marginBottom: '1rem',
             fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '1.6rem', fontWeight: 600, letterSpacing: '.04em',
+            fontSize: '1.5rem', fontWeight: 600, letterSpacing: '.04em',
             color: 'var(--cream)', textDecoration: 'none',
           }}>
             Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
@@ -41,7 +40,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Shop */}
         <FooterCol title="Shop" links={shopLinks} />
         <FooterCol title="Help" links={helpLinks} />
         <FooterCol title="Contact" links={contactLinks} />
@@ -50,6 +48,7 @@ export default function Footer() {
       <div style={{
         borderTop: '1px solid rgba(253,248,242,.08)', paddingTop: '1.5rem',
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        flexWrap: 'wrap', gap: '1rem',
       }}>
         <span style={{ fontSize: '.75rem', color: 'rgba(253,248,242,.35)' }}>© 2025 Perry Collectibles. All rights reserved.</span>
         <a href="https://www.instagram.com/perrycollectibles" target="_blank" rel="noreferrer"

@@ -7,21 +7,18 @@ const reviews = [
 
 export default function Testimonials() {
   return (
-    <section style={{ padding: '6rem 5rem', background: 'linear-gradient(180deg, var(--light-gold) 0%, var(--cream) 100%)' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '3.5rem' }}>
+    <section className="section-pad" style={{ background: 'linear-gradient(180deg, var(--light-gold) 0%, var(--cream) 100%)' }}>
+      <div className="section-header">
         <div>
-          <div style={{ fontSize: '.72rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--terracotta)', marginBottom: '.6rem' }}>Reviews</div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2rem,3.5vw,3rem)', fontWeight: 300, color: 'var(--deep)', lineHeight: 1.1 }}>
-            What our customers say
-          </h2>
+          <div className="section-label">Reviews</div>
+          <h2 className="section-title">What our customers say</h2>
         </div>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '2rem' }}>
+      <div className="testimonials-grid">
         {reviews.map(r => (
           <div key={r.author} style={{
-            background: 'var(--cream)', padding: '2.5rem',
-            borderLeft: '2px solid var(--blush)',
-            position: 'relative',
+            background: 'var(--cream)', padding: 'clamp(1.5rem, 3vw, 2.5rem)',
+            borderLeft: '2px solid var(--blush)', position: 'relative',
           }}>
             <div style={{
               fontFamily: "'Cormorant Garamond', serif",
