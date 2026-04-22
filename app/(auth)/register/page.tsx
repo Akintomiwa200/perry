@@ -48,15 +48,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-20 bg-[var(--bg-light)]">
-      <div className="w-full max-w-md bg-[var(--cream)] border border-[var(--blush)] rounded-lg p-6 sm:p-10">
-
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-[var(--deep)]">
-            Create your account
+    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-[var(--bg-light)]">
+      <div className="w-full max-w-md bg-[var(--cream)] border border-[var(--blush)] rounded-lg p-5 sm:p-10 shadow-lg">
+        
+        {/* Header - Better spacing on mobile */}
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-light font-serif text-[var(--deep)]">
+            Create account
           </h1>
-          <p className="text-sm text-[var(--mid)] mt-2">
+          <p className="text-xs sm:text-sm text-[var(--mid)] mt-2">
             Join thousands of collectors
           </p>
         </div>
@@ -69,11 +69,11 @@ export default function RegisterPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
 
-          {/* Grid */}
+          {/* Grid - Stacks on mobile, side by side on tablet+ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
+            
             {/* First Name */}
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-[var(--deep)]">
@@ -82,9 +82,10 @@ export default function RegisterPage() {
               <input
                 value={form.firstName}
                 onChange={set('firstName')}
-                className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
                   errors.firstName ? 'border-red-600' : 'border-[var(--blush)]'
                 }`}
+                placeholder="John"
               />
               {errors.firstName && (
                 <p className="text-xs text-red-600">{errors.firstName}</p>
@@ -99,9 +100,10 @@ export default function RegisterPage() {
               <input
                 value={form.lastName}
                 onChange={set('lastName')}
-                className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
                   errors.lastName ? 'border-red-600' : 'border-[var(--blush)]'
                 }`}
+                placeholder="Doe"
               />
               {errors.lastName && (
                 <p className="text-xs text-red-600">{errors.lastName}</p>
@@ -115,11 +117,15 @@ export default function RegisterPage() {
               Email
             </label>
             <input
+              type="email"
               value={form.email}
               onChange={set('email')}
-              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
                 errors.email ? 'border-red-600' : 'border-[var(--blush)]'
               }`}
+              placeholder="hello@example.com"
+              autoCapitalize="none"
+              autoComplete="email"
             />
             {errors.email && (
               <p className="text-xs text-red-600">{errors.email}</p>
@@ -135,9 +141,11 @@ export default function RegisterPage() {
               type="password"
               value={form.password}
               onChange={set('password')}
-              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
                 errors.password ? 'border-red-600' : 'border-[var(--blush)]'
               }`}
+              placeholder="••••••••"
+              autoComplete="new-password"
             />
             {errors.password && (
               <p className="text-xs text-red-600">{errors.password}</p>
@@ -153,30 +161,32 @@ export default function RegisterPage() {
               type="password"
               value={form.confirm}
               onChange={set('confirm')}
-              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
                 errors.confirm ? 'border-red-600' : 'border-[var(--blush)]'
               }`}
+              placeholder="••••••••"
+              autoComplete="new-password"
             />
             {errors.confirm && (
               <p className="text-xs text-red-600">{errors.confirm}</p>
             )}
           </div>
 
-          {/* Submit */}
+          {/* Submit Button - Better touch target on mobile */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-[var(--deep)] text-[var(--cream)] text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-60"
+            className="w-full py-3 sm:py-3 bg-[var(--deep)] text-[var(--cream)] text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-60 transition-opacity active:scale-[0.98] font-medium"
           >
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-sm text-[var(--mid)] mt-4">
+          <p className="text-center text-xs sm:text-sm text-[var(--mid)] mt-2 sm:mt-4">
             Already have an account?{' '}
             <Link
               href="/login"
-              className="text-[var(--terracotta)] font-medium hover:underline"
+              className="text-[var(--terracotta)] font-medium hover:underline transition-colors"
             >
               Sign in
             </Link>
