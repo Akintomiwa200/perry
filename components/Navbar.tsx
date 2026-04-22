@@ -36,6 +36,8 @@ export default function Navbar() {
         boxShadow: scrolled ? '0 1px 0 rgba(192,120,88,.15)' : 'none',
         transition: 'background .4s, box-shadow .4s',
       }}>
+
+        {/* Logo */}
         <Link href="/" style={{
           fontFamily: "'Cormorant Garamond', serif",
           fontSize: '1.5rem', fontWeight: 600, letterSpacing: '.04em',
@@ -44,7 +46,7 @@ export default function Navbar() {
           Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
         </Link>
 
-        {/* Desktop links — original, untouched */}
+        {/* Middle nav links — CSS class controls desktop/mobile visibility, untouched */}
         <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
           {navLinks.map(([label, href]) => (
             <li key={label}>
@@ -62,16 +64,19 @@ export default function Navbar() {
           ))}
         </ul>
 
+        {/* Right side — CTA on desktop, hamburger on mobile, both in same div */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Desktop CTA — hidden on mobile, visible on desktop */}
+
+          {/* CTA: hidden on mobile, shown on desktop — no inline display so Tailwind wins */}
           <Link
             href={ctaLink}
             className="hidden md:inline-flex items-center"
             style={{
               fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
               background: 'var(--deep)', color: 'var(--cream)',
-              border: 'none', padding: '.65rem 1.4rem',
-              fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
+              padding: '.65rem 1.4rem',
+              fontFamily: "'Jost', sans-serif", fontWeight: 400,
+              transition: 'background .3s',
               textDecoration: 'none',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
@@ -80,13 +85,14 @@ export default function Navbar() {
             {ctaLabel}
           </Link>
 
-          {/* Hamburger — visible on mobile, hidden on desktop */}
+          {/* Hamburger: shown on mobile, hidden on desktop — no inline display so Tailwind wins */}
           <button
-            className="hidden max-md:flex flex-col"
+            className="md:hidden"
             onClick={() => setMenuOpen(o => !o)}
             style={{
               background: 'none', border: 'none', padding: '.4rem',
-              gap: '5px', cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', gap: '5px',
+              cursor: 'pointer',
             }}
             aria-label="Menu"
           >
@@ -95,7 +101,6 @@ export default function Navbar() {
               background: 'var(--deep)', borderRadius: 2,
               transition: 'transform .3s, opacity .3s',
               transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
-              opacity: menuOpen ? 1 : 1,
             }} />
             <span style={{
               display: 'block', width: 24, height: 2,
