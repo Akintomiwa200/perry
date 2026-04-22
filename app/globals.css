@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  /* Modern design system tokens (from first file) */
+  /* Modern design system tokens */
   --color-primary: #5D4432;
   --color-primary-hover: #4A3527;
   --color-primary-light: #7D6250;
@@ -33,7 +33,7 @@
   --shadow-md: 0 4px 12px rgba(62, 43, 30, 0.10);
   --shadow-lg: 0 8px 24px rgba(62, 43, 30, 0.12);
 
-  /* Artisan/boutique design tokens (from second file) */
+  /* Artisan/boutique design tokens */
   --cream: #fdf8f2;
   --blush: #e8c4b0;
   --terracotta: #c07858;
@@ -69,7 +69,7 @@
     overflow-x: hidden;
   }
 
-  /* Custom cursor from second file */
+  /* Custom cursor */
   * { cursor: none; }
 
   body::before {
@@ -106,7 +106,7 @@
 }
 
 @layer components {
-  /* ===== MODERN COMPONENTS (from first file) ===== */
+  /* ===== MODERN COMPONENTS ===== */
   
   /* Buttons */
   .btn {
@@ -222,7 +222,7 @@
   .badge-warning { background: #FEF3C7; color: var(--color-warning); }
   .badge-danger { background: var(--color-danger); color: #fff; }
 
-  /* ===== ARTISAN/BOUTIQUE COMPONENTS (from second file) ===== */
+  /* ===== ARTISAN/BOUTIQUE COMPONENTS ===== */
 
   /* Layout Helpers */
   .section-pad { padding: 6rem 5rem; }
@@ -297,12 +297,10 @@
     gap: 3rem;
     margin-bottom: 3rem;
   }
-
- 
 }
 
 @layer utilities {
-  /* Modern utilities (from first file) */
+  /* Modern utilities */
   .text-primary { color: var(--color-primary); }
   .text-muted { color: var(--color-text-muted); }
   .bg-surface { background-color: var(--color-surface); }
@@ -329,7 +327,7 @@
   .page-enter { animation: pageEnter 350ms ease forwards; }
   @keyframes pageEnter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Artisan animations (from second file) */
+  /* Artisan animations */
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
@@ -351,13 +349,10 @@
   }
 }
 
-/* ===== RESPONSIVE STYLES (from second file) ===== */
+/* ===== RESPONSIVE STYLES ===== */
+
 @media (max-width: 960px) {
   .section-pad { padding: 4rem 2.5rem; }
-
-  /* Nav */
-  .nav-links-desktop { display: none; }
-  .nav-mobile-btn { display: flex; }
 
   /* Hero */
   .hero-grid { grid-template-columns: 1fr; }
@@ -414,9 +409,9 @@
   .about-stats { gap: 1.5rem !important; }
 }
 
+/* ===== NAV VISIBILITY (mobile-first) ===== */
 
-
-/* Default: mobile first - hamburger visible, desktop nav hidden */
+/* Default: mobile — show hamburger, hide desktop nav */
 .nav-links-desktop {
   display: none;
 }
@@ -424,7 +419,7 @@
   display: flex;
 }
 
-/* Desktop view */
+/* Desktop: show nav links, hide hamburger */
 @media (min-width: 768px) {
   .nav-links-desktop {
     display: flex;
