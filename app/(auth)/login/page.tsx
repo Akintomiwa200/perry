@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import Input from '@/components/ui/Input';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
@@ -10,7 +11,7 @@ export default function LoginPage() {
   const { login, isLoading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validate = () => {
@@ -25,111 +26,90 @@ export default function LoginPage() {
     ev.preventDefault();
     if (!validate()) return;
     const result = await login({ email, password });
-    if (result.success) router.push('/shop');
+    if (result.success) router.push('/');
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
-      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-6 sm:p-10 shadow-md">
+    <div
+      className="p-6 sm:p-8 rounded-2xl w-full"
+      style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}
+    >
+      <div className="text-center mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
+          Welcome back
+        </h1>
+        <p className="text-xs sm:text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
+          Sign in to your account
+        </p>
+      </div>
+
+      {error && (
+        <div 
+          className="p-3 sm:p-4 rounded-xl mb-4 sm:mb-5 text-sm" 
+          style={{ background: '#FEE2E2', color: 'var(--color-danger)', borderLeft: '4px solid var(--color-danger)' }} 
+          role="alert"
+        >
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
+        <Input 
+          label="Email Address" 
+          type="email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          error={errors.email} 
+          placeholder="jane@example.com" 
+          autoComplete="email" 
+        />
         
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
-            Welcome back
-          </h1>
-          <p className="text-sm text-muted mt-2">
-            Sign in to your account
-          </p>
+        <div className="relative">
+          <Input 
+            label="Password" 
+            type={showPassword ? 'text' : 'password'} 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            error={errors.password} 
+            placeholder="Enter your password" 
+            autoComplete="current-password"
+            className="pr-12"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[38px] sm:top-[42px] text-muted hover:text-primary transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
         </div>
 
-        {/* Global error */}
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 border-l-4 border-red-600 rounded text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
-          
-          {/* Email */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-primary tracking-wide">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jane@example.com"
-              className={`input ${errors.email ? 'input-error' : ''}`}
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-            {errors.email && (
-              <p className="text-xs text-danger mt-1">{errors.email}</p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-primary tracking-wide">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPw ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className={`input ${errors.password ? 'input-error' : ''} pr-12`}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
-                aria-label={showPw ? 'Hide password' : 'Show password'}
-              >
-                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-xs text-danger mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Forgot Password */}
-          <div className="flex justify-end -mt-1">
-            <Link
-              href="/forgot-password"
-              className="text-sm text-primary hover:underline transition-colors"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="btn btn-primary w-full mt-2"
+        <div className="flex justify-end -mt-1">
+          <Link 
+            href="/forgot-password" 
+            className="text-xs sm:text-sm hover:underline transition-opacity" 
+            style={{ color: 'var(--color-primary)' }}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
+            Forgot password?
+          </Link>
+        </div>
 
-          {/* Footer */}
-          <p className="text-center text-sm text-muted mt-6">
-            Don&apos;t have an account?{' '}
-            <Link
-              href="/register"
-              className="text-primary font-semibold hover:underline transition-colors"
-            >
-              Create one
-            </Link>
-          </p>
-        </form>
-      </div>
-    </main>
+        <button 
+          type="submit" 
+          disabled={isLoading} 
+          className="btn btn-primary w-full py-3 sm:py-3.5 text-sm sm:text-base mt-2"
+        >
+          {isLoading ? 'Signing in...' : 'Sign In'}
+        </button>
+      </form>
+
+      <p className="text-center text-xs sm:text-sm mt-6" style={{ color: 'var(--color-text-muted)' }}>
+        Don't have an account?{' '}
+        <Link href="/register" className="font-medium hover:opacity-80 transition-opacity" style={{ color: 'var(--color-primary)' }}>
+          Create one
+        </Link>
+      </p>
+    </div>
   );
 }
