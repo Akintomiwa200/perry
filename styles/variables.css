@@ -1,0 +1,14 @@
+/* Re-exported design tokens for use in CSS Modules */
+:root {
+  --color-primary: #5D4432;
+  --color-primary-hover: #4A3527;
+  --color-secondary: #E9E3DD;
+  --color-surface: #F9F7F5;
+  --color-surface-raised: #FFFFFF;
+  --color-text: #3E2B1E;
+  --color-text-muted: #8C7B6E;
+  --color-border: #DDD5CE;
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+}
