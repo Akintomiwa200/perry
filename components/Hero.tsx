@@ -1,5 +1,11 @@
 'use client'
+import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
+
 export default function Hero() {
+  const isAuthenticated = useSelector((s: RootState) => !!s.auth.user)
+  
   return (
     <section className="hero-grid" style={{ position: 'relative', overflow: 'hidden' }}>
       {/* LEFT */}
@@ -36,26 +42,39 @@ export default function Hero() {
         </p>
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <button
-            style={{
-              background: 'var(--terracotta)', color: '#fff',
-              fontFamily: "'Jost', sans-serif", fontSize: '.78rem',
-              letterSpacing: '.16em', textTransform: 'uppercase',
-              padding: '1rem 2rem', border: 'none', transition: 'background .3s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-          >Explore Collection</button>
-          <button
-            style={{
+          {isAuthenticated ? (
+            <Link href="/shop" style={{
+                background: 'var(--terracotta)', color: '#fff',
+                fontFamily: "'Jost', sans-serif", fontSize: '.78rem',
+                letterSpacing: '.16em', textTransform: 'uppercase',
+                padding: '1rem 2rem', border: 'none', transition: 'background .3s',
+                textDecoration: 'none', display: 'inline-block',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--terracotta)')}
+            >Explore Collection</Link>
+          ) : (
+            <Link href="/login" style={{
+                background: 'var(--terracotta)', color: '#fff',
+                fontFamily: "'Jost', sans-serif", fontSize: '.78rem',
+                letterSpacing: '.16em', textTransform: 'uppercase',
+                padding: '1rem 2rem', border: 'none', transition: 'background .3s',
+                textDecoration: 'none', display: 'inline-block',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--terracotta)')}
+            >Shop Now</Link>
+          )}
+          <Link href="/about" style={{
               background: 'transparent', border: '1px solid var(--blush)',
               color: 'var(--deep)', fontFamily: "'Jost', sans-serif",
               fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
               padding: '1rem 1.8rem', transition: 'border-color .3s, color .3s',
+              textDecoration: 'none', display: 'inline-block',
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--terracotta)'; e.currentTarget.style.color = 'var(--terracotta)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--blush)'; e.currentTarget.style.color = 'var(--deep)' }}
-          >Our Story</button>
+          >Our Story</Link>
         </div>
       </div>
 

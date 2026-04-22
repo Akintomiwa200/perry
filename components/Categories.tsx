@@ -1,5 +1,6 @@
 'use client'
 import { useEffect } from 'react'
+import Link from 'next/link'
 
 const categories = [
   { name: 'Accessories', sub: 'Jewellery · Scarves · Bags', icon: '💍', grad: 'linear-gradient(135deg,#c9a96e,#d4806a)', span: true },
@@ -26,9 +27,9 @@ export default function Categories() {
           <div className="section-label">Browse</div>
           <h2 className="section-title">Shop by Category</h2>
         </div>
-        <a href="#" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
+        <Link href="/categories" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
           View all →
-        </a>
+        </Link>
       </div>
 
       <div className="reveal cat-grid">

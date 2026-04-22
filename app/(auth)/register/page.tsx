@@ -28,7 +28,7 @@ export default function RegisterPage() {
     ev.preventDefault();
     if (!validate()) return;
     const result = await register({ firstName: form.firstName, lastName: form.lastName, email: form.email, password: form.password });
-    if (result.success) router.push('/');
+    if (result.success) router.push('/shop');
   };
 
   return (

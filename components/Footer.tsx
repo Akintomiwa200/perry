@@ -8,6 +8,7 @@ type FooterLink = {
 }
 
 const shopLinks: FooterLink[] = [
+  { label: 'Shop All', href: '/shop' },
   { label: 'Accessories', href: '/shop?category=accessories' },
   { label: 'Footwear', href: '/shop?category=footwear' },
   { label: 'Wigs & Hair', href: '/shop?category=wigs' },

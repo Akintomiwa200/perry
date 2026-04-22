@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
 
 
 const navLinks = [
@@ -13,6 +15,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const isAuthenticated = useSelector((s: RootState) => !!s.auth.user)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -58,17 +61,32 @@ export default function Navbar() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <button
-            className="nav-links-desktop"
-            style={{
-              fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--deep)', color: 'var(--cream)',
-              border: 'none', padding: '.65rem 1.4rem',
-              fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
-          >Shop Now</button>
+          {isAuthenticated ? (
+            <Link href="/cart" title="Cart"
+              style={{
+                fontSize: '1.25rem',
+                background: 'transparent',
+                color: 'var(--deep)',
+                border: 'none',
+                padding: '.5rem',
+                textDecoration: 'none',
+                display: 'inline-block',
+              }}
+            >🛒</Link>
+          ) : (
+            <Link href="/login"
+              className="nav-links-desktop"
+              style={{
+                fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
+                background: 'var(--deep)', color: 'var(--cream)',
+                border: 'none', padding: '.65rem 1.4rem',
+                fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
+                textDecoration: 'none', display: 'inline-block',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
+            >Shop Now</Link>
+          )}
 
           {/* Hamburger */}
           <button
@@ -121,13 +139,25 @@ export default function Navbar() {
             {label}
           </Link>
         ))}
-        <button style={{
-          marginTop: '.5rem',
-          fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
-          background: 'var(--terracotta)', color: '#fff',
-          border: 'none', padding: '1rem',
-          fontFamily: "'Jost', sans-serif",
-        }}>Shop Now</button>
+        {isAuthenticated ? (
+            <Link href="/cart" onClick={() => setMenuOpen(false)} style={{
+              marginTop: '.5rem',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              background: 'var(--terracotta)', color: '#fff',
+              border: 'none', padding: '1rem',
+              fontFamily: "'Jost', sans-serif",
+              textDecoration: 'none', display: 'inline-block',
+            }}>Cart 🛒</Link>
+          ) : (
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+              marginTop: '.5rem',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              background: 'var(--terracotta)', color: '#fff',
+              border: 'none', padding: '1rem',
+              fontFamily: "'Jost', sans-serif",
+              textDecoration: 'none', display: 'inline-block',
+            }}>Shop Now</Link>
+          )}
       </div>
     </>
   )

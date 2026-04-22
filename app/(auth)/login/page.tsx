@@ -26,7 +26,7 @@ export default function LoginPage() {
     ev.preventDefault();
     if (!validate()) return;
     const result = await login({ email, password });
-    if (result.success) router.push('/');
+    if (result.success) router.push('/shop');
   };
 
   return (

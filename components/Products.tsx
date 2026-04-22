@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 
 const products = [
   { id: 1, icon: '💍', cat: 'Accessories', name: 'Gold Statement Necklace', price: '₦8,500', oldPrice: null, badge: 'New' },
@@ -68,9 +69,9 @@ export default function Products() {
           <div className="section-label">New In</div>
           <h2 className="section-title">Fresh Picks</h2>
         </div>
-        <a href="#" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
+        <Link href="/products" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
           View all →
-        </a>
+        </Link>
       </div>
       <div className="product-grid">
         {products.map(p => <ProductCard key={p.id} product={p} />)}
