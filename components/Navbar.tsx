@@ -27,134 +27,115 @@ export default function Navbar() {
 
   return (
     <>
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '1.2rem 2rem',
-        background: scrolled || menuOpen ? 'rgba(253,248,242,.96)' : 'transparent',
-        backdropFilter: scrolled || menuOpen ? 'blur(12px)' : 'none',
-        boxShadow: scrolled ? '0 1px 0 rgba(192,120,88,.15)' : 'none',
-        transition: 'background .4s, box-shadow .4s',
-      }}>
-        <Link href="/" style={{
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: '1.5rem', fontWeight: 600, letterSpacing: '.04em',
-          color: 'var(--deep)', textDecoration: 'none',
-        }}>
+      <nav
+        className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-8 py-5 transition-all"
+        style={{
+          background: scrolled || menuOpen ? 'rgba(253,248,242,.96)' : 'transparent',
+          backdropFilter: scrolled || menuOpen ? 'blur(12px)' : 'none',
+          boxShadow: scrolled ? '0 1px 0 var(--blush)' : 'none',
+        }}
+      >
+        {/* Logo */}
+        <Link href="/" className="text-[1.5rem] font-semibold tracking-wide"
+          style={{ fontFamily: "'Cormorant Garamond', serif", color: 'var(--deep)' }}
+        >
           Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
         </Link>
 
-        {/* Desktop links */}
-        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
+        {/* Desktop Links */}
+        <ul className="hidden md:flex gap-10 list-none">
           {navLinks.map(([label, href]) => (
             <li key={label}>
-              <Link href={href} style={{
-                fontSize: '.8rem',
-                letterSpacing: '.18em',
-                textTransform: 'uppercase',
-                color: 'var(--deep)',
-                textDecoration: 'none',
-                fontWeight: 400,
-              }}>
+              <Link
+                href={href}
+                className="text-[0.8rem] uppercase tracking-[0.18em]"
+                style={{ color: 'var(--deep)' }}
+              >
                 {label}
               </Link>
             </li>
           ))}
         </ul>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Desktop CTA Button */}
+        <div className="flex items-center gap-4">
+          {/* Desktop CTA */}
           <Link
             href={ctaLink}
-            className="nav-links-desktop"
+            className="hidden md:inline-block px-6 py-2 text-[0.75rem] uppercase tracking-[0.16em] transition-colors"
             style={{
-              fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--deep)', color: 'var(--cream)',
-              border: 'none', padding: '.65rem 1.4rem',
-              fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
-              textDecoration: 'none', display: 'inline-block',
+              background: 'var(--deep)',
+              color: 'var(--cream)',
+              fontFamily: "'Jost', sans-serif",
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
           >
             {ctaLabel}
           </Link>
 
-          {/* Hamburger */}
+          {/* Mobile Hamburger */}
           <button
-            className="nav-mobile-btn"
+            className="flex md:hidden flex-col gap-[5px]"
             onClick={() => setMenuOpen(o => !o)}
-            style={{
-              background: 'none', border: 'none', padding: '.4rem',
-              display: 'flex', flexDirection: 'column', gap: '5px',
-              cursor: 'pointer',
-            }}
             aria-label="Menu"
           >
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
-              opacity: menuOpen ? 1 : 1,
-            }} />
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              opacity: menuOpen ? 0 : 1,
-            }} />
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
-            }} />
+            <span
+              className="w-6 h-[2px] transition-all"
+              style={{
+                background: 'var(--deep)',
+                transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+              }}
+            />
+            <span
+              className="w-6 h-[2px] transition-all"
+              style={{
+                background: 'var(--deep)',
+                opacity: menuOpen ? 0 : 1,
+              }}
+            />
+            <span
+              className="w-6 h-[2px] transition-all"
+              style={{
+                background: 'var(--deep)',
+                transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+              }}
+            />
           </button>
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile Menu */}
       {menuOpen && (
-        <div style={{
-          position: 'fixed', top: '72px', left: 0, right: 0, zIndex: 99,
-          background: 'rgba(253,248,242,.98)', backdropFilter: 'blur(12px)',
-          display: 'flex', flexDirection: 'column', padding: '1.5rem 2rem 2rem',
-          borderBottom: '1px solid var(--blush)',
-          gap: '1.2rem',
-        }}>
+        <div
+          className="fixed top-[72px] left-0 right-0 z-[99] flex flex-col px-8 py-6 gap-5"
+          style={{
+            background: 'rgba(253,248,242,.98)',
+            backdropFilter: 'blur(12px)',
+            borderBottom: '1px solid var(--blush)',
+          }}
+        >
           {navLinks.map(([label, href]) => (
             <Link
               key={label}
               href={href}
               onClick={() => setMenuOpen(false)}
+              className="uppercase tracking-[0.18em] py-2 border-b"
               style={{
-                fontSize: '.85rem',
-                letterSpacing: '.18em',
-                textTransform: 'uppercase',
                 color: 'var(--deep)',
-                textDecoration: 'none',
-                fontWeight: 400,
-                padding: '.5rem 0',
-                borderBottom: '1px solid var(--blush)',
+                borderColor: 'var(--blush)',
               }}
             >
               {label}
             </Link>
           ))}
-          
-          {/* Single CTA in mobile menu */}
+
+          {/* Mobile CTA */}
           <Link
             href={ctaLink}
             onClick={() => setMenuOpen(false)}
+            className="mt-2 text-center py-4 uppercase tracking-[0.16em]"
             style={{
-              marginTop: '.5rem',
-              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--terracotta)', color: '#fff',
-              border: 'none', padding: '1rem',
+              background: 'var(--terracotta)',
+              color: '#fff',
               fontFamily: "'Jost', sans-serif",
-              textDecoration: 'none', display: 'inline-block',
-              textAlign: 'center',
             }}
           >
             {ctaLabel}
