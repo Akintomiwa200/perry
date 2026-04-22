@@ -2,7 +2,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-const navLinks = [['Shop', '#categories'], ['New In', '#new'], ['About', '#about'], ['Contact', '#contact']]
+
+const navLinks = [
+  ['Shop', '/shop'],
+  ['New In', '/shop?filter=new'],
+  ['About', '/about'],
+  ['Contact', '/contact']
+]
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -35,15 +41,18 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none' }}>
-          {navLinks.map(([label, href]) => (
+         {navLinks.map(([label, href]) => (
             <li key={label}>
-              <a href={href} style={{
-                fontSize: '.8rem', letterSpacing: '.18em', textTransform: 'uppercase',
-                color: 'var(--deep)', textDecoration: 'none', fontWeight: 400,
-              }}
-                onMouseEnter={e => (e.currentTarget.style.color = 'var(--terracotta)')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--deep)')}
-              >{label}</a>
+              <Link href={href} style={{
+                fontSize: '.8rem',
+                letterSpacing: '.18em',
+                textTransform: 'uppercase',
+                color: 'var(--deep)',
+                textDecoration: 'none',
+                fontWeight: 400,
+              }}>
+                {label}
+              </Link>
             </li>
           ))}
         </ul>
@@ -96,14 +105,21 @@ export default function Navbar() {
         gap: '1.2rem',
       }}>
         {navLinks.map(([label, href]) => (
-          <a key={label} href={href}
+          <Link key={label} href={href}
             onClick={() => setMenuOpen(false)}
             style={{
-              fontSize: '.85rem', letterSpacing: '.18em', textTransform: 'uppercase',
-              color: 'var(--deep)', textDecoration: 'none', fontWeight: 400,
-              padding: '.5rem 0', borderBottom: '1px solid var(--blush)',
+              fontSize: '.85rem',
+              letterSpacing: '.18em',
+              textTransform: 'uppercase',
+              color: 'var(--deep)',
+              textDecoration: 'none',
+              fontWeight: 400,
+              padding: '.5rem 0',
+              borderBottom: '1px solid var(--blush)',
             }}
-          >{label}</a>
+          >
+            {label}
+          </Link>
         ))}
         <button style={{
           marginTop: '.5rem',

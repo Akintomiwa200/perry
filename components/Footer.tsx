@@ -1,7 +1,13 @@
 'use client'
 import Link from 'next/link'
 
-const shopLinks = ['Accessories', 'Footwear', 'Wigs & Hair', 'Beauty', 'Handbags']
+const shopLinks = [
+  { label: 'Accessories', href: '/shop?category=accessories' },
+  { label: 'Footwear', href: '/shop?category=footwear' },
+  { label: 'Wigs & Hair', href: '/shop?category=wigs' },
+  { label: 'Beauty', href: '/shop?category=beauty' },
+  { label: 'Handbags', href: '/shop?category=handbags' }
+]
 const helpLinks = ['How to Order', 'Delivery Info', 'Returns Policy', 'Size Guide', 'FAQs']
 const contactLinks = ['Sango Ota, Ogun State', '@perrycollectibles', 'DM to Order', 'WhatsApp Us']
 
@@ -66,12 +72,12 @@ function FooterCol({ title, links }: { title: string; links: string[] }) {
       <h4 style={{ fontSize: '.72rem', letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '1.4rem' }}>{title}</h4>
       <ul style={{ listStyle: 'none' }}>
         {links.map(l => (
-          <li key={l} style={{ marginBottom: '.7rem' }}>
-            <a href="#" style={{ fontSize: '.84rem', color: 'rgba(253,248,242,.5)', textDecoration: 'none', transition: 'color .2s' }}
+          <li key={l.label} style={{ marginBottom: '.7rem' }}>
+            <Link href={l.href} style={{ fontSize: '.84rem', color: 'rgba(253,248,242,.5)', textDecoration: 'none', transition: 'color .2s' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--cream)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(253,248,242,.5)')}
-            >{l}</a>
-          </li>
+            >{l.label}</Link>
+             </li>
         ))}
       </ul>
     </div>
