@@ -298,11 +298,7 @@
     margin-bottom: 3rem;
   }
 
-  /* Navbar */
-  .nav-links-desktop { display: flex; }
-  .nav-mobile-btn { display: none; }
-  .mobile-menu { display: none; }
-  .mobile-menu.open { display: flex; }
+ 
 }
 
 @layer utilities {
