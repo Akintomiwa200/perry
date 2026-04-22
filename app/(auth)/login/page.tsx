@@ -11,7 +11,7 @@ export default function LoginPage() {
   const { login, isLoading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validate = () => {
@@ -31,82 +31,71 @@ export default function LoginPage() {
 
   return (
     <div
-      className="p-6 sm:p-8 rounded-2xl w-full"
+      className="p-8 rounded-2xl"
       style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}
     >
-      <div className="text-center mb-6 sm:mb-8">
-        <h1 className="text-xl sm:text-2xl font-bold" style={{ color: 'var(--color-text)' }}>
-          Welcome back
-        </h1>
-        <p className="text-xs sm:text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
-          Sign in to your account
-        </p>
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>Welcome back</h1>
+        <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>Sign in to your account</p>
       </div>
 
       {error && (
-        <div 
-          className="p-3 sm:p-4 rounded-xl mb-4 sm:mb-5 text-sm" 
-          style={{ background: '#FEE2E2', color: 'var(--color-danger)', borderLeft: '4px solid var(--color-danger)' }} 
+        <div
+          className="p-4 rounded-xl mb-5 text-sm"
+          style={{ background: '#FEE2E2', color: 'var(--color-danger)', borderLeft: '4px solid var(--color-danger)' }}
           role="alert"
         >
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
-        <Input 
-          label="Email Address" 
-          type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          error={errors.email} 
-          placeholder="jane@example.com" 
-          autoComplete="email" 
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        <Input
+          label="Email Address"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          error={errors.email}
+          placeholder="jane@example.com"
+          autoComplete="email"
         />
-        
-        <div className="relative">
-          <Input 
-            label="Password" 
-            type={showPassword ? 'text' : 'password'} 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            error={errors.password} 
-            placeholder="Enter your password" 
-            autoComplete="current-password"
-            className="pr-12"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-[38px] sm:top-[42px] text-muted hover:text-primary transition-colors"
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium" style={{ color: 'var(--color-text)' }}>Password</label>
+          <div className="relative">
+            <input
+              type={showPw ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`input pr-10${errors.password ? ' input-error' : ''}`}
+              placeholder="••••••••"
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPw(!showPw)}
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+              aria-label={showPw ? 'Hide password' : 'Show password'}
+            >
+              {showPw ? <EyeOff size={16} style={{ color: 'var(--color-text-muted)' }} /> : <Eye size={16} style={{ color: 'var(--color-text-muted)' }} />}
+            </button>
+          </div>
+          {errors.password && <p className="text-xs" style={{ color: 'var(--color-danger)' }} role="alert">{errors.password}</p>}
         </div>
 
-        <div className="flex justify-end -mt-1">
-          <Link 
-            href="/forgot-password" 
-            className="text-xs sm:text-sm hover:underline transition-opacity" 
-            style={{ color: 'var(--color-primary)' }}
-          >
+        <div className="flex justify-end">
+          <Link href="/forgot-password" className="text-xs" style={{ color: 'var(--color-primary)' }}>
             Forgot password?
           </Link>
         </div>
 
-        <button 
-          type="submit" 
-          disabled={isLoading} 
-          className="btn btn-primary w-full py-3 sm:py-3.5 text-sm sm:text-base mt-2"
-        >
+        <button type="submit" disabled={isLoading} className="btn btn-primary btn-lg w-full">
           {isLoading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
 
-      <p className="text-center text-xs sm:text-sm mt-6" style={{ color: 'var(--color-text-muted)' }}>
-        Don't have an account?{' '}
-        <Link href="/register" className="font-medium hover:opacity-80 transition-opacity" style={{ color: 'var(--color-primary)' }}>
+      <p className="text-center text-sm mt-6" style={{ color: 'var(--color-text-muted)' }}>
+        Don&apos;t have an account?{' '}
+        <Link href="/register" className="font-medium" style={{ color: 'var(--color-primary)' }}>
           Create one
         </Link>
       </p>
