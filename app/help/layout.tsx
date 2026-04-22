@@ -1,6 +1,8 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
 
 const helpLinks = [
   { href: '/help/how-to-order', label: 'How to Order', desc: 'Step-by-step guide to placing your order' },
@@ -15,44 +17,35 @@ export default function HelpLayout({ children }: { children: React.ReactNode }) 
   const isHub = pathname === '/help'
 
   return (
-    <div className="help-page">
-      <section className="help-hero">
-        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300, color: 'var(--deep)' }}>
-          Help Center
-        </h1>
-        <p style={{ color: 'var(--mid)', marginTop: '0.5rem' }}>How can we help you today?</p>
-      </section>
-
-      {isHub ? (
-        <div className="help-grid">
-          {helpLinks.map(link => (
-            <Link key={link.href} href={link.href} className="help-card">
-              <h3>{link.label}</h3>
-              <p>{link.desc}</p>
-            </Link>
-          ))}
+    <>
+      <Navbar />
+      <main style={{ padding: '8rem 1.5rem 4rem', maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300, color: 'var(--deep)' }}>
+            Help Center
+          </h1>
+          <p style={{ color: 'var(--mid)', marginTop: '0.5rem' }}>How can we help you today?</p>
         </div>
-      ) : (
-        <div className="help-content">
-          <Link href="/help" className="back-link">← Back to Help Center</Link>
-          {children}
-        </div>
-      )}
 
-      <style jsx>{`
-        .help-page { padding: 8rem 1.5rem 4rem; max-width: 1000px; margin: 0 auto; }
-        .help-hero { text-align: center; margin-bottom: 3rem; }
-        .help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-        .help-card {
-          background: var(--cream); padding: 2rem; border: 1px solid var(--blush);
-          text-decoration: none; transition: all 0.3s;
-        }
-        .help-card:hover { border-color: var(--terracotta); transform: translateY(-2px); }
-        .help-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--deep); margin-bottom: 0.5rem; }
-        .help-card p { font-size: 0.9rem; color: var(--mid); }
-        .help-content { background: var(--cream); padding: 2.5rem; border: 1px solid var(--blush); }
-        .back-link { display: inline-block; margin-bottom: 1.5rem; color: var(--terracotta); text-decoration: none; font-size: 0.85rem; }
-      `}</style>
-    </div>
+        {isHub ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            {helpLinks.map(link => (
+              <Link key={link.href} href={link.href} style={{
+                background: 'var(--cream)', padding: '2rem', border: '1px solid var(--blush)',
+                textDecoration: 'none', transition: 'all 0.3s',
+              }}>
+                <h3 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', color: 'var(--deep)', marginBottom: '0.5rem' }}>{link.label}</h3>
+                <p style={{ fontSize: '.9rem', color: 'var(--mid)' }}>{link.desc}</p>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div style={{ background: 'var(--cream)', padding: '2.5rem', border: '1px solid var(--blush)' }}>
+            {children}
+          </div>
+        )}
+      </main>
+      <Footer />
+    </>
   )
 }

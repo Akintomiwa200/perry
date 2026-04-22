@@ -3,7 +3,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import Input from '@/components/ui/Input';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -32,46 +33,108 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className="p-8 rounded-2xl"
-      style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}
-    >
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>Create your account</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>Join thousands of collectors</p>
-      </div>
+    <>
+      <Navbar />
+      <main style={{ padding: '8rem 1.5rem 4rem', maxWidth: '480px', margin: '0 auto' }}>
+        <div style={{ padding: '2.5rem', background: 'var(--cream)', borderRadius: 4, border: '1px solid var(--blush)' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '2rem', fontWeight: 300, color: 'var(--deep)' }}>Create your account</h1>
+            <p style={{ fontSize: '.9rem', color: 'var(--mid)', marginTop: '0.5rem' }}>Join thousands of collectors</p>
+          </div>
 
-      {error && (
-        <div className="p-4 rounded-xl mb-5 text-sm" style={{ background: '#FEE2E2', color: 'var(--color-danger)', borderLeft: '4px solid var(--color-danger)' }} role="alert">
-          {error}
+          {error && (
+            <div style={{ padding: '1rem', marginBottom: '1.25rem', background: '#FEE2E2', color: '#991b1b', borderLeft: '4px solid #991b1b', borderRadius: 4, fontSize: '.85rem' }}>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <label style={{ fontSize: '.75rem', color: 'var(--deep)', fontWeight: 500 }}>First Name</label>
+                <input
+                  type="text"
+                  value={form.firstName}
+                  onChange={set('firstName')}
+                  placeholder="Jane"
+                  style={{ padding: '0.75rem', borderRadius: 4, border: errors.firstName ? '1px solid #991b1b' : '1px solid var(--blush)', fontSize: '.9rem', background: '#fff' }}
+                />
+                {errors.firstName && <p style={{ fontSize: '.75rem', color: '#991b1b' }}>{errors.firstName}</p>}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <label style={{ fontSize: '.75rem', color: 'var(--deep)', fontWeight: 500 }}>Last Name</label>
+                <input
+                  type="text"
+                  value={form.lastName}
+                  onChange={set('lastName')}
+                  placeholder="Doe"
+                  style={{ padding: '0.75rem', borderRadius: 4, border: errors.lastName ? '1px solid #991b1b' : '1px solid var(--blush)', fontSize: '.9rem', background: '#fff' }}
+                />
+                {errors.lastName && <p style={{ fontSize: '.75rem', color: '#991b1b' }}>{errors.lastName}</p>}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '.75rem', color: 'var(--deep)', fontWeight: 500 }}>Email Address</label>
+              <input
+                type="email"
+                value={form.email}
+                onChange={set('email')}
+                placeholder="jane@example.com"
+                style={{ padding: '0.75rem', borderRadius: 4, border: errors.email ? '1px solid #991b1b' : '1px solid var(--blush)', fontSize: '.9rem', background: '#fff' }}
+              />
+              {errors.email && <p style={{ fontSize: '.75rem', color: '#991b1b' }}>{errors.email}</p>}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '.75rem', color: 'var(--deep)', fontWeight: 500 }}>Password</label>
+              <input
+                type="password"
+                value={form.password}
+                onChange={set('password')}
+                placeholder="Min. 8 characters"
+                style={{ padding: '0.75rem', borderRadius: 4, border: errors.password ? '1px solid #991b1b' : '1px solid var(--blush)', fontSize: '.9rem', background: '#fff' }}
+              />
+              {errors.password && <p style={{ fontSize: '.75rem', color: '#991b1b' }}>{errors.password}</p>}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+              <label style={{ fontSize: '.75rem', color: 'var(--deep)', fontWeight: 500 }}>Confirm Password</label>
+              <input
+                type="password"
+                value={form.confirm}
+                onChange={set('confirm')}
+                placeholder="Re-enter password"
+                style={{ padding: '0.75rem', borderRadius: 4, border: errors.confirm ? '1px solid #991b1b' : '1px solid var(--blush)', fontSize: '.9rem', background: '#fff' }}
+              />
+              {errors.confirm && <p style={{ fontSize: '.75rem', color: '#991b1b' }}>{errors.confirm}</p>}
+            </div>
+
+            <p style={{ fontSize: '.75rem', color: 'var(--mid)' }}>
+              By creating an account you agree to our{' '}
+              <Link href="/terms" style={{ color: 'var(--terracotta)', textDecoration: 'underline' }}>Terms of Service</Link>{' '}
+              and{' '}
+              <Link href="/privacy" style={{ color: 'var(--terracotta)', textDecoration: 'underline' }}>Privacy Policy</Link>.
+            </p>
+
+            <button type="submit" disabled={isLoading} style={{
+              background: 'var(--deep)', color: 'var(--cream)',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              padding: '1rem', border: 'none', cursor: 'pointer',
+            }}>
+              {isLoading ? 'Creating account...' : 'Create Account'}
+            </button>
+          </form>
+
+          <p style={{ textAlign: 'center', fontSize: '.85rem', marginTop: '1.5rem', color: 'var(--mid)' }}>
+            Already have an account?{' '}
+            <Link href="/login" style={{ color: 'var(--terracotta)', fontWeight: 500, textDecoration: 'none' }}>
+              Sign in
+            </Link>
+          </p>
         </div>
-      )}
-
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Input label="First Name" value={form.firstName} onChange={set('firstName')} error={errors.firstName} placeholder="Jane" autoComplete="given-name" />
-          <Input label="Last Name" value={form.lastName} onChange={set('lastName')} error={errors.lastName} placeholder="Doe" autoComplete="family-name" />
-        </div>
-        <Input label="Email Address" type="email" value={form.email} onChange={set('email')} error={errors.email} placeholder="jane@example.com" autoComplete="email" />
-        <Input label="Password" type="password" value={form.password} onChange={set('password')} error={errors.password} placeholder="Min. 8 characters" autoComplete="new-password" />
-        <Input label="Confirm Password" type="password" value={form.confirm} onChange={set('confirm')} error={errors.confirm} placeholder="Re-enter password" autoComplete="new-password" />
-
-        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-          By creating an account you agree to our{' '}
-          <Link href="/terms" className="underline" style={{ color: 'var(--color-primary)' }}>Terms of Service</Link>{' '}
-          and{' '}
-          <Link href="/privacy" className="underline" style={{ color: 'var(--color-primary)' }}>Privacy Policy</Link>.
-        </p>
-
-        <button type="submit" disabled={isLoading} className="btn btn-primary btn-lg w-full">
-          {isLoading ? 'Creating account...' : 'Create Account'}
-        </button>
-      </form>
-
-      <p className="text-center text-sm mt-6" style={{ color: 'var(--color-text-muted)' }}>
-        Already have an account?{' '}
-        <Link href="/login" className="font-medium" style={{ color: 'var(--color-primary)' }}>Sign in</Link>
-      </p>
-    </div>
+      </main>
+      <Footer />
+    </>
   );
 }

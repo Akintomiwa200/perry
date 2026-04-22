@@ -1,10 +1,9 @@
 'use client';
 import { useState } from 'react';
-import Header from '@/components/layout/Header';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import Link from 'next/link';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import Input from '@/components/ui/Input';
-import { Mail, MessageSquare, Clock, CheckCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
@@ -20,70 +19,72 @@ export default function ContactPage() {
   return (
     <>
       <Navbar />
-      <Header />
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 page-enter">
-        <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-text)' }}>Contact Us</h1>
-        <p className="text-base mb-12" style={{ color: 'var(--color-text-muted)' }}>
-          Have a question? We'd love to hear from you.
-        </p>
+      <main style={{ padding: '8rem 1.5rem 4rem', maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.5rem, 5vw, 4rem)', fontWeight: 300, color: 'var(--deep)' }}>
+            Contact Us
+          </h1>
+          <p style={{ color: 'var(--mid)', marginTop: '0.5rem' }}>
+            Have a question? We&apos;d love to hear from you.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
           {/* Info */}
-          <div className="flex flex-col gap-6">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {[
-              { icon: Mail, title: 'Email', value: 'hello@perrycollectibles.com', sub: 'We reply within 24 hours' },
-              { icon: MessageSquare, title: 'Live Chat', value: 'Available on site', sub: 'Mon–Fri, 9am–6pm PT' },
-              { icon: Clock, title: 'Response Time', value: '< 24 hours', sub: 'Usually much faster' },
-            ].map(({ icon: Icon, title, value, sub }) => (
-              <div key={title} className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'var(--color-secondary)' }}>
-                  <Icon size={16} style={{ color: 'var(--color-primary)' }} />
+              { title: 'Email', value: 'hello@perrycollectibles.com', sub: 'We reply within 24 hours' },
+              { title: 'Instagram', value: '@perrycollectibles', sub: 'DM us anytime' },
+              { title: 'WhatsApp', value: '+234 000 000 0000', sub: 'Mon–Fri, 9am–6pm' },
+            ].map(({ title, value, sub }) => (
+              <div key={title} style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, background: 'var(--light-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  ✉️
                 </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{title}</p>
-                  <p className="text-sm" style={{ color: 'var(--color-text)' }}>{value}</p>
-                  <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{sub}</p>
+                  <p style={{ fontSize: '.9rem', fontWeight: 500, color: 'var(--deep)' }}>{title}</p>
+                  <p style={{ fontSize: '.9rem', color: 'var(--deep)' }}>{value}</p>
+                  <p style={{ fontSize: '.75rem', color: 'var(--mid)' }}>{sub}</p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Form */}
-          <div className="lg:col-span-2">
+          <div>
             {sent ? (
-              <div
-                className="p-8 rounded-2xl text-center flex flex-col items-center gap-4"
-                style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
-              >
-                <CheckCircle size={48} style={{ color: 'var(--color-success)' }} />
-                <h2 className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>Message sent!</h2>
-                <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  Thanks for reaching out, {form.name}. We'll get back to you within 24 hours.
+              <div style={{ padding: '2.5rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)', textAlign: 'center' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✅</div>
+                <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.8rem', color: 'var(--deep)', marginBottom: '0.5rem' }}>Message sent!</h2>
+                <p style={{ fontSize: '.9rem', color: 'var(--mid)' }}>
+                  Thanks for reaching out, {form.name}. We&apos;ll get back to you within 24 hours.
                 </p>
               </div>
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="p-6 rounded-2xl flex flex-col gap-4"
-                style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)' }}
+                style={{ padding: '2rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)' }}
               >
-                <div className="grid grid-cols-2 gap-4">
-                  <Input label="Your Name" value={form.name} onChange={set('name')} placeholder="Jane Doe" required />
-                  <Input label="Email Address" type="email" value={form.email} onChange={set('email')} placeholder="jane@example.com" required />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <Input label="Your Name" value={form.name} onChange={set('name')} placeholder="Jane Doe" />
+                  <Input label="Email Address" type="email" value={form.email} onChange={set('email')} placeholder="jane@example.com" />
                 </div>
-                <Input label="Subject" value={form.subject} onChange={set('subject')} placeholder="Order question, product inquiry..." required />
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-medium" style={{ color: 'var(--color-text)' }}>Message</label>
+                <Input label="Subject" value={form.subject} onChange={set('subject')} placeholder="Order question..." />
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ display: 'block', fontSize: '.75rem', color: 'var(--deep)', marginBottom: '0.5rem' }}>Message</label>
                   <textarea
                     value={form.message}
                     onChange={set('message')}
                     rows={5}
                     placeholder="Tell us how we can help..."
-                    className="input h-auto py-3 resize-none"
-                    required
+                    style={{ width: '100%', padding: '0.75rem', borderRadius: 4, border: '1px solid var(--blush)', background: '#fff', fontFamily: 'inherit', fontSize: '.9rem' }}
                   />
                 </div>
-                <button type="submit" className="btn btn-primary btn-lg self-start px-10">Send Message</button>
+                <button type="submit" style={{
+                  background: 'var(--deep)', color: 'var(--cream)',
+                  fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+                  padding: '1rem 2rem', border: 'none', cursor: 'pointer',
+                }}>Send Message</button>
               </form>
             )}
           </div>

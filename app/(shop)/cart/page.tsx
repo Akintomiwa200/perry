@@ -1,48 +1,63 @@
 'use client';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import CartItem from '@/components/cart/CartItem';
 import CartSummary from '@/components/cart/CartSummary';
 import Link from 'next/link';
-import { ShoppingBag } from 'lucide-react';
 
 export default function CartPage() {
   const { items } = useSelector((s: RootState) => s.cart);
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8" style={{ color: 'var(--color-text)' }}>
-        Your Cart
-        {items.length > 0 && (
-          <span className="ml-3 text-base font-normal" style={{ color: 'var(--color-text-muted)' }}>
-            ({items.length} {items.length === 1 ? 'item' : 'items'})
-          </span>
-        )}
-      </h1>
+    <>
+      <Navbar />
+      <main style={{ padding: '8rem 1.5rem 4rem', maxWidth: '1200px', margin: '0 auto' }}>
+        <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 300, color: 'var(--deep)', marginBottom: '2rem' }}>
+          Your Cart
+          {items.length > 0 && (
+            <span style={{ fontSize: '1rem', fontWeight: 400, color: 'var(--mid)', marginLeft: '0.75rem' }}>
+              ({items.length} {items.length === 1 ? 'item' : 'items'})
+            </span>
+          )}
+        </h1>
 
-      {items.length === 0 ? (
-        <div className="text-center py-24 flex flex-col items-center gap-4">
-          <ShoppingBag size={56} style={{ color: 'var(--color-border)' }} />
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--color-text)' }}>Your cart is empty</h2>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-            Add some collectibles to get started.
-          </p>
-          <Link href="/shop" className="btn btn-primary btn-lg mt-2">
-            Start Shopping
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {items.map((item) => (
-              <CartItem key={item.id} item={item} />
-            ))}
+        {items.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '6rem 2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ fontSize: '3.5rem' }}>🛒</div>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', color: 'var(--deep)' }}>Your cart is empty</h2>
+            <p style={{ fontSize: '.9rem', color: 'var(--mid)' }}>
+              Add some items to get started.
+            </p>
+            <Link href="/shop" style={{
+              background: 'var(--terracotta)', color: '#fff',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              padding: '1rem 2rem', border: 'none', textDecoration: 'none', display: 'inline-block', marginTop: '0.5rem',
+            }}>
+              Continue Shopping
+            </Link>
           </div>
-          <div className="lg:col-span-1">
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '3rem', alignItems: 'start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {items.map((item) => (
+                <CartItem key={item.productId} item={item} />
+              ))}
+            </div>
             <CartSummary />
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        <style jsx>{`
+          @media (max-width: 900px) {
+            div[style*="grid-template-columns"] {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
+      </main>
+      <Footer />
+    </>
   );
 }
