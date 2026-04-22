@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,8 +17,6 @@ export default function RegisterPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [field]: e.target.value }));
@@ -51,153 +48,135 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
-      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-6 sm:p-10 shadow-md">
-        
+    <main className="min-h-screen flex items-center justify-center px-4 py-20 bg-[var(--bg-light)]">
+      <div className="w-full max-w-md bg-[var(--cream)] border border-[var(--blush)] rounded-lg p-6 sm:p-10">
+
         {/* Header */}
-        <div className="text-center mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
-            Create account
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-light font-serif text-[var(--deep)]">
+            Create your account
           </h1>
-          <p className="text-sm text-muted mt-2">
+          <p className="text-sm text-[var(--mid)] mt-2">
             Join thousands of collectors
           </p>
         </div>
 
         {/* Global error */}
         {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 border-l-4 border-red-600 rounded text-sm">
+          <div className="mb-4 p-3 bg-red-100 text-red-700 border-l-4 border-red-700 rounded text-sm">
             {error}
           </div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-            
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
             {/* First Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-primary tracking-wide">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[var(--deep)]">
                 First Name
               </label>
               <input
                 value={form.firstName}
                 onChange={set('firstName')}
-                className={`input ${errors.firstName ? 'input-error' : ''}`}
-                placeholder="John"
+                className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                  errors.firstName ? 'border-red-600' : 'border-[var(--blush)]'
+                }`}
               />
               {errors.firstName && (
-                <p className="text-xs text-danger mt-1">{errors.firstName}</p>
+                <p className="text-xs text-red-600">{errors.firstName}</p>
               )}
             </div>
 
             {/* Last Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-primary tracking-wide">
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-[var(--deep)]">
                 Last Name
               </label>
               <input
                 value={form.lastName}
                 onChange={set('lastName')}
-                className={`input ${errors.lastName ? 'input-error' : ''}`}
-                placeholder="Doe"
+                className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                  errors.lastName ? 'border-red-600' : 'border-[var(--blush)]'
+                }`}
               />
               {errors.lastName && (
-                <p className="text-xs text-danger mt-1">{errors.lastName}</p>
+                <p className="text-xs text-red-600">{errors.lastName}</p>
               )}
             </div>
           </div>
 
           {/* Email */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-primary tracking-wide">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[var(--deep)]">
               Email
             </label>
             <input
-              type="email"
               value={form.email}
               onChange={set('email')}
-              className={`input ${errors.email ? 'input-error' : ''}`}
-              placeholder="hello@example.com"
-              autoCapitalize="none"
-              autoComplete="email"
+              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                errors.email ? 'border-red-600' : 'border-[var(--blush)]'
+              }`}
             />
             {errors.email && (
-              <p className="text-xs text-danger mt-1">{errors.email}</p>
+              <p className="text-xs text-red-600">{errors.email}</p>
             )}
           </div>
 
           {/* Password */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-primary tracking-wide">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[var(--deep)]">
               Password
             </label>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={form.password}
-                onChange={set('password')}
-                className={`input ${errors.password ? 'input-error' : ''} pr-12`}
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+            <input
+              type="password"
+              value={form.password}
+              onChange={set('password')}
+              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                errors.password ? 'border-red-600' : 'border-[var(--blush)]'
+              }`}
+            />
             {errors.password && (
-              <p className="text-xs text-danger mt-1">{errors.password}</p>
+              <p className="text-xs text-red-600">{errors.password}</p>
             )}
           </div>
 
           {/* Confirm Password */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-primary tracking-wide">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-medium text-[var(--deep)]">
               Confirm Password
             </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={form.confirm}
-                onChange={set('confirm')}
-                className={`input ${errors.confirm ? 'input-error' : ''} pr-12`}
-                placeholder="••••••••"
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
+            <input
+              type="password"
+              value={form.confirm}
+              onChange={set('confirm')}
+              className={`px-3 py-3 border rounded text-sm bg-white outline-none ${
+                errors.confirm ? 'border-red-600' : 'border-[var(--blush)]'
+              }`}
+            />
             {errors.confirm && (
-              <p className="text-xs text-danger mt-1">{errors.confirm}</p>
+              <p className="text-xs text-red-600">{errors.confirm}</p>
             )}
           </div>
 
-          {/* Submit Button */}
+          {/* Submit */}
           <button
             type="submit"
             disabled={isLoading}
-            className="btn btn-primary w-full mt-2"
+            className="w-full py-3 bg-[var(--deep)] text-[var(--cream)] text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-60"
           >
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-sm text-muted mt-6">
+          <p className="text-center text-sm text-[var(--mid)] mt-4">
             Already have an account?{' '}
             <Link
               href="/login"
-              className="text-primary font-semibold hover:underline transition-colors"
+              className="text-[var(--terracotta)] font-medium hover:underline"
             >
               Sign in
             </Link>
