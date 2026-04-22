@@ -3,8 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,7 +33,7 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Navbar />
+     
       <main style={{ padding: '8rem 1.5rem 4rem', maxWidth: '480px', margin: '0 auto' }}>
         <div style={{ padding: '2.5rem', background: 'var(--cream)', borderRadius: 4, border: '1px solid var(--blush)' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -134,7 +133,7 @@ export default function RegisterPage() {
           </p>
         </div>
       </main>
-      <Footer />
+     
     </>
   );
 }
