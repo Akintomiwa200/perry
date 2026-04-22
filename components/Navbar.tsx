@@ -44,8 +44,8 @@ export default function Navbar() {
           Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
         </Link>
 
-        {/* Desktop links */}
-        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
+        {/* Desktop links — hidden on mobile, flex on md+ */}
+        <ul className="hidden md:flex" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
           {navLinks.map(([label, href]) => (
             <li key={label}>
               <Link href={href} style={{
@@ -63,16 +63,16 @@ export default function Navbar() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Desktop CTA Button */}
+          {/* Desktop CTA — hidden on mobile, inline-flex on md+ */}
           <Link
             href={ctaLink}
-            className="nav-links-desktop"
+            className="hidden md:inline-flex items-center"
             style={{
               fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
               background: 'var(--deep)', color: 'var(--cream)',
               border: 'none', padding: '.65rem 1.4rem',
               fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
-              textDecoration: 'none', display: 'inline-block',
+              textDecoration: 'none',
             }}
             onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
@@ -80,14 +80,13 @@ export default function Navbar() {
             {ctaLabel}
           </Link>
 
-          {/* Hamburger */}
+          {/* Hamburger — visible on mobile, hidden on md+ */}
           <button
-            className="nav-mobile-btn"
+            className="flex md:hidden flex-col"
             onClick={() => setMenuOpen(o => !o)}
             style={{
               background: 'none', border: 'none', padding: '.4rem',
-              display: 'flex', flexDirection: 'column', gap: '5px',
-              cursor: 'pointer',
+              gap: '5px', cursor: 'pointer',
             }}
             aria-label="Menu"
           >
@@ -96,12 +95,11 @@ export default function Navbar() {
               background: 'var(--deep)', borderRadius: 2,
               transition: 'transform .3s, opacity .3s',
               transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
-              opacity: menuOpen ? 1 : 1,
             }} />
             <span style={{
               display: 'block', width: 24, height: 2,
               background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
+              transition: 'opacity .3s',
               opacity: menuOpen ? 0 : 1,
             }} />
             <span style={{
@@ -114,7 +112,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu — only renders when open */}
       {menuOpen && (
         <div style={{
           position: 'fixed', top: '72px', left: 0, right: 0, zIndex: 99,
@@ -142,8 +140,8 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          
-          {/* Single CTA in mobile menu */}
+
+          {/* CTA in mobile menu */}
           <Link
             href={ctaLink}
             onClick={() => setMenuOpen(false)}
@@ -153,7 +151,7 @@ export default function Navbar() {
               background: 'var(--terracotta)', color: '#fff',
               border: 'none', padding: '1rem',
               fontFamily: "'Jost', sans-serif",
-              textDecoration: 'none', display: 'inline-block',
+              textDecoration: 'none', display: 'block',
               textAlign: 'center',
             }}
           >
