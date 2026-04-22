@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -17,6 +18,8 @@ export default function RegisterPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const set = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((p) => ({ ...p, [field]: e.target.value }));
@@ -48,15 +51,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-[#F9F7F5]">
-      <div className="w-full max-w-md bg-white border border-[#DDD5CE] rounded-lg p-6 sm:p-10 shadow-lg">
+    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
+      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-6 sm:p-10 shadow-md">
         
         {/* Header */}
         <div className="text-center mb-8 sm:mb-10">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-[#3E2B1E]">
+          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
             Create account
           </h1>
-          <p className="text-sm text-[#8C7B6E] mt-2">
+          <p className="text-sm text-muted mt-2">
             Join thousands of collectors
           </p>
         </div>
@@ -74,109 +77,109 @@ export default function RegisterPage() {
             
             {/* First Name */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
+              <label className="text-xs font-medium text-primary tracking-wide">
                 First Name
               </label>
               <input
                 value={form.firstName}
                 onChange={set('firstName')}
-                className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
-                  errors.firstName 
-                    ? 'border-red-500 focus:ring-red-200' 
-                    : 'border-[#DDD5CE] hover:border-[#5D4432]'
-                }`}
+                className={`input ${errors.firstName ? 'input-error' : ''}`}
                 placeholder="John"
               />
               {errors.firstName && (
-                <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>
+                <p className="text-xs text-danger mt-1">{errors.firstName}</p>
               )}
             </div>
 
             {/* Last Name */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
+              <label className="text-xs font-medium text-primary tracking-wide">
                 Last Name
               </label>
               <input
                 value={form.lastName}
                 onChange={set('lastName')}
-                className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
-                  errors.lastName 
-                    ? 'border-red-500 focus:ring-red-200' 
-                    : 'border-[#DDD5CE] hover:border-[#5D4432]'
-                }`}
+                className={`input ${errors.lastName ? 'input-error' : ''}`}
                 placeholder="Doe"
               />
               {errors.lastName && (
-                <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>
+                <p className="text-xs text-danger mt-1">{errors.lastName}</p>
               )}
             </div>
           </div>
 
           {/* Email */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
+            <label className="text-xs font-medium text-primary tracking-wide">
               Email
             </label>
             <input
               type="email"
               value={form.email}
               onChange={set('email')}
-              className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
-                errors.email 
-                  ? 'border-red-500 focus:ring-red-200' 
-                  : 'border-[#DDD5CE] hover:border-[#5D4432]'
-              }`}
+              className={`input ${errors.email ? 'input-error' : ''}`}
               placeholder="hello@example.com"
               autoCapitalize="none"
               autoComplete="email"
             />
             {errors.email && (
-              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+              <p className="text-xs text-danger mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
+            <label className="text-xs font-medium text-primary tracking-wide">
               Password
             </label>
-            <input
-              type="password"
-              value={form.password}
-              onChange={set('password')}
-              className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
-                errors.password 
-                  ? 'border-red-500 focus:ring-red-200' 
-                  : 'border-[#DDD5CE] hover:border-[#5D4432]'
-              }`}
-              placeholder="••••••••"
-              autoComplete="new-password"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={form.password}
+                onChange={set('password')}
+                className={`input ${errors.password ? 'input-error' : ''} pr-12`}
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {errors.password && (
-              <p className="text-xs text-red-600 mt-1">{errors.password}</p>
+              <p className="text-xs text-danger mt-1">{errors.password}</p>
             )}
           </div>
 
           {/* Confirm Password */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
+            <label className="text-xs font-medium text-primary tracking-wide">
               Confirm Password
             </label>
-            <input
-              type="password"
-              value={form.confirm}
-              onChange={set('confirm')}
-              className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
-                errors.confirm 
-                  ? 'border-red-500 focus:ring-red-200' 
-                  : 'border-[#DDD5CE] hover:border-[#5D4432]'
-              }`}
-              placeholder="••••••••"
-              autoComplete="new-password"
-            />
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={form.confirm}
+                onChange={set('confirm')}
+                className={`input ${errors.confirm ? 'input-error' : ''} pr-12`}
+                placeholder="••••••••"
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-primary transition-colors"
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             {errors.confirm && (
-              <p className="text-xs text-red-600 mt-1">{errors.confirm}</p>
+              <p className="text-xs text-danger mt-1">{errors.confirm}</p>
             )}
           </div>
 
@@ -184,17 +187,17 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 sm:py-4 bg-[#5D4432] text-white text-xs sm:text-sm uppercase tracking-wider rounded-lg hover:bg-[#4A3527] disabled:opacity-60 disabled:cursor-not-allowed transition-all active:scale-[0.98] font-medium mt-2"
+            className="btn btn-primary w-full mt-2"
           >
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-xs sm:text-sm text-[#8C7B6E] mt-6">
+          <p className="text-center text-sm text-muted mt-6">
             Already have an account?{' '}
             <Link
               href="/login"
-              className="text-[#5D4432] font-semibold hover:underline transition-colors"
+              className="text-primary font-semibold hover:underline transition-colors"
             >
               Sign in
             </Link>
