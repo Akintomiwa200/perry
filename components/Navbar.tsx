@@ -14,12 +14,20 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const isAuthenticated = useSelector((s: RootState) => !!s.auth.user)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
   }, [])
 
   const ctaLink = isAuthenticated ? '/cart' : '/login'
@@ -46,80 +54,81 @@ export default function Navbar() {
           Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
         </Link>
 
-        {/* Middle nav links — CSS class controls desktop/mobile visibility, untouched */}
-        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
-          {navLinks.map(([label, href]) => (
-            <li key={label}>
-              <Link href={href} style={{
-                fontSize: '.8rem',
-                letterSpacing: '.18em',
-                textTransform: 'uppercase',
-                color: 'var(--deep)',
-                textDecoration: 'none',
-                fontWeight: 400,
-              }}>
-                {label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {/* Desktop nav links */}
+        {!isMobile && (
+          <ul style={{ display: 'flex', gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
+            {navLinks.map(([label, href]) => (
+              <li key={label}>
+                <Link href={href} style={{
+                  fontSize: '.8rem',
+                  letterSpacing: '.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--deep)',
+                  textDecoration: 'none',
+                  fontWeight: 400,
+                }}>
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
 
-        {/* Right side — CTA on desktop, hamburger on mobile, both in same div */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* Desktop CTA */}
+          {!isMobile && (
+            <Link
+              href={ctaLink}
+              style={{
+                fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
+                background: 'var(--deep)', color: 'var(--cream)',
+                border: 'none', padding: '.65rem 1.4rem',
+                fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
+                textDecoration: 'none', display: 'inline-block',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
+            >
+              {ctaLabel}
+            </Link>
+          )}
 
-          {/* CTA: hidden on mobile, shown on desktop — no inline display so Tailwind wins */}
-          <Link
-            href={ctaLink}
-            className="hidden md:inline-flex items-center"
-            style={{
-              fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--deep)', color: 'var(--cream)',
-              padding: '.65rem 1.4rem',
-              fontFamily: "'Jost', sans-serif", fontWeight: 400,
-              transition: 'background .3s',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
-          >
-            {ctaLabel}
-          </Link>
-
-          {/* Hamburger: shown on mobile, hidden on desktop — no inline display so Tailwind wins */}
-          <button
-            className="md:hidden"
-            onClick={() => setMenuOpen(o => !o)}
-            style={{
-              background: 'none', border: 'none', padding: '.4rem',
-              display: 'flex', flexDirection: 'column', gap: '5px',
-              cursor: 'pointer',
-            }}
-            aria-label="Menu"
-          >
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
-            }} />
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              opacity: menuOpen ? 0 : 1,
-            }} />
-            <span style={{
-              display: 'block', width: 24, height: 2,
-              background: 'var(--deep)', borderRadius: 2,
-              transition: 'transform .3s, opacity .3s',
-              transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
-            }} />
-          </button>
+          {/* Hamburger — mobile only */}
+          {isMobile && (
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              style={{
+                background: 'none', border: 'none', padding: '.4rem',
+                display: 'flex', flexDirection: 'column', gap: '5px',
+                cursor: 'pointer',
+              }}
+              aria-label="Menu"
+            >
+              <span style={{
+                display: 'block', width: 24, height: 2,
+                background: 'var(--deep)', borderRadius: 2,
+                transition: 'transform .3s, opacity .3s',
+                transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+              }} />
+              <span style={{
+                display: 'block', width: 24, height: 2,
+                background: 'var(--deep)', borderRadius: 2,
+                transition: 'transform .3s, opacity .3s',
+                opacity: menuOpen ? 0 : 1,
+              }} />
+              <span style={{
+                display: 'block', width: 24, height: 2,
+                background: 'var(--deep)', borderRadius: 2,
+                transition: 'transform .3s, opacity .3s',
+                transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+              }} />
+            </button>
+          )}
         </div>
       </nav>
 
-      {/* Mobile menu — original, untouched */}
-      {menuOpen && (
+      {/* Mobile menu */}
+      {isMobile && menuOpen && (
         <div style={{
           position: 'fixed', top: '72px', left: 0, right: 0, zIndex: 99,
           background: 'rgba(253,248,242,.98)', backdropFilter: 'blur(12px)',
@@ -147,7 +156,6 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Single CTA in mobile menu */}
           <Link
             href={ctaLink}
             onClick={() => setMenuOpen(false)}
