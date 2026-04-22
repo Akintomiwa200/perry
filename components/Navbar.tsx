@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/store/store'
 
-
 const navLinks = [
   ['Shop', '/shop'],
   ['New In', '/shop?filter=new'],
@@ -22,6 +21,9 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
+
+  const ctaLink = isAuthenticated ? '/cart' : '/login'
+  const ctaLabel = isAuthenticated ? 'Cart 🛒' : 'Shop Now'
 
   return (
     <>
@@ -43,8 +45,8 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop links */}
-        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none' }}>
-         {navLinks.map(([label, href]) => (
+        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
+          {navLinks.map(([label, href]) => (
             <li key={label}>
               <Link href={href} style={{
                 fontSize: '.8rem',
@@ -61,32 +63,22 @@ export default function Navbar() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {isAuthenticated ? (
-            <Link href="/cart" title="Cart"
-              style={{
-                fontSize: '1.25rem',
-                background: 'transparent',
-                color: 'var(--deep)',
-                border: 'none',
-                padding: '.5rem',
-                textDecoration: 'none',
-                display: 'inline-block',
-              }}
-            >🛒</Link>
-          ) : (
-            <Link href="/login"
-              className="nav-links-desktop"
-              style={{
-                fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
-                background: 'var(--deep)', color: 'var(--cream)',
-                border: 'none', padding: '.65rem 1.4rem',
-                fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
-                textDecoration: 'none', display: 'inline-block',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
-            >Shop Now</Link>
-          )}
+          {/* Desktop CTA Button */}
+          <Link
+            href={ctaLink}
+            className="nav-links-desktop"
+            style={{
+              fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              background: 'var(--deep)', color: 'var(--cream)',
+              border: 'none', padding: '.65rem 1.4rem',
+              fontFamily: "'Jost', sans-serif", fontWeight: 400, transition: 'background .3s',
+              textDecoration: 'none', display: 'inline-block',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--deep)')}
+          >
+            {ctaLabel}
+          </Link>
 
           {/* Hamburger */}
           <button
@@ -95,70 +87,80 @@ export default function Navbar() {
             style={{
               background: 'none', border: 'none', padding: '.4rem',
               display: 'flex', flexDirection: 'column', gap: '5px',
+              cursor: 'pointer',
             }}
+            aria-label="Menu"
           >
-            {[0, 1, 2].map(i => (
-              <span key={i} style={{
-                display: 'block', width: 24, height: 2,
-                background: 'var(--deep)', borderRadius: 2,
-                transition: 'transform .3s, opacity .3s',
-                transform: menuOpen
-                  ? i === 0 ? 'translateY(7px) rotate(45deg)'
-                  : i === 2 ? 'translateY(-7px) rotate(-45deg)'
-                  : 'none'
-                  : 'none',
-                opacity: menuOpen && i === 1 ? 0 : 1,
-              }} />
-            ))}
+            <span style={{
+              display: 'block', width: 24, height: 2,
+              background: 'var(--deep)', borderRadius: 2,
+              transition: 'transform .3s, opacity .3s',
+              transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+              opacity: menuOpen ? 1 : 1,
+            }} />
+            <span style={{
+              display: 'block', width: 24, height: 2,
+              background: 'var(--deep)', borderRadius: 2,
+              transition: 'transform .3s, opacity .3s',
+              opacity: menuOpen ? 0 : 1,
+            }} />
+            <span style={{
+              display: 'block', width: 24, height: 2,
+              background: 'var(--deep)', borderRadius: 2,
+              transition: 'transform .3s, opacity .3s',
+              transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none',
+            }} />
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
-      <div className={`mobile-menu${menuOpen ? ' open' : ''}`} style={{
-        position: 'fixed', top: '60px', left: 0, right: 0, zIndex: 99,
-        background: 'rgba(253,248,242,.98)', backdropFilter: 'blur(12px)',
-        flexDirection: 'column', padding: '1.5rem 2rem 2rem',
-        borderBottom: '1px solid var(--blush)',
-        gap: '1.2rem',
-      }}>
-        {navLinks.map(([label, href]) => (
-          <Link key={label} href={href}
+      {menuOpen && (
+        <div style={{
+          position: 'fixed', top: '72px', left: 0, right: 0, zIndex: 99,
+          background: 'rgba(253,248,242,.98)', backdropFilter: 'blur(12px)',
+          display: 'flex', flexDirection: 'column', padding: '1.5rem 2rem 2rem',
+          borderBottom: '1px solid var(--blush)',
+          gap: '1.2rem',
+        }}>
+          {navLinks.map(([label, href]) => (
+            <Link
+              key={label}
+              href={href}
+              onClick={() => setMenuOpen(false)}
+              style={{
+                fontSize: '.85rem',
+                letterSpacing: '.18em',
+                textTransform: 'uppercase',
+                color: 'var(--deep)',
+                textDecoration: 'none',
+                fontWeight: 400,
+                padding: '.5rem 0',
+                borderBottom: '1px solid var(--blush)',
+              }}
+            >
+              {label}
+            </Link>
+          ))}
+          
+          {/* Single CTA in mobile menu */}
+          <Link
+            href={ctaLink}
             onClick={() => setMenuOpen(false)}
             style={{
-              fontSize: '.85rem',
-              letterSpacing: '.18em',
-              textTransform: 'uppercase',
-              color: 'var(--deep)',
-              textDecoration: 'none',
-              fontWeight: 400,
-              padding: '.5rem 0',
-              borderBottom: '1px solid var(--blush)',
+              marginTop: '.5rem',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              background: 'var(--terracotta)', color: '#fff',
+              border: 'none', padding: '1rem',
+              fontFamily: "'Jost', sans-serif",
+              textDecoration: 'none', display: 'inline-block',
+              textAlign: 'center',
             }}
           >
-            {label}
+            {ctaLabel}
           </Link>
-        ))}
-        {isAuthenticated ? (
-            <Link href="/cart" onClick={() => setMenuOpen(false)} style={{
-              marginTop: '.5rem',
-              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--terracotta)', color: '#fff',
-              border: 'none', padding: '1rem',
-              fontFamily: "'Jost', sans-serif",
-              textDecoration: 'none', display: 'inline-block',
-            }}>Cart 🛒</Link>
-          ) : (
-            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-              marginTop: '.5rem',
-              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              background: 'var(--terracotta)', color: '#fff',
-              border: 'none', padding: '1rem',
-              fontFamily: "'Jost', sans-serif",
-              textDecoration: 'none', display: 'inline-block',
-            }}>Shop Now</Link>
-          )}
-      </div>
+        </div>
+      )}
     </>
   )
 }
