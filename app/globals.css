@@ -416,12 +416,10 @@
 
 
 
-
-/* Default: mobile first */
+/* Default: mobile first - hamburger visible, desktop nav hidden */
 .nav-links-desktop {
   display: none;
 }
-
 .nav-mobile-btn {
   display: flex;
 }
@@ -432,7 +430,6 @@
     display: flex;
     align-items: center;
   }
-
   .nav-mobile-btn {
     display: none;
   }
