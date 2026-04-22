@@ -44,15 +44,8 @@ export default function Navbar() {
           Perry <span style={{ color: 'var(--terracotta)' }}>Collectibles</span>
         </Link>
 
-        {/* Desktop links - hidden on mobile */}
-        <ul style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2.4rem',
-          listStyle: 'none',
-          margin: 0,
-          padding: 0,
-        }} className="nav-links-desktop">
+        {/* Desktop links */}
+        <ul className="nav-links-desktop" style={{ gap: '2.4rem', listStyle: 'none', margin: 0, padding: 0 }}>
           {navLinks.map(([label, href]) => (
             <li key={label}>
               <Link href={href} style={{
@@ -70,7 +63,7 @@ export default function Navbar() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Desktop CTA Button - hidden on mobile */}
+          {/* Desktop CTA Button */}
           <Link
             href={ctaLink}
             className="nav-links-desktop"
@@ -87,7 +80,7 @@ export default function Navbar() {
             {ctaLabel}
           </Link>
 
-          {/* Hamburger - visible on mobile only */}
+          {/* Hamburger */}
           <button
             className="nav-mobile-btn"
             onClick={() => setMenuOpen(o => !o)}
@@ -103,6 +96,7 @@ export default function Navbar() {
               background: 'var(--deep)', borderRadius: 2,
               transition: 'transform .3s, opacity .3s',
               transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none',
+              opacity: menuOpen ? 1 : 1,
             }} />
             <span style={{
               display: 'block', width: 24, height: 2,
@@ -120,7 +114,7 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile menu - only shows when open */}
+      {/* Mobile menu */}
       {menuOpen && (
         <div style={{
           position: 'fixed', top: '72px', left: 0, right: 0, zIndex: 99,
@@ -148,6 +142,23 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
+          
+          {/* Single CTA in mobile menu */}
+          <Link
+            href={ctaLink}
+            onClick={() => setMenuOpen(false)}
+            style={{
+              marginTop: '.5rem',
+              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
+              background: 'var(--terracotta)', color: '#fff',
+              border: 'none', padding: '1rem',
+              fontFamily: "'Jost', sans-serif",
+              textDecoration: 'none', display: 'inline-block',
+              textAlign: 'center',
+            }}
+          >
+            {ctaLabel}
+          </Link>
         </div>
       )}
     </>
