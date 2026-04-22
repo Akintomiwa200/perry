@@ -72,6 +72,43 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           }}
         />
 
+        {/* HOVER OVERLAY — blur + dim */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(42, 26, 18, 0.35)',
+          backdropFilter: hovered ? 'blur(3px)' : 'blur(0px)',
+          opacity: hovered ? 1 : 0,
+          transition: 'opacity .4s ease, backdrop-filter .4s ease',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          paddingBottom: '1.5rem',
+        }}>
+          <button
+            style={{
+              fontSize: '.72rem',
+              letterSpacing: '.18em',
+              textTransform: 'uppercase',
+              background: 'var(--cream)',
+              color: 'var(--deep)',
+              border: 'none',
+              padding: '.75rem 1.6rem',
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 500,
+              cursor: 'pointer',
+              transform: hovered ? 'translateY(0)' : 'translateY(12px)',
+              transition: 'transform .4s ease, background .3s',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)', e.currentTarget.style.color = '#fff')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'var(--cream)', e.currentTarget.style.color = 'var(--deep)')}
+            onClick={e => e.stopPropagation()}
+          >
+            Add to Cart
+          </button>
+        </div>
+
         {/* BADGE */}
         {product.badge && (
           <div style={{
@@ -91,7 +128,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
         {/* WISHLIST */}
         <button
-          onClick={() => setWished(w => !w)}
+          onClick={e => { e.stopPropagation(); setWished(w => !w) }}
           style={{
             position: 'absolute',
             top: '.8rem',
@@ -110,6 +147,8 @@ function ProductCard({ product }: { product: typeof products[0] }) {
             transition: 'all .3s ease',
             color: wished ? 'var(--terracotta)' : '#333',
             boxShadow: '0 6px 18px rgba(0,0,0,.08)',
+            cursor: 'pointer',
+            zIndex: 2,
           }}
         >
           {wished ? '♥' : '♡'}
