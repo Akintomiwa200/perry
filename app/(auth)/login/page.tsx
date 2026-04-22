@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,32 +29,32 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
-      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-5 sm:p-10 shadow-md">
+    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-[#F9F7F5]">
+      <div className="w-full max-w-md bg-white border border-[#DDD5CE] rounded-lg p-6 sm:p-10 shadow-lg">
         
         {/* Header */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
+        <div className="text-center mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-light font-serif text-[#3E2B1E]">
             Welcome back
           </h1>
-          <p className="text-sm text-muted mt-2">
+          <p className="text-sm text-[#8C7B6E] mt-2">
             Sign in to your account
           </p>
         </div>
 
         {/* Global error */}
         {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 border-l-4 border-red-700 rounded text-sm">
+          <div className="mb-4 p-3 bg-red-50 text-red-600 border-l-4 border-red-600 rounded text-sm">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
           
           {/* Email */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-primary">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
               Email Address
             </label>
             <input
@@ -61,18 +62,22 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jane@example.com"
-              className={`input ${errors.email ? 'input-error' : ''}`}
+              className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent ${
+                errors.email 
+                  ? 'border-red-500 focus:ring-red-200' 
+                  : 'border-[#DDD5CE] hover:border-[#5D4432]'
+              }`}
               autoCapitalize="none"
               autoComplete="email"
             />
             {errors.email && (
-              <p className="text-xs text-red-600">{errors.email}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.email}</p>
             )}
           </div>
 
           {/* Password */}
-          <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-primary">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-[#3E2B1E] tracking-wide">
               Password
             </label>
             <div className="relative">
@@ -81,27 +86,32 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`input ${errors.password ? 'input-error' : ''} pr-16`}
+                className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg bg-white outline-none transition-all focus:ring-2 focus:ring-[#5D4432] focus:border-transparent pr-12 ${
+                  errors.password 
+                    ? 'border-red-500 focus:ring-red-200' 
+                    : 'border-[#DDD5CE] hover:border-[#5D4432]'
+                }`}
                 autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-primary transition-colors font-medium"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C7B6E] hover:text-[#5D4432] transition-colors"
+                aria-label={showPw ? 'Hide password' : 'Show password'}
               >
-                {showPw ? 'Hide' : 'Show'}
+                {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-xs text-red-600">{errors.password}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.password}</p>
             )}
           </div>
 
           {/* Forgot Password */}
-          <div className="flex justify-end">
+          <div className="flex justify-end -mt-1">
             <Link
               href="/forgot-password"
-              className="text-sm text-primary hover:underline transition-colors"
+              className="text-xs sm:text-sm text-[#5D4432] hover:text-[#4A3527] hover:underline transition-colors"
             >
               Forgot password?
             </Link>
@@ -111,17 +121,17 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="btn btn-primary w-full mt-2"
+            className="w-full py-3.5 sm:py-4 bg-[#5D4432] text-white text-xs sm:text-sm uppercase tracking-wider rounded-lg hover:bg-[#4A3527] disabled:opacity-60 disabled:cursor-not-allowed transition-all active:scale-[0.98] font-medium mt-2"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-sm text-muted mt-4">
+          <p className="text-center text-xs sm:text-sm text-[#8C7B6E] mt-6">
             Don&apos;t have an account?{' '}
             <Link
               href="/register"
-              className="text-primary font-medium hover:underline"
+              className="text-[#5D4432] font-semibold hover:underline transition-colors"
             >
               Create one
             </Link>
