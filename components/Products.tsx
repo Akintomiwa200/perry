@@ -3,10 +3,42 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 const products = [
-  { id: 1, icon: '💍', cat: 'Accessories', name: 'Gold Statement Necklace', price: '₦8,500', oldPrice: null, badge: 'New' },
-  { id: 2, icon: '👠', cat: 'Footwear', name: 'Strappy Block Heel', price: '₦11,500', oldPrice: '₦15,000', badge: 'Hot' },
-  { id: 3, icon: '💆‍♀️', cat: 'Wigs & Hair', name: 'Lace Front — Body Wave', price: '₦45,000', oldPrice: null, badge: null },
-  { id: 4, icon: '👜', cat: 'Handbags', name: 'Structured Mini Tote', price: '₦16,000', oldPrice: '₦22,000', badge: 'Sale' },
+  {
+    id: 1,
+    image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop',
+    cat: 'Accessories',
+    name: 'Gold Statement Necklace',
+    price: '₦8,500',
+    oldPrice: null,
+    badge: 'New',
+  },
+  {
+    id: 2,
+    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop',
+    cat: 'Footwear',
+    name: 'Strappy Block Heel',
+    price: '₦11,500',
+    oldPrice: '₦15,000',
+    badge: 'Hot',
+  },
+  {
+    id: 3,
+    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop',
+    cat: 'Wigs & Hair',
+    name: 'Lace Front — Body Wave',
+    price: '₦45,000',
+    oldPrice: null,
+    badge: null,
+  },
+  {
+    id: 4,
+    image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=800&auto=format&fit=crop',
+    cat: 'Handbags',
+    name: 'Structured Mini Tote',
+    price: '₦16,000',
+    oldPrice: '₦22,000',
+    badge: 'Sale',
+  },
 ]
 
 function ProductCard({ product }: { product: typeof products[0] }) {
@@ -14,47 +46,111 @@ function ProductCard({ product }: { product: typeof products[0] }) {
   const [hovered, setHovered] = useState(false)
 
   return (
-    <div onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ cursor: 'pointer' }}
+    >
+      {/* IMAGE */}
       <div style={{
-        aspectRatio: '3/4', position: 'relative', overflow: 'hidden',
-        marginBottom: '1rem', background: 'var(--light-gold)', borderRadius: 2,
+        aspectRatio: '3/4',
+        position: 'relative',
+        overflow: 'hidden',
+        marginBottom: '1rem',
+        borderRadius: 6,
+        background: '#f3ece7',
       }}>
-        <div style={{
-          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 'clamp(3rem, 6vw, 5rem)',
-          transition: 'transform .5s ease',
-          transform: hovered ? 'scale(1.08)' : 'scale(1)',
-        }}>{product.icon}</div>
+        <img
+          src={product.image}
+          alt={product.name}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            transition: 'transform .6s ease',
+            transform: hovered ? 'scale(1.08)' : 'scale(1)',
+          }}
+        />
 
+        {/* BADGE */}
         {product.badge && (
           <div style={{
-            position: 'absolute', top: '.8rem', left: '.8rem',
-            background: 'var(--terracotta)', color: '#fff',
-            fontSize: '.65rem', letterSpacing: '.14em', textTransform: 'uppercase',
+            position: 'absolute',
+            top: '.8rem',
+            left: '.8rem',
+            background: 'var(--terracotta)',
+            color: '#fff',
+            fontSize: '.65rem',
+            letterSpacing: '.14em',
+            textTransform: 'uppercase',
             padding: '.3rem .7rem',
-          }}>{product.badge}</div>
+          }}>
+            {product.badge}
+          </div>
         )}
 
+        {/* WISHLIST */}
         <button
           onClick={() => setWished(w => !w)}
           style={{
-            position: 'absolute', top: '.8rem', right: '.8rem',
-            width: 32, height: 32, borderRadius: '50%',
-            background: 'rgba(253,248,242,.9)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '.85rem', border: 'none',
+            position: 'absolute',
+            top: '.8rem',
+            right: '.8rem',
+            width: 34,
+            height: 34,
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,.9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '.9rem',
+            border: 'none',
             opacity: hovered ? 1 : 0,
-            transform: hovered ? 'translateY(0)' : 'translateY(-4px)',
-            transition: 'opacity .3s, transform .3s',
-            color: wished ? 'var(--terracotta)' : 'var(--deep)',
+            transform: hovered ? 'translateY(0)' : 'translateY(-6px)',
+            transition: 'all .3s ease',
+            color: wished ? 'var(--terracotta)' : '#333',
+            boxShadow: '0 6px 18px rgba(0,0,0,.08)',
           }}
-        >{wished ? '♥' : '♡'}</button>
+        >
+          {wished ? '♥' : '♡'}
+        </button>
       </div>
 
-      <div style={{ fontSize: '.68rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--mid)', marginBottom: '.25rem' }}>{product.cat}</div>
-      <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(1rem, 2vw, 1.15rem)', fontWeight: 400, color: 'var(--deep)', marginBottom: '.5rem' }}>{product.name}</div>
-      <div style={{ fontSize: '.95rem', fontWeight: 500, color: 'var(--terracotta)' }}>
-        {product.oldPrice && <span style={{ textDecoration: 'line-through', color: 'var(--blush)', marginRight: '.5rem' }}>{product.oldPrice}</span>}
+      {/* TEXT */}
+      <div style={{
+        fontSize: '.68rem',
+        letterSpacing: '.16em',
+        textTransform: 'uppercase',
+        color: 'var(--mid)',
+        marginBottom: '.25rem',
+      }}>
+        {product.cat}
+      </div>
+
+      <div style={{
+        fontFamily: "'Cormorant Garamond', serif",
+        fontSize: 'clamp(1rem, 2vw, 1.15rem)',
+        fontWeight: 400,
+        color: 'var(--deep)',
+        marginBottom: '.5rem',
+      }}>
+        {product.name}
+      </div>
+
+      <div style={{
+        fontSize: '.95rem',
+        fontWeight: 500,
+        color: 'var(--terracotta)',
+      }}>
+        {product.oldPrice && (
+          <span style={{
+            textDecoration: 'line-through',
+            color: '#b8a39a',
+            marginRight: '.5rem'
+          }}>
+            {product.oldPrice}
+          </span>
+        )}
         {product.price}
       </div>
     </div>
@@ -63,18 +159,38 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
 export default function Products() {
   return (
-    <section id="new" className="section-pad" style={{ background: 'var(--cream)', position: 'relative', zIndex: 1 }}>
+    <section
+      id="new"
+      className="section-pad"
+      style={{
+        background: 'var(--cream)',
+        position: 'relative',
+        zIndex: 1
+      }}
+    >
+      {/* HEADER */}
       <div className="section-header">
         <div>
           <div className="section-label">New In</div>
           <h2 className="section-title">Fresh Picks</h2>
         </div>
-        <Link href="/products" style={{ fontSize: '.75rem', letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--terracotta)', textDecoration: 'none' }}>
+
+        <Link href="/products" style={{
+          fontSize: '.75rem',
+          letterSpacing: '.16em',
+          textTransform: 'uppercase',
+          color: 'var(--terracotta)',
+          textDecoration: 'none'
+        }}>
           View all →
         </Link>
       </div>
+
+      {/* GRID */}
       <div className="product-grid">
-        {products.map(p => <ProductCard key={p.id} product={p} />)}
+        {products.map(p => (
+          <ProductCard key={p.id} product={p} />
+        ))}
       </div>
     </section>
   )
