@@ -1,5 +1,6 @@
 'use client'
-import { useState, useSearchParams } from 'react'
+import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ProductList from '@/components/product/ProductList'
