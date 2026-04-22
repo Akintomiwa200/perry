@@ -63,7 +63,7 @@ export default function Navbar() {
         </ul>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          {/* Desktop CTA — FIX: removed display:'inline-block', Tailwind handles visibility */}
+          {/* Desktop CTA — hidden on mobile, visible on desktop */}
           <Link
             href={ctaLink}
             className="hidden md:inline-flex items-center"
@@ -80,9 +80,9 @@ export default function Navbar() {
             {ctaLabel}
           </Link>
 
-          {/* Hamburger — FIX: removed display:'flex', Tailwind handles visibility */}
+          {/* Hamburger — visible on mobile, hidden on desktop */}
           <button
-            className="flex md:hidden flex-col"
+            className="hidden max-md:flex flex-col"
             onClick={() => setMenuOpen(o => !o)}
             style={{
               background: 'none', border: 'none', padding: '.4rem',
@@ -141,7 +141,7 @@ export default function Navbar() {
               {label}
             </Link>
           ))}
-          
+
           {/* Single CTA in mobile menu */}
           <Link
             href={ctaLink}
