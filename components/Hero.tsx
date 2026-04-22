@@ -5,9 +5,10 @@ import { RootState } from '@/store/store'
 
 export default function Hero() {
   const isAuthenticated = useSelector((s: RootState) => !!s.auth.user)
-  
+
   return (
     <section className="hero-grid" style={{ position: 'relative', overflow: 'hidden' }}>
+      
       {/* LEFT */}
       <div style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -43,43 +44,19 @@ export default function Hero() {
 
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
           {isAuthenticated ? (
-            <Link href="/shop" style={{
-                background: 'var(--terracotta)', color: '#fff',
-                fontFamily: "'Jost', sans-serif", fontSize: '.78rem',
-                letterSpacing: '.16em', textTransform: 'uppercase',
-                padding: '1rem 2rem', border: 'none', transition: 'background .3s',
-                textDecoration: 'none', display: 'inline-block',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-            >Explore Collection</Link>
+            <Link href="/shop" style={btnPrimary}>Explore Collection</Link>
           ) : (
-            <Link href="/login" style={{
-                background: 'var(--terracotta)', color: '#fff',
-                fontFamily: "'Jost', sans-serif", fontSize: '.78rem',
-                letterSpacing: '.16em', textTransform: 'uppercase',
-                padding: '1rem 2rem', border: 'none', transition: 'background .3s',
-                textDecoration: 'none', display: 'inline-block',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--rose)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--terracotta)')}
-            >Shop Now</Link>
+            <Link href="/login" style={btnPrimary}>Shop Now</Link>
           )}
-          <Link href="/about" style={{
-              background: 'transparent', border: '1px solid var(--blush)',
-              color: 'var(--deep)', fontFamily: "'Jost', sans-serif",
-              fontSize: '.78rem', letterSpacing: '.16em', textTransform: 'uppercase',
-              padding: '1rem 1.8rem', transition: 'border-color .3s, color .3s',
-              textDecoration: 'none', display: 'inline-block',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--terracotta)'; e.currentTarget.style.color = 'var(--terracotta)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--blush)'; e.currentTarget.style.color = 'var(--deep)' }}
-          >Our Story</Link>
+
+          <Link href="/about" style={btnOutline}>Our Story</Link>
         </div>
       </div>
 
-      {/* RIGHT – hidden on mobile via CSS */}
+      {/* RIGHT */}
       <div className="hero-right-panel" style={{ position: 'relative', overflow: 'hidden' }}>
+        
+        {/* background layers */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, var(--blush) 0%, var(--light-gold) 60%, var(--blush) 100%)',
@@ -88,50 +65,83 @@ export default function Hero() {
           position: 'absolute', inset: 0,
           backgroundImage: 'radial-gradient(circle at 30% 20%, rgba(192,120,88,.22) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(212,128,106,.18) 0%, transparent 45%)',
         }} />
-        <div style={{
-          position: 'absolute', right: '-1rem', bottom: '4rem', zIndex: 1,
-          fontFamily: "'Cormorant Garamond', serif",
-          fontSize: '14rem', fontWeight: 300, lineHeight: 1,
-          color: 'rgba(192,120,88,.1)', letterSpacing: '-.04em', pointerEvents: 'none',
-        }}>P</div>
+
+        {/* floating bag image */}
+        <div className="float-a" style={{
+          position: 'absolute', width: '54%', top: '12%', left: '8%',
+          borderRadius: 6, overflow: 'hidden',
+          boxShadow: '0 20px 60px rgba(42,26,18,.18)',
+        }}>
+          <img
+            src="https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=800&auto=format&fit=crop"
+            alt="Luxury handbag"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+
+        {/* floating heels image */}
+        <div className="float-b" style={{
+          position: 'absolute', width: '38%', bottom: '14%', right: '6%',
+          borderRadius: 6, overflow: 'hidden',
+          boxShadow: '0 20px 60px rgba(42,26,18,.18)',
+        }}>
+          <img
+            src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop"
+            alt="High heels"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+
+        {/* badge */}
         <div className="spin-badge" style={{
           position: 'absolute', top: '5rem', right: '3rem', zIndex: 3,
           width: 90, height: 90,
           border: '1px solid rgba(192,120,88,.4)', borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <span style={{ fontSize: '.58rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--terracotta)', lineHeight: 1.4 }}>
+          <span style={{
+            fontSize: '.58rem', letterSpacing: '.18em',
+            textTransform: 'uppercase', color: 'var(--terracotta)',
+          }}>
             New<br />Arrivals<br />2025
           </span>
         </div>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 2 }}>
-          <div className="float-a" style={{
-            position: 'absolute', width: '54%', top: '12%', left: '8%',
-            borderRadius: 2, overflow: 'hidden', boxShadow: '0 20px 60px rgba(42,26,18,.18)',
-          }}>
-            <div style={{
-              width: '100%', aspectRatio: '4/5',
-              background: 'linear-gradient(145deg,#c9a96e,#d4806a)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '5rem',
-            }}>👜</div>
-          </div>
-          <div className="float-b" style={{
-            position: 'absolute', width: '38%', bottom: '14%', right: '6%',
-            borderRadius: 2, overflow: 'hidden', boxShadow: '0 20px 60px rgba(42,26,18,.18)',
-          }}>
-            <div style={{
-              width: '100%', aspectRatio: '3/4',
-              background: 'linear-gradient(145deg,#8a5a42,#c07858)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3.5rem',
-            }}>👠</div>
-          </div>
-        </div>
+
+        {/* label */}
         <div style={{
-          position: 'absolute', bottom: '3rem', left: '3rem', zIndex: 3,
+          position: 'absolute', bottom: '3rem', left: '3rem',
           fontFamily: "'Cormorant Garamond', serif",
-          fontSize: '1.1rem', fontStyle: 'italic', color: 'var(--deep)', opacity: .7,
-        }}>The Perry Edit</div>
+          fontSize: '1.1rem', fontStyle: 'italic',
+          color: 'var(--deep)', opacity: .7,
+        }}>
+          The Perry Edit
+        </div>
       </div>
     </section>
   )
+}
+
+/* reusable styles */
+const btnPrimary = {
+  background: 'var(--terracotta)',
+  color: '#fff',
+  fontFamily: "'Jost', sans-serif",
+  fontSize: '.78rem',
+  letterSpacing: '.16em',
+  textTransform: 'uppercase',
+  padding: '1rem 2rem',
+  textDecoration: 'none',
+  display: 'inline-block',
+}
+
+const btnOutline = {
+  background: 'transparent',
+  border: '1px solid var(--blush)',
+  color: 'var(--deep)',
+  fontFamily: "'Jost', sans-serif",
+  fontSize: '.78rem',
+  letterSpacing: '.16em',
+  textTransform: 'uppercase',
+  padding: '1rem 1.8rem',
+  textDecoration: 'none',
 }
