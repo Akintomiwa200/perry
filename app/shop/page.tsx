@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ProductList from '@/components/product/ProductList'
@@ -16,9 +15,7 @@ const categories = [
 ]
 
 export default function ShopPage() {
-  const searchParams = useSearchParams()
-  const initialCategory = searchParams.get('filter') || 'all'
-  const [activeCategory, setActiveCategory] = useState(initialCategory)
+  const [activeCategory, setActiveCategory] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
 
   const filtered = mockProducts.filter(p => 
