@@ -4,18 +4,19 @@ import Footer from '@/components/Footer';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FDF8F2]">
-      
-      <Navbar />
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: 'var(--color-surface)' }}
+    >
+     <Navbar />
 
-      {/* CONTENT */}
-      <div className="flex-1 flex justify-center items-center px-4 sm:px-6">
-        <div className="w-full max-w-md my-8 sm:my-12 md:my-16 lg:my-20">
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
           {children}
         </div>
       </div>
 
-      <Footer />
+       <Footer />
     </div>
   );
 }
