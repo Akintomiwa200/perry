@@ -48,15 +48,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-[var(--bg-light)]">
-      <div className="w-full max-w-md bg-[var(--cream)] border border-[var(--blush)] rounded-lg p-5 sm:p-10 shadow-lg">
+    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
+      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-5 sm:p-10 shadow-md">
         
-        {/* Header - Better spacing on mobile */}
+        {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-light font-serif text-[var(--deep)]">
+          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
             Create account
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--mid)] mt-2">
+          <p className="text-sm text-muted mt-2">
             Join thousands of collectors
           </p>
         </div>
@@ -76,15 +76,13 @@ export default function RegisterPage() {
             
             {/* First Name */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[var(--deep)]">
+              <label className="text-xs font-medium text-primary">
                 First Name
               </label>
               <input
                 value={form.firstName}
                 onChange={set('firstName')}
-                className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
-                  errors.firstName ? 'border-red-600' : 'border-[var(--blush)]'
-                }`}
+                className={`input ${errors.firstName ? 'input-error' : ''}`}
                 placeholder="John"
               />
               {errors.firstName && (
@@ -94,15 +92,13 @@ export default function RegisterPage() {
 
             {/* Last Name */}
             <div className="flex flex-col gap-1">
-              <label className="text-xs font-medium text-[var(--deep)]">
+              <label className="text-xs font-medium text-primary">
                 Last Name
               </label>
               <input
                 value={form.lastName}
                 onChange={set('lastName')}
-                className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
-                  errors.lastName ? 'border-red-600' : 'border-[var(--blush)]'
-                }`}
+                className={`input ${errors.lastName ? 'input-error' : ''}`}
                 placeholder="Doe"
               />
               {errors.lastName && (
@@ -113,16 +109,14 @@ export default function RegisterPage() {
 
           {/* Email */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[var(--deep)]">
+            <label className="text-xs font-medium text-primary">
               Email
             </label>
             <input
               type="email"
               value={form.email}
               onChange={set('email')}
-              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
-                errors.email ? 'border-red-600' : 'border-[var(--blush)]'
-              }`}
+              className={`input ${errors.email ? 'input-error' : ''}`}
               placeholder="hello@example.com"
               autoCapitalize="none"
               autoComplete="email"
@@ -134,16 +128,14 @@ export default function RegisterPage() {
 
           {/* Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[var(--deep)]">
+            <label className="text-xs font-medium text-primary">
               Password
             </label>
             <input
               type="password"
               value={form.password}
               onChange={set('password')}
-              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
-                errors.password ? 'border-red-600' : 'border-[var(--blush)]'
-              }`}
+              className={`input ${errors.password ? 'input-error' : ''}`}
               placeholder="••••••••"
               autoComplete="new-password"
             />
@@ -154,16 +146,14 @@ export default function RegisterPage() {
 
           {/* Confirm Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[var(--deep)]">
+            <label className="text-xs font-medium text-primary">
               Confirm Password
             </label>
             <input
               type="password"
               value={form.confirm}
               onChange={set('confirm')}
-              className={`px-3 py-2.5 sm:py-3 border rounded text-sm bg-white outline-none transition-colors focus:ring-2 focus:ring-[var(--terracotta)] focus:border-transparent ${
-                errors.confirm ? 'border-red-600' : 'border-[var(--blush)]'
-              }`}
+              className={`input ${errors.confirm ? 'input-error' : ''}`}
               placeholder="••••••••"
               autoComplete="new-password"
             />
@@ -172,21 +162,21 @@ export default function RegisterPage() {
             )}
           </div>
 
-          {/* Submit Button - Better touch target on mobile */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 sm:py-3 bg-[var(--deep)] text-[var(--cream)] text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-60 transition-opacity active:scale-[0.98] font-medium"
+            className="btn btn-primary w-full mt-2"
           >
             {isLoading ? 'Creating account...' : 'Create Account'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-xs sm:text-sm text-[var(--mid)] mt-2 sm:mt-4">
+          <p className="text-center text-sm text-muted mt-4">
             Already have an account?{' '}
             <Link
               href="/login"
-              className="text-[var(--terracotta)] font-medium hover:underline transition-colors"
+              className="text-primary font-medium hover:underline"
             >
               Sign in
             </Link>

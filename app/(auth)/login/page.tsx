@@ -7,7 +7,6 @@ import { useAuth } from '@/hooks/useAuth';
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, error } = useAuth();
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -24,26 +23,25 @@ export default function LoginPage() {
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!validate()) return;
-
     const result = await login({ email, password });
     if (result.success) router.push('/shop');
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-20 bg-[var(--bg-light)]">
-      <div className="w-full max-w-md bg-[var(--cream)] border border-[var(--blush)] rounded-lg p-6 sm:p-10">
+    <main className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-20 bg-surface">
+      <div className="w-full max-w-md bg-surface-raised border border-default rounded-lg p-5 sm:p-10 shadow-md">
         
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-light font-serif text-[var(--deep)]">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-light font-serif text-primary">
             Welcome back
           </h1>
-          <p className="text-sm text-[var(--mid)] mt-2">
+          <p className="text-sm text-muted mt-2">
             Sign in to your account
           </p>
         </div>
 
-        {/* Error */}
+        {/* Global error */}
         {error && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 border-l-4 border-red-700 rounded text-sm">
             {error}
@@ -51,11 +49,11 @@ export default function LoginPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-
+        <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 sm:gap-5">
+          
           {/* Email */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[var(--deep)]">
+            <label className="text-xs font-medium text-primary">
               Email Address
             </label>
             <input
@@ -63,9 +61,9 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="jane@example.com"
-              className={`w-full px-3 py-3 border rounded text-sm bg-white outline-none focus:ring-1 ${
-                errors.email ? 'border-red-600' : 'border-[var(--blush)]'
-              }`}
+              className={`input ${errors.email ? 'input-error' : ''}`}
+              autoCapitalize="none"
+              autoComplete="email"
             />
             {errors.email && (
               <p className="text-xs text-red-600">{errors.email}</p>
@@ -74,60 +72,56 @@ export default function LoginPage() {
 
           {/* Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-[var(--deep)]">
+            <label className="text-xs font-medium text-primary">
               Password
             </label>
-
             <div className="relative">
               <input
                 type={showPw ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-3 py-3 pr-16 border rounded text-sm bg-white outline-none focus:ring-1 ${
-                  errors.password ? 'border-red-600' : 'border-[var(--blush)]'
-                }`}
+                className={`input ${errors.password ? 'input-error' : ''} pr-16`}
+                autoComplete="current-password"
               />
-
               <button
                 type="button"
                 onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--mid)]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-primary transition-colors font-medium"
               >
                 {showPw ? 'Hide' : 'Show'}
               </button>
             </div>
-
             {errors.password && (
               <p className="text-xs text-red-600">{errors.password}</p>
             )}
           </div>
 
-          {/* Forgot password */}
+          {/* Forgot Password */}
           <div className="flex justify-end">
             <Link
               href="/forgot-password"
-              className="text-xs text-[var(--terracotta)] hover:underline"
+              className="text-sm text-primary hover:underline transition-colors"
             >
               Forgot password?
             </Link>
           </div>
 
-          {/* Submit */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-[var(--deep)] text-[var(--cream)] text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-60"
+            className="btn btn-primary w-full mt-2"
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
 
           {/* Footer */}
-          <p className="text-center text-sm text-[var(--mid)] mt-4">
+          <p className="text-center text-sm text-muted mt-4">
             Don&apos;t have an account?{' '}
             <Link
               href="/register"
-              className="text-[var(--terracotta)] font-medium hover:underline"
+              className="text-primary font-medium hover:underline"
             >
               Create one
             </Link>
