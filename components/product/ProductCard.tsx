@@ -11,26 +11,11 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { add, isInCart } = useCart();
+  const { add, isInCart } = useCart()
 
   return (
     <div
-      className="group relative flex flex-col overflow-hidden"
-      style={{
-        background: 'var(--color-surface-raised)',
-        border: '1px solid var(--color-border)',
-        borderRadius: 'var(--radius-lg)',
-        boxShadow: 'var(--shadow-sm)',
-        transition: 'transform 200ms ease, box-shadow 200ms ease',
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-md)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-sm)';
-      }}
+      className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
     >
       {/* Image */}
       <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
