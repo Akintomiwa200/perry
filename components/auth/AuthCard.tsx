@@ -27,7 +27,7 @@ export default function AuthCard({ children, className = '', headerText, subText
         </div>
       </main>
 
-     
+      
     </div>
   );
 }
