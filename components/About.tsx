@@ -2,47 +2,6 @@
 export default function About() {
   return (
     <>
-      {/* Section 1: Our Story (existing) */}
-      <section id="about" className="about-grid" style={{ background: 'var(--deep)' }}>
-        <div style={{ padding: 'clamp(3rem,6vw,5rem)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div style={{ fontSize: '.72rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '.6rem' }}>Our Story</div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(1.8rem, 3.5vw, 3rem)', fontWeight: 300, color: 'var(--cream)', lineHeight: 1.1, marginBottom: '1.5rem' }}>
-            Designed for the modern Nigerian woman
-          </h2>
-          <p style={{ fontSize: '.9rem', lineHeight: 1.9, color: 'rgba(253,248,242,.65)', fontWeight: 300, marginBottom: '2rem' }}>
-            Perry Collectibles was born from a passion for making premium fashion accessible to every woman. Located in the heart of Sango Ota, we've been serving our community with the finest accessories, footwear, wigs, and beauty products since 2021.
-          </p>
-          <div className="about-stats" style={{ display: 'flex', gap: '3rem', marginTop: '1rem', flexWrap: 'wrap' }}>
-            {[['3K+', 'Happy Customers'], ['500+', 'Products'], ['4★', 'Avg. Rating']].map(([num, label]) => (
-              <div key={label}>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2rem, 4vw, 2.8rem)', fontWeight: 300, color: 'var(--gold)', lineHeight: 1 }}>{num}</div>
-                <div style={{ fontSize: '.7rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(253,248,242,.5)', marginTop: '.3rem' }}>{label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="about-right-panel" style={{ position: 'relative', overflow: 'hidden', background: 'linear-gradient(135deg, var(--mid), var(--terracotta))' }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(201,169,110,.08) 30px, rgba(201,169,110,.08) 31px)',
-          }} />
-          <div style={{
-            position: 'absolute', bottom: '3rem', right: '3rem', left: '3rem',
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(2rem, 3.5vw, 3.2rem)', fontWeight: 300, fontStyle: 'italic',
-            color: 'rgba(253,248,242,.15)', lineHeight: 1.15, textAlign: 'right',
-          }}>Style.<br />Beauty.<br />You.</div>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', textAlign: 'center', width: '80%' }}>
-            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(1.1rem, 2vw, 1.5rem)', fontStyle: 'italic', fontWeight: 300, color: 'var(--cream)', lineHeight: 1.5 }}>
-              “Every woman deserves to feel luxurious — without compromise.”
-            </p>
-            <cite style={{ display: 'block', marginTop: '1rem', fontSize: '.7rem', letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--gold)', fontStyle: 'normal' }}>
-              — Perry Collectibles
-            </cite>
-          </div>
-        </div>
-      </section>
-
       {/* Section 2: Our Mission */}
       <section style={{ padding: 'clamp(5rem,10vw,8rem) clamp(2rem,5vw,4rem)', background: 'var(--cream)', textAlign: 'center' }}>
         <div style={{ fontSize: '.72rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--deep)', marginBottom: '.6rem', display: 'inline-block' }}>Our Mission</div>
@@ -69,7 +28,7 @@ export default function About() {
       {/* Section 3: Our Values */}
       <section style={{ padding: 'clamp(5rem,10vw,8rem) clamp(2rem,5vw,4rem)', background: 'var(--deep)', color: 'var(--cream)' }}>
         <div style={{ fontSize: '.72rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '3rem', textAlign: 'center' }}>Our Values</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(20rem, 1fr)', gap: '3rem', maxWidth: '80rem', marginInline: 'auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(20rem, 1fr))', gap: '3rem', maxWidth: '80rem', marginInline: 'auto' }}>
           {[
             { title: 'Quality First', desc: 'Handpicked premium products from trusted sources, ensuring every piece meets our high standards.', icon: '♦️' },
             { title: 'Community', desc: 'Serving Sango Ota and beyond, building lasting relationships with every customer.', icon: '❤️' },
@@ -101,14 +60,12 @@ export default function About() {
             { year: '2024', event: '500+ products, 4★ rating — growing stronger!' },
             { year: '2025', event: 'Opening physical store + new categories.' }
           ].map(({ year, event }, i) => (
-            <div key={year} style={{ 
-              display: 'flex', alignItems: 'center', gap: '2rem', width: '100%', 
+            <div key={year} style={{
+              display: 'flex', alignItems: 'center', gap: '2rem', width: '100%',
               flexDirection: i % 2 ? 'row-reverse' : 'row',
-              opacity: 0, transform: 'translateY(20px)', transition: 'all 0.6s ease',
-              animationDelay: `${i * 0.2}s`
             }} className="journey-item">
-              <div style={{ 
-                width: '3rem', height: '3rem', borderRadius: '50%', background: 'var(--gold)', 
+              <div style={{
+                width: '3rem', height: '3rem', borderRadius: '50%', background: 'var(--gold)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--deep)'
               }}>
                 {year.slice(-2)}

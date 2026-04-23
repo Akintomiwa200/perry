@@ -3,7 +3,7 @@ import Navbar from '@/components/Navbar'
 import Hero from '@/components/Hero'
 import Marquee from '@/components/Marquee'
 import Categories from '@/components/Categories'
-import About from '@/components/About'
+import AboutStory from '@/components/AboutStory'
 import Products from '@/components/Products'
 import Testimonials from '@/components/Testimonials'
 import Newsletter from '@/components/Newsletter'
@@ -18,7 +18,7 @@ export default function Home() {
         <Hero />
         <Marquee />
         <Categories />
-        <About />
+        <AboutStory />
         <Products />
         <Testimonials />
         <Newsletter />

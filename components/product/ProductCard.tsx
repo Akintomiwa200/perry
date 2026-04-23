@@ -2,8 +2,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Heart } from 'lucide-react';
-import { useDispatch } from 'react-redux';
-import { addToCart } from '@/store/cartSlice';
+import { useCart } from '@/hooks/useCart';
 import { Product } from '@/types/product.types';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
 
@@ -12,7 +11,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const dispatch = useDispatch();
+  const { add, isInCart } = useCart();
 
   return (
     <div
@@ -122,14 +121,14 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Add to Cart */}
         <button
-          onClick={() => dispatch(addToCart({ product }))}
+          onClick={() => add(product)}
           disabled={product.stock === 0}
           className="btn btn-primary btn-sm w-full mt-1"
           style={{ opacity: product.stock === 0 ? 0.5 : 1 }}
           aria-label={`Add ${product.name} to cart`}
         >
           <ShoppingCart size={14} />
-          {product.stock === 0 ? 'Sold Out' : 'Add to Cart'}
+          {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
         </button>
       </div>
     </div>
