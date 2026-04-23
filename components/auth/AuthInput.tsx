@@ -46,20 +46,32 @@ export default function AuthInput({
   return (
     <div className="flex flex-col gap-1">
       <label className="text-xs font-medium" style={{ color: 'var(--color-text)' }}>{label}</label>
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         <input
           type={inputType}
           value={value}
           onChange={handleChange}
-          className={`input pr-12 w-full${error ? ' input-error' : ''}`}
+          className={`input pr-10 w-full${error ? ' input-error' : ''}`}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          style={{ paddingRight: '2.5rem' }}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-1"
-          style={{ opacity: 0.7 }}
+          style={{
+            position: 'absolute',
+            right: '0.75rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'none',
+            border: 'none',
+            padding: '0.25rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            opacity: 0.6,
+          }}
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
           {showPassword ? <EyeOff size={18} style={{ color: 'var(--color-text-muted)' }} /> : <Eye size={18} style={{ color: 'var(--color-text-muted)' }} />}

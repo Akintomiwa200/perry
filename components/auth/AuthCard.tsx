@@ -14,13 +14,7 @@ interface AuthCardProps {
 export default function AuthCard({ children, className = '', headerText, subText, footer }: AuthCardProps) {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--cream)' }}>
-      {/* Header */}
-      <header className="w-full py-6 px-6 flex justify-center" style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface-raised)' }}>
-        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <Coffee size={24} style={{ color: 'var(--color-primary)' }} />
-          <span className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>Perry Collectibles</span>
-        </Link>
-      </header>
+     
 
       {/* Main content */}
       <main className="flex-1 flex items-center justify-center p-6">
@@ -33,14 +27,7 @@ export default function AuthCard({ children, className = '', headerText, subText
         </div>
       </main>
 
-      {/* Footer */}
-      {footer || (
-        <footer className="py-4 text-center text-xs" style={{ color: 'var(--color-text-muted)', borderTop: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface-raised)' }}>
-          © {new Date().getFullYear()} Perry Collectibles ·{' '}
-          <Link href="/privacy" className="hover:underline">Privacy</Link> ·{' '}
-          <Link href="/terms" className="hover:underline">Terms</Link>
-        </footer>
-      )}
+     
     </div>
   );
 }
