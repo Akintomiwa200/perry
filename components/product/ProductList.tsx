@@ -8,7 +8,21 @@ interface ProductListProps {
   gridCols?: number;
 }
 
-export default function ProductList({ products, title, emptyMessage = 'No items here yet. Start exploring →', gridCols = 3 }: ProductListProps) {
+export default function ProductList({
+  products,
+  title,
+  emptyMessage = 'No items here yet. Start exploring →',
+  gridCols = 3,
+}: ProductListProps) {
+  // Build a safe Tailwind class for desktop columns (avoids dynamic class purging)
+  const desktopColsClass: Record<number, string> = {
+    1: 'lg:grid-cols-1',
+    2: 'lg:grid-cols-2',
+    3: 'lg:grid-cols-3',
+    4: 'lg:grid-cols-4',
+  };
+  const lgCols = desktopColsClass[gridCols] ?? 'lg:grid-cols-3';
+
   return (
     <section>
       {title && (
@@ -16,6 +30,7 @@ export default function ProductList({ products, title, emptyMessage = 'No items 
           {title}
         </h2>
       )}
+
       {products.length === 0 ? (
         <div
           className="flex flex-col items-center justify-center py-20 rounded-xl"
@@ -25,11 +40,11 @@ export default function ProductList({ products, title, emptyMessage = 'No items 
           <p className="text-base font-medium">{emptyMessage}</p>
         </div>
       ) : (
-      <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${gridCols} gap-5 md:gap-6`}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${lgCols} gap-5 md:gap-6`}>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
       )}
     </section>
   );

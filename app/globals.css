@@ -317,6 +317,12 @@
   .font-display { font-family: var(--font-primary); font-weight: 700; }
   .font-mono { font-family: var(--font-mono); }
 
+
+
+/* In your @layer utilities */
+.bg-cream { background-color: var(--cream); }
+
+
   /* Skeleton loader */
   .skeleton {
     background: linear-gradient(90deg, var(--color-secondary) 25%, #ede7e1 50%, var(--color-secondary) 75%);
