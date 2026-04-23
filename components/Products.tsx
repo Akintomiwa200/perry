@@ -20,7 +20,7 @@ function ProductCard({
   const { add, isInCart } = useCart()
 
   return (
-    <div className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)] transition-shadow hover:shadow-lg">
+    <div className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]">
       {/* IMAGE CONTAINER */}
       <Link
         href={`/products/${product.slug}`}
@@ -158,8 +158,7 @@ export default function Products() {
         </Link>
       </div>
 
-      {/* PRODUCT GRID - Responsive: 1 on mobile, 2 on tablet, 3 on desktop */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="product-gridhome">
         {finalProducts.map((p) => (
           <ProductCard
             key={p.id}
