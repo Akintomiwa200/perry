@@ -73,7 +73,7 @@ export default function About() {
           {[
             { title: 'Quality First', desc: 'Handpicked premium products from trusted sources, ensuring every piece meets our high standards.', icon: '♦️' },
             { title: 'Community', desc: 'Serving Sango Ota and beyond, building lasting relationships with every customer.', icon: '❤️' },
-            { title: 'Accessibility', desc: 'Luxury shouldn\\'t break the bank — fair prices, fast delivery across Nigeria.', icon: '🔓' },
+            { title: 'Accessibility', desc: 'Luxury shouldn\'t break the bank — fair prices, fast delivery across Nigeria.', icon: '🔓' },
             { title: 'Innovation', desc: 'Staying ahead with trending styles in wigs, footwear, and beauty essentials.', icon: '💡' }
           ].map(({ title, desc, icon }) => (
             <div key={title} style={{ textAlign: 'center', padding: '2rem' }}>
