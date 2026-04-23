@@ -6,12 +6,9 @@ import { cn } from '@/lib/utils';
 interface AuthCardProps {
   children: ReactNode;
   className?: string;
-  headerText: string;
-  subText: string;
-  footer?: ReactNode;
 }
 
-export default function AuthCard({ children, className = '', headerText, subText, footer }: AuthCardProps) {
+export default function AuthCard({ children, className = ''}: AuthCardProps) {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--cream)' }}>
      
