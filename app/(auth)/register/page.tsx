@@ -3,7 +3,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
-import Input from '@/components/ui/Input';
+import AuthInput from '@/components/auth/AuthInput';
+import ErrorAlert from '@/components/auth/ErrorAlert';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -32,46 +33,70 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className="p-8 rounded-2xl"
-      style={{ background: 'var(--color-surface-raised)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-md)' }}
-    >
-      <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text)' }}>Create your account</h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>Join thousands of collectors</p>
-      </div>
-
-      {error && (
-        <div className="p-4 rounded-xl mb-5 text-sm" style={{ background: '#FEE2E2', color: 'var(--color-danger)', borderLeft: '4px solid var(--color-danger)' }} role="alert">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+    <>
+      {error && <ErrorAlert message={error} />}
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
         <div className="grid grid-cols-2 gap-4">
-          <Input label="First Name" value={form.firstName} onChange={set('firstName')} error={errors.firstName} placeholder="Jane" autoComplete="given-name" />
-          <Input label="Last Name" value={form.lastName} onChange={set('lastName')} error={errors.lastName} placeholder="Doe" autoComplete="family-name" />
+          <AuthInput 
+            label="First Name" 
+            value={form.firstName} 
+            onChange={set('firstName')} 
+            error={errors.firstName} 
+            placeholder="Jane" 
+            autoComplete="given-name" 
+          />
+          <AuthInput 
+            label="Last Name" 
+            value={form.lastName} 
+            onChange={set('lastName')} 
+            error={errors.lastName} 
+            placeholder="Doe" 
+            autoComplete="family-name" 
+          />
         </div>
-        <Input label="Email Address" type="email" value={form.email} onChange={set('email')} error={errors.email} placeholder="jane@example.com" autoComplete="email" />
-        <Input label="Password" type="password" value={form.password} onChange={set('password')} error={errors.password} placeholder="Min. 8 characters" autoComplete="new-password" />
-        <Input label="Confirm Password" type="password" value={form.confirm} onChange={set('confirm')} error={errors.confirm} placeholder="Re-enter password" autoComplete="new-password" />
-
-        <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+        <AuthInput 
+          label="Email Address" 
+          type="email" 
+          value={form.email} 
+          onChange={set('email')} 
+          error={errors.email} 
+          placeholder="jane@example.com" 
+          autoComplete="email" 
+        />
+        <AuthInput 
+          label="Password" 
+          type="password" 
+          value={form.password} 
+          onChange={set('password')} 
+          error={errors.password} 
+          placeholder="Min. 8 characters" 
+          autoComplete="new-password" 
+        />
+        <AuthInput 
+          label="Confirm Password" 
+          type="password" 
+          value={form.confirm} 
+          onChange={set('confirm')} 
+          error={errors.confirm} 
+          placeholder="Re-enter password" 
+          autoComplete="new-password" 
+        />
+        <p className="text-xs text-color-text-muted">
           By creating an account you agree to our{' '}
-          <Link href="/terms" className="underline" style={{ color: 'var(--color-primary)' }}>Terms of Service</Link>{' '}
+          <Link href="/terms" className="underline text-color-primary">Terms of Service</Link>{' '}
           and{' '}
-          <Link href="/privacy" className="underline" style={{ color: 'var(--color-primary)' }}>Privacy Policy</Link>.
+          <Link href="/privacy" className="underline text-color-primary">Privacy Policy</Link>.
         </p>
-
         <button type="submit" disabled={isLoading} className="btn btn-primary btn-lg w-full">
           {isLoading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
-
-      <p className="text-center text-sm mt-6" style={{ color: 'var(--color-text-muted)' }}>
+      <p className="text-center text-sm mt-8 text-color-text-muted">
         Already have an account?{' '}
-        <Link href="/login" className="font-medium" style={{ color: 'var(--color-primary)' }}>Sign in</Link>
+        <Link href="/login" className="font-medium text-color-primary hover:underline">
+          Sign in
+        </Link>
       </p>
-    </div>
+    </>
   );
 }

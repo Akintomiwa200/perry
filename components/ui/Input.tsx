@@ -15,8 +15,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-medium"
-            style={{ color: 'var(--color-text)' }}
+            className="text-xs font-medium text-color-text"
           >
             {label}
           </label>
@@ -30,12 +29,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && (
-          <p id={`${inputId}-error`} className="text-xs" style={{ color: 'var(--color-danger)' }} role="alert">
+          <p id={`${inputId}-error`} className="text-xs text-color-danger" role="alert">
             {error}
           </p>
         )}
         {!error && helperText && (
-          <p id={`${inputId}-helper`} className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+          <p id={`${inputId}-helper`} className="text-xs text-color-text-muted">
             {helperText}
           </p>
         )}
