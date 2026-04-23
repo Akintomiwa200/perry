@@ -11,27 +11,21 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { add, isInCart } = useCart();
-
-  // 🔥 Auto NEW logic (last 30 days)
-  const isRecentlyAdded = (() => {
-    if (!product.createdAt) return false;
-    const created = new Date(product.createdAt);
-    const now = new Date();
-    const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays <= 30;
-  })();
-
-  const showNew = product.isNew || isRecentlyAdded;
+  const { add, isInCart } = useCart()
 
   return (
-    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl transition-all duration-200 hover:shadow-md">
-
-      {/* IMAGE */}
-      <Link
-        href={`/products/${product.slug}`}
-        className="relative block w-full overflow-hidden"
-      >
+    <div
+      className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] transition-all duration-200 hover:shadow-[var(--shadow-md)]"
+      style={{ transition: 'transform 200ms ease, box-shadow 200ms ease' }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-md)'
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-sm)'
+      }}
+    >
         <div className="aspect-[3/4] w-full bg-[var(--color-secondary)]">
           {product.images?.[0] ? (
             <Image
