@@ -1,176 +1,169 @@
-'use client';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ShoppingCart, Heart } from 'lucide-react';
-import { useCart } from '@/hooks/useCart';
-import { Product } from '@/types/product.types';
-import { formatPrice, calculateDiscount } from '@/lib/utils';
+'use client'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ShoppingCart, Heart } from 'lucide-react'
+import { useCart } from '@/hooks/useCart'
+import { mockProducts } from '@/lib/db'
+import { Product } from '@/types/product.types'
+import { formatPrice, calculateDiscount } from '@/lib/utils'
 
-interface ProductCardProps {
-  product: Product;
-}
-
-export default function ProductCard({ product }: ProductCardProps) {
+function ProductCard({
+  product,
+  isPopular,
+  isNewAuto,
+}: {
+  product: Product
+  isPopular?: boolean
+  isNewAuto?: boolean
+}) {
   const { add, isInCart } = useCart()
 
   return (
-    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">
+    <div className="group relative overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-raised)]">
 
-      {/* Image */}
-      <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
-        <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--color-secondary)' }}>
-          {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            />
-          ) : (
-            <span className="text-4xl select-none">🎁</span>
+      {/* IMAGE */}
+      <Link href={`/products/${product.slug}`} className="block relative" style={{ aspectRatio: '3/4' }}>
+        {product.images?.[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={product.name}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-[var(--color-secondary)]">
+            🎁
+          </div>
+        )}
+
+        {/* BADGES */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
+
+          {/* AUTO NEW */}
+          {(product.isNew || isNewAuto) && (
+            <span className="badge badge-primary">New</span>
           )}
-        </div>
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          {product.isNew && <span className="badge badge-primary">New</span>}
+          {/* AUTO POPULAR */}
+          {isPopular && (
+            <span className="badge bg-black text-white text-xs px-2 py-1 rounded">
+              Popular
+            </span>
+          )}
+
+          {/* SALE */}
           {product.isSale && product.compareAtPrice && (
             <span className="badge badge-danger">
               -{calculateDiscount(product.price, product.compareAtPrice)}%
             </span>
           )}
-          {product.stock === 0 && <span className="badge" style={{ background: 'var(--color-text-muted)', color: '#fff' }}>Sold Out</span>}
-          {product.stock > 0 && product.stock <= 3 && (
-            <span className="badge badge-warning">Only {product.stock} left</span>
-          )}
         </div>
 
-        {/* Wishlist */}
+        {/* WISHLIST */}
         <button
-          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
-          style={{ background: 'var(--color-surface-raised)', boxShadow: 'var(--shadow-sm)' }}
-          aria-label="Add to wishlist"
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition"
+          style={{ background: 'var(--color-surface-raised)' }}
         >
-          <Heart size={14} style={{ color: 'var(--color-text-muted)' }} />
+          <Heart size={14} />
         </button>
+      </Link>
 
-        {/* ── MOBILE ONLY: overlay with name + price + add to cart ── */}
-        <div
-          className="
-            md:hidden
-            absolute inset-0
-            flex flex-col justify-end
-            p-3
-            opacity-0 group-hover:opacity-100
-            transition-opacity duration-300
-          "
-          style={{ background: 'linear-gradient(to top, rgba(42,26,18,0.82) 0%, rgba(42,26,18,0.3) 60%, transparent 100%)' }}
-        >
-          <p
-            className="text-xs uppercase tracking-widest mb-0.5"
-            style={{ color: 'rgba(255,255,255,0.7)', fontFamily: "'Jost', sans-serif" }}
-          >
-            {product.category}
-          </p>
+      {/* HOVER OVERLAY */}
+      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex flex-col justify-end p-4">
+        <div className="translate-y-6 group-hover:translate-y-0 transition flex flex-col gap-2">
 
-          <h3
-            className="text-sm font-medium leading-snug line-clamp-2 mb-1"
-            style={{ color: '#fff', fontFamily: "'Cormorant Garamond', serif", fontSize: '1rem' }}
-          >
+          <h3 className="text-sm font-semibold text-white line-clamp-2">
             {product.name}
           </h3>
 
-          <div className="flex items-center gap-2 mb-2">
-            <span
-              className="text-sm font-semibold"
-              style={{ color: product.isSale ? '#f87171' : 'var(--light-gold)' }}
-            >
+          <div className="flex items-center gap-2">
+            <span className="text-white font-semibold">
               {formatPrice(product.price)}
             </span>
             {product.compareAtPrice && (
-              <span className="text-xs line-through" style={{ color: 'rgba(255,255,255,0.5)' }}>
+              <span className="text-xs line-through text-gray-300">
                 {formatPrice(product.compareAtPrice)}
               </span>
             )}
           </div>
 
           <button
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); add(product) }}
+            onClick={() => add(product)}
             disabled={product.stock === 0}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-xs uppercase tracking-widest transition-colors duration-200"
-            style={{
-              background: product.stock === 0 ? 'rgba(255,255,255,0.2)' : 'var(--terracotta)',
-              color: '#fff',
-              fontFamily: "'Jost', sans-serif",
-              border: 'none',
-              opacity: product.stock === 0 ? 0.6 : 1,
-              cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
-            }}
+            className="bg-white text-black text-xs py-2 rounded mt-2"
           >
-            <ShoppingCart size={12} />
-            {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
+            {product.stock === 0
+              ? 'Sold Out'
+              : isInCart(product.id)
+              ? 'Added'
+              : 'Add to Cart'}
           </button>
         </div>
-      </Link>
+      </div>
+    </div>
+  )
+}
 
-      {/* ── DESKTOP ONLY: normal info below image ── */}
-      <div className="hidden md:flex flex-col gap-2 p-4">
-        <Link href={`/products/${product.slug}`}>
-          <h3
-            className="text-sm font-medium leading-snug line-clamp-2"
-            style={{ color: 'var(--color-text)' }}
-          >
-            {product.name}
-          </h3>
+export default function Products() {
+  const now = new Date()
+
+  // NEW = within last 30 days
+  const isRecentlyAdded = (date: string) => {
+    const created = new Date(date)
+    const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
+    return diffDays <= 30
+  }
+
+  // POPULAR = high engagement
+  const popularityScore = (p: Product) =>
+    p.reviewCount * 0.7 + p.rating * 20
+
+  // SORT
+  const sortedByDate = [...mockProducts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
+
+  const sortedByPopularity = [...mockProducts].sort(
+    (a, b) => popularityScore(b) - popularityScore(a)
+  )
+
+  // SELECT
+  const latest = sortedByDate.slice(0, 2)
+  const popular = sortedByPopularity.slice(0, 2)
+
+  const selectedIds = new Set([...latest, ...popular].map(p => p.id))
+
+  const others = mockProducts
+    .filter(p => !selectedIds.has(p.id))
+    .slice(0, 2)
+
+  const finalProducts = [...latest, ...popular, ...others]
+
+  const popularIds = new Set(popular.map(p => p.id))
+
+  return (
+    <section id="products" className="section-pad" style={{ background: 'var(--cream)' }}>
+      <div className="section-header">
+        <div>
+          <div className="section-label">Shop</div>
+          <h2 className="section-title">Trending Picks</h2>
+        </div>
+
+        <Link href="/shop" className="text-xs uppercase tracking-widest text-[var(--terracotta)]">
+          View all →
         </Link>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1">
-          <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span
-                key={i}
-                className="text-xs"
-                style={{ color: i < Math.floor(product.rating) ? '#D97706' : 'var(--color-border)' }}
-              >
-                ★
-              </span>
-            ))}
-          </div>
-          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-            ({product.reviewCount})
-          </span>
-        </div>
-
-        {/* Price */}
-        <div className="flex items-center gap-2">
-          <span
-            className="text-base font-semibold"
-            style={{ color: product.isSale ? 'var(--color-danger)' : 'var(--color-text)' }}
-          >
-            {formatPrice(product.price)}
-          </span>
-          {product.compareAtPrice && (
-            <span className="text-sm line-through" style={{ color: 'var(--color-text-muted)' }}>
-              {formatPrice(product.compareAtPrice)}
-            </span>
-          )}
-        </div>
-
-        {/* Add to Cart */}
-        <button
-          onClick={() => add(product)}
-          disabled={product.stock === 0}
-          className="btn btn-primary btn-sm w-full mt-1"
-          style={{ opacity: product.stock === 0 ? 0.5 : 1 }}
-          aria-label={`Add ${product.name} to cart`}
-        >
-          <ShoppingCart size={14} />
-          {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
-        </button>
       </div>
 
-    </div>
-  );
+      <div className="product-grid">
+        {finalProducts.map(p => (
+          <ProductCard
+            key={p.id}
+            product={p}
+            isPopular={popularIds.has(p.id)}
+            isNewAuto={isRecentlyAdded(p.createdAt)}
+          />
+        ))}
+      </div>
+    </section>
+  )
 }

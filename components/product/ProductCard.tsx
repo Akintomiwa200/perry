@@ -11,18 +11,28 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { add, isInCart } = useCart()
+  const { add, isInCart } = useCart();
+
+  // 🔥 Auto NEW logic (last 30 days)
+  const isRecentlyAdded = (() => {
+    if (!product.createdAt) return false;
+    const created = new Date(product.createdAt);
+    const now = new Date();
+    const diffDays = (now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24);
+    return diffDays <= 30;
+  })();
+
+  const showNew = product.isNew || isRecentlyAdded;
 
   return (
-    <div
-      className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
-    >
-      {/* Image */}
-      <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
-        <div
-          className="w-full h-full flex items-center justify-center"
-          style={{ background: 'var(--color-secondary)' }}
-        >
+    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-xl transition-all duration-200 hover:shadow-md">
+
+      {/* IMAGE */}
+      <Link
+        href={`/products/${product.slug}`}
+        className="relative block w-full overflow-hidden"
+      >
+        <div className="aspect-[3/4] w-full bg-[var(--color-secondary)]">
           {product.images?.[0] ? (
             <Image
               src={product.images[0]}
@@ -32,88 +42,113 @@ export default function ProductCard({ product }: ProductCardProps) {
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
-            <span className="text-4xl select-none">🎁</span>
+            <div className="flex items-center justify-center h-full text-3xl">
+              🎁
+            </div>
           )}
         </div>
 
-        {/* Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1">
-          {product.isNew && <span className="badge badge-primary">New</span>}
+        {/* BADGES */}
+        <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+          {product.featured && (
+            <span className="badge bg-purple-600 text-white text-xs px-2 py-0.5">
+              Popular
+            </span>
+          )}
+
+          {showNew && (
+            <span className="badge badge-primary text-xs px-2 py-0.5">
+              New
+            </span>
+          )}
+
           {product.isSale && product.compareAtPrice && (
-            <span className="badge badge-danger">
+            <span className="badge badge-danger text-xs px-2 py-0.5">
               -{calculateDiscount(product.price, product.compareAtPrice)}%
             </span>
           )}
-          {product.stock === 0 && <span className="badge" style={{ background: 'var(--color-text-muted)', color: '#fff' }}>Sold Out</span>}
+
+          {product.stock === 0 && (
+            <span className="badge text-xs px-2 py-0.5 bg-gray-500 text-white">
+              Sold Out
+            </span>
+          )}
+
           {product.stock > 0 && product.stock <= 3 && (
-            <span className="badge badge-warning">Only {product.stock} left</span>
+            <span className="badge badge-warning text-xs px-2 py-0.5">
+              Only {product.stock} left
+            </span>
           )}
         </div>
 
-        {/* Wishlist */}
+        {/* WISHLIST */}
         <button
-          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ background: 'var(--color-surface-raised)', boxShadow: 'var(--shadow-sm)' }}
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
           aria-label="Add to wishlist"
         >
-          <Heart size={14} style={{ color: 'var(--color-text-muted)' }} />
+          <Heart size={14} className="text-gray-500" />
         </button>
       </Link>
 
-      {/* Info */}
-      <div className="flex flex-col gap-2 p-4">
+      {/* INFO */}
+      <div className="flex flex-col gap-2 p-3 sm:p-4">
+
+        {/* NAME */}
         <Link href={`/products/${product.slug}`}>
-          <h3
-            className="text-sm font-medium leading-snug line-clamp-2"
-            style={{ color: 'var(--color-text)' }}
-          >
+          <h3 className="text-sm sm:text-base font-medium line-clamp-2 text-[var(--color-text)]">
             {product.name}
           </h3>
         </Link>
 
-        {/* Rating */}
+        {/* RATING */}
         <div className="flex items-center gap-1">
-          <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span
-                key={i}
-                className="text-xs"
-                style={{ color: i < Math.floor(product.rating) ? '#D97706' : 'var(--color-border)' }}
-              >
-                ★
-              </span>
-            ))}
+          <div className="flex text-xs">
+            {Array.from({ length: 5 }).map((_, i) => {
+              const filled = i < Math.round(product.rating || 0);
+              return (
+                <span
+                  key={i}
+                  className={filled ? 'text-amber-500' : 'text-gray-300'}
+                >
+                  ★
+                </span>
+              );
+            })}
           </div>
-          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-            ({product.reviewCount})
+          <span className="text-xs text-gray-500">
+            ({product.reviewCount || 0})
           </span>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center gap-2">
+        {/* PRICE */}
+        <div className="flex items-center gap-2 flex-wrap">
           <span
-            className="text-base font-semibold"
-            style={{ color: product.isSale ? 'var(--color-danger)' : 'var(--color-text)' }}
+            className={`font-semibold text-sm sm:text-base ${
+              product.isSale ? 'text-red-600' : 'text-[var(--color-text)]'
+            }`}
           >
             {formatPrice(product.price)}
           </span>
+
           {product.compareAtPrice && (
-            <span className="text-sm line-through" style={{ color: 'var(--color-text-muted)' }}>
+            <span className="text-xs sm:text-sm line-through text-gray-400">
               {formatPrice(product.compareAtPrice)}
             </span>
           )}
         </div>
 
-        {/* Add to Cart */}
+        {/* BUTTON */}
         <button
           onClick={() => add(product)}
           disabled={product.stock === 0}
-          className="btn btn-primary btn-sm w-full mt-1"
-          style={{ opacity: product.stock === 0 ? 0.5 : 1 }}
-          aria-label={`Add ${product.name} to cart`}
+          className="btn btn-primary btn-sm w-full mt-2 flex items-center justify-center gap-2"
         >
           <ShoppingCart size={14} />
-          {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
+          {product.stock === 0
+            ? 'Sold Out'
+            : isInCart(product.id)
+            ? 'Added'
+            : 'Add'}
         </button>
       </div>
     </div>
