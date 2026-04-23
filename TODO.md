@@ -1,4 +1,4 @@
-# Fix Scattered Auth UI (login, signup, forgot-password)
+ firt ,# Fix Scattered Auth UI (login, signup, forgot-password)
 
 ## Plan Overview
 - Create shared auth components for consistency

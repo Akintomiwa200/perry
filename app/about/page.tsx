@@ -9,7 +9,7 @@ export default function AboutPage() {
   return (
     <>
       <Navbar />
-      <main style={{ paddingTop: '60px' }}>
+<main style={{ paddingTop: 'var(--navbar-height, 60px)', minHeight: '100vh' }}>
         <About />
       </main>
       <Footer />
