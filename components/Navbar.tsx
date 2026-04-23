@@ -6,7 +6,7 @@ import { RootState } from '@/store/store'
 
 const navLinks = [
   ['Shop', '/shop'],
-  ['New In', '/shop?filter=new'],
+  ['New In', '/shop?sort=newest'],
   ['About', '/about'],
   ['Contact', '/contact']
 ]

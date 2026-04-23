@@ -18,8 +18,9 @@ export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
 
-  const filtered = mockProducts.filter(p => 
-    activeCategory === 'all' || p.category.toLowerCase() === activeCategory || p.category.toLowerCase().replace(' ', '-') === activeCategory
+  const filtered = mockProducts.filter(p =>
+    activeCategory === 'all' ||
+    p.category.toLowerCase().replace(/[\s&]+/g, '-') === activeCategory
   )
 
   const sorted = [...filtered].sort((a, b) => {
@@ -27,7 +28,7 @@ export default function ShopPage() {
       case 'price-asc': return a.price - b.price
       case 'price-desc': return b.price - a.price
       case 'rating': return b.rating - a.rating
-      default: return b.isNew ? 1 : -1
+      default: return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)
     }
   })
 

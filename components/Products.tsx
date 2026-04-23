@@ -1,220 +1,126 @@
 'use client'
-import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { ShoppingCart, Heart } from 'lucide-react'
+import { useCart } from '@/hooks/useCart'
+import { mockProducts } from '@/lib/db'
+import { Product } from '@/types/product.types'
+import { formatPrice, calculateDiscount } from '@/lib/utils'
 
-const products = [
-  {
-    id: 1,
-    image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop',
-    cat: 'Accessories',
-    name: 'Gold Statement Necklace',
-    price: '₦8,500',
-    oldPrice: null,
-    badge: 'New',
-  },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=800&auto=format&fit=crop',
-    cat: 'Footwear',
-    name: 'Strappy Block Heel',
-    price: '₦11,500',
-    oldPrice: '₦15,000',
-    badge: 'Hot',
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=800&auto=format&fit=crop',
-    cat: 'Wigs & Hair',
-    name: 'Lace Front — Body Wave',
-    price: '₦45,000',
-    oldPrice: null,
-    badge: null,
-  },
-  {
-    id: 4,
-    image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=800&auto=format&fit=crop',
-    cat: 'Handbags',
-    name: 'Structured Mini Tote',
-    price: '₦16,000',
-    oldPrice: '₦22,000',
-    badge: 'Sale',
-  },
-]
-
-function ProductCard({ product }: { product: typeof products[0] }) {
-  const [wished, setWished] = useState(false)
-  const [hovered, setHovered] = useState(false)
+function ProductCard({ product }: { product: Product }) {
+  const { add, isInCart } = useCart()
 
   return (
     <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{ cursor: 'pointer' }}
+      className="group relative flex flex-col overflow-hidden"
+      style={{
+        background: 'var(--color-surface-raised)',
+        border: '1px solid var(--color-border)',
+        borderRadius: 'var(--radius-lg)',
+        boxShadow: 'var(--shadow-sm)',
+        transition: 'transform 200ms ease, box-shadow 200ms ease',
+      }}
+      onMouseEnter={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-md)'
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--shadow-sm)'
+      }}
     >
-      {/* IMAGE */}
-      <div style={{
-        aspectRatio: '3/4',
-        position: 'relative',
-        overflow: 'hidden',
-        marginBottom: '1rem',
-        borderRadius: 6,
-        background: '#f3ece7',
-      }}>
-        <img
-          src={product.image}
-          alt={product.name}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            transition: 'transform .6s ease',
-            transform: hovered ? 'scale(1.08)' : 'scale(1)',
-          }}
-        />
-
-        {/* HOVER OVERLAY — blur + dim */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(42, 26, 18, 0.35)',
-          backdropFilter: hovered ? 'blur(3px)' : 'blur(0px)',
-          opacity: hovered ? 1 : 0,
-          transition: 'opacity .4s ease, backdrop-filter .4s ease',
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'center',
-          paddingBottom: '1.5rem',
-        }}>
-          <button
-            style={{
-              fontSize: '.72rem',
-              letterSpacing: '.18em',
-              textTransform: 'uppercase',
-              background: 'var(--cream)',
-              color: 'var(--deep)',
-              border: 'none',
-              padding: '.75rem 1.6rem',
-              fontFamily: "'Jost', sans-serif",
-              fontWeight: 500,
-              cursor: 'pointer',
-              transform: hovered ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'transform .4s ease, background .3s',
-              whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = 'var(--terracotta)', e.currentTarget.style.color = '#fff')}
-            onMouseLeave={e => (e.currentTarget.style.background = 'var(--cream)', e.currentTarget.style.color = 'var(--deep)')}
-            onClick={e => e.stopPropagation()}
-          >
-            Add to Cart
-          </button>
+      <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--color-secondary)' }}>
+          {product.images?.[0] ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          ) : (
+            <span className="text-4xl select-none">🎁</span>
+          )}
         </div>
 
-        {/* BADGE */}
-        {product.badge && (
-          <div style={{
-            position: 'absolute',
-            top: '.8rem',
-            left: '.8rem',
-            background: 'var(--terracotta)',
-            color: '#fff',
-            fontSize: '.65rem',
-            letterSpacing: '.14em',
-            textTransform: 'uppercase',
-            padding: '.3rem .7rem',
-          }}>
-            {product.badge}
-          </div>
-        )}
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          {product.isNew && <span className="badge badge-primary">New</span>}
+          {product.isSale && product.compareAtPrice && (
+            <span className="badge badge-danger">
+              -{calculateDiscount(product.price, product.compareAtPrice)}%
+            </span>
+          )}
+        </div>
 
-        {/* WISHLIST */}
+        {/* Wishlist */}
         <button
-          onClick={e => { e.stopPropagation(); setWished(w => !w) }}
-          style={{
-            position: 'absolute',
-            top: '.8rem',
-            right: '.8rem',
-            width: 34,
-            height: 34,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,.9)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '.9rem',
-            border: 'none',
-            opacity: hovered ? 1 : 0,
-            transform: hovered ? 'translateY(0)' : 'translateY(-6px)',
-            transition: 'all .3s ease',
-            color: wished ? 'var(--terracotta)' : '#333',
-            boxShadow: '0 6px 18px rgba(0,0,0,.08)',
-            cursor: 'pointer',
-            zIndex: 2,
-          }}
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+          style={{ background: 'var(--color-surface-raised)', boxShadow: 'var(--shadow-sm)' }}
+          aria-label="Add to wishlist"
         >
-          {wished ? '♥' : '♡'}
+          <Heart size={14} style={{ color: 'var(--color-text-muted)' }} />
         </button>
-      </div>
+      </Link>
 
-      {/* TEXT */}
-      <div style={{
-        fontSize: '.68rem',
-        letterSpacing: '.16em',
-        textTransform: 'uppercase',
-        color: 'var(--mid)',
-        marginBottom: '.25rem',
-      }}>
-        {product.cat}
-      </div>
+      <div className="flex flex-col gap-2 p-4">
+        <Link href={`/products/${product.slug}`}>
+          <h3 className="text-sm font-medium leading-snug line-clamp-2" style={{ color: 'var(--color-text)' }}>
+            {product.name}
+          </h3>
+        </Link>
 
-      <div style={{
-        fontFamily: "'Cormorant Garamond', serif",
-        fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-        fontWeight: 400,
-        color: 'var(--deep)',
-        marginBottom: '.5rem',
-      }}>
-        {product.name}
-      </div>
+        <div className="flex items-center gap-1">
+          <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className="text-xs" style={{ color: i < Math.floor(product.rating) ? '#D97706' : 'var(--color-border)' }}>★</span>
+            ))}
+          </div>
+          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>({product.reviewCount})</span>
+        </div>
 
-      <div style={{
-        fontSize: '.95rem',
-        fontWeight: 500,
-        color: 'var(--terracotta)',
-      }}>
-        {product.oldPrice && (
-          <span style={{
-            textDecoration: 'line-through',
-            color: '#b8a39a',
-            marginRight: '.5rem'
-          }}>
-            {product.oldPrice}
+        <div className="flex items-center gap-2">
+          <span className="text-base font-semibold" style={{ color: product.isSale ? 'var(--color-danger)' : 'var(--color-text)' }}>
+            {formatPrice(product.price)}
           </span>
-        )}
-        {product.price}
+          {product.compareAtPrice && (
+            <span className="text-sm line-through" style={{ color: 'var(--color-text-muted)' }}>
+              {formatPrice(product.compareAtPrice)}
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={() => add(product)}
+          disabled={product.stock === 0}
+          className="btn btn-primary btn-sm w-full mt-1"
+          style={{ opacity: product.stock === 0 ? 0.5 : 1 }}
+          aria-label={`Add ${product.name} to cart`}
+        >
+          <ShoppingCart size={14} />
+          {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
+        </button>
       </div>
     </div>
   )
 }
 
 export default function Products() {
+  const newProducts = mockProducts.filter(p => p.isNew)
+
+  if (newProducts.length === 0) return null
+
   return (
-    <section
-      id="new"
-      className="section-pad"
-      style={{
-        background: 'var(--cream)',
-        position: 'relative',
-        zIndex: 1
-      }}
-    >
-      {/* HEADER */}
+    <section id="new" className="section-pad" style={{ background: 'var(--cream)', position: 'relative', zIndex: 1 }}>
+      {/* Header */}
       <div className="section-header">
         <div>
           <div className="section-label">New In</div>
           <h2 className="section-title">Fresh Picks</h2>
         </div>
 
-        <Link href="/products" style={{
+        <Link href="/shop" style={{
           fontSize: '.75rem',
           letterSpacing: '.16em',
           textTransform: 'uppercase',
@@ -225,9 +131,9 @@ export default function Products() {
         </Link>
       </div>
 
-      {/* GRID */}
+      {/* Grid */}
       <div className="product-grid">
-        {products.map(p => (
+        {newProducts.map(p => (
           <ProductCard key={p.id} product={p} />
         ))}
       </div>
