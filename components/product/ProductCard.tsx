@@ -90,19 +90,17 @@ export default function ProductCard({ product, isPopular, isNewAuto }: ProductCa
           </h3>
         </Link>
 
-        {/* Size / color tags */}
-        {(product.size || product.color) && (
+        {/* Tags (first 2 from product.tags) */}
+        {product.tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {product.size && (
-              <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded border border-gray-300 text-gray-500">
-                {product.size}
+            {product.tags.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded border border-gray-300 text-gray-500"
+              >
+                {tag}
               </span>
-            )}
-            {product.color && (
-              <span className="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded border border-gray-300 text-gray-500">
-                {product.color}
-              </span>
-            )}
+            ))}
           </div>
         )}
 
