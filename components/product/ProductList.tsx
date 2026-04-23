@@ -5,9 +5,10 @@ interface ProductListProps {
   products: Product[];
   title?: string;
   emptyMessage?: string;
+  gridCols?: number;
 }
 
-export default function ProductList({ products, title, emptyMessage = 'No items here yet. Start exploring →' }: ProductListProps) {
+export default function ProductList({ products, title, emptyMessage = 'No items here yet. Start exploring →', gridCols = 3 }: ProductListProps) {
   return (
     <section>
       {title && (
@@ -24,7 +25,7 @@ export default function ProductList({ products, title, emptyMessage = 'No items 
           <p className="text-base font-medium">{emptyMessage}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-${gridCols} gap-4 md:gap-6`}>
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
