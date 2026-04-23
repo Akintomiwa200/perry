@@ -8,6 +8,8 @@ import { formatPrice, calculateDiscount } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
+  isPopular?: boolean;
+  isNewAuto?: boolean;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -34,7 +36,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">
-          {product.isNew && <span className="badge badge-primary">New</span>}
+          {(product.isNew || isNewAuto) && <span className="badge badge-primary">New</span>}
+          {isPopular && <span className="badge badge-warning">Popular</span>}
           {product.isSale && product.compareAtPrice && (
             <span className="badge badge-danger">
               -{calculateDiscount(product.price, product.compareAtPrice)}%

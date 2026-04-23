@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart } from 'lucide-react'
+import { Heart, ShoppingCart } from 'lucide-react'
 import { useCart } from '@/hooks/useCart'
 import { mockProducts } from '@/lib/db'
 import { Product } from '@/types/product.types'
@@ -20,127 +20,83 @@ function ProductCard({
   const { add, isInCart } = useCart()
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
-      {/* IMAGE CONTAINER - Clickable to product page */}
-      <Link 
-        href={`/products/${product.slug}`} 
-        className="relative block overflow-hidden"
-        style={{ aspectRatio: '3/4' }}
-      >
-        {product.images?.[0] ? (
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            className="object-cover transition-transform duration-700 group-hover:scale-110"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-100">
-            <span className="text-4xl">🎁</span>
-          </div>
-        )}
-
-        {/* BADGES */}
-        <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
-          {(product.isNew || isNewAuto) && (
-            <span className="rounded-full bg-blue-600 px-2.5 py-1 text-xs font-bold uppercase text-white shadow-md">
-              New
-            </span>
-          )}
-          {isPopular && (
-            <span className="rounded-full bg-amber-600 px-2.5 py-1 text-xs font-bold uppercase text-white shadow-md">
-              Popular
-            </span>
-          )}
-          {product.isSale && product.compareAtPrice && (
-            <span className="rounded-full bg-red-600 px-2.5 py-1 text-xs font-bold uppercase text-white shadow-md">
-              -{calculateDiscount(product.price, product.compareAtPrice)}%
-            </span>
+    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+      <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
+        <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--color-secondary)' }}>
+          {product.images?.[0] ? (
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          ) : (
+            <span className="text-4xl select-none">🎁</span>
           )}
         </div>
 
-        {/* WISHLIST BUTTON */}
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-1">
+          {(product.isNew || isNewAuto) && <span className="badge badge-primary">New</span>}
+          {isPopular && <span className="badge badge-warning">Popular</span>}
+          {product.isSale && product.compareAtPrice && (
+            <span className="badge badge-danger">
+              -{calculateDiscount(product.price, product.compareAtPrice)}%
+            </span>
+          )}
+          {product.stock === 0 && <span className="badge" style={{ background: 'var(--color-text-muted)', color: '#fff' }}>Sold Out</span>}
+          {product.stock > 0 && product.stock <= 3 && (
+            <span className="badge badge-warning">Only {product.stock} left</span>
+          )}
+        </div>
+
+        {/* Wishlist */}
         <button
-          onClick={(e) => {
-            e.preventDefault()
-            // Add wishlist logic here
-          }}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 group-hover:opacity-100"
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface-raised)] shadow-sm"
           aria-label="Add to wishlist"
         >
-          <Heart size={16} className="text-gray-700 hover:text-red-500" />
+          <Heart size={14} className="text-[var(--color-text-muted)]" />
         </button>
       </Link>
 
-      {/* PRODUCT INFO (Always visible below image) */}
-      <div className="p-4">
+      <div className="flex flex-col gap-2 p-4">
         <Link href={`/products/${product.slug}`}>
-          <h3 className="mb-2 line-clamp-2 text-base font-semibold text-gray-900 transition-colors hover:text-amber-700">
+          <h3 className="text-sm font-medium leading-snug line-clamp-2 text-[var(--color-text)]">
             {product.name}
           </h3>
         </Link>
-        
-        <div className="mb-3 flex items-center gap-2">
-          <span className="text-lg font-bold text-gray-900">
+
+        <div className="flex items-center gap-1">
+          <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
+            {Array.from({ length: 5 }).map((_, i) => (
+                <span key={i} className={`text-xs ${i < Math.floor(product.rating) ? 'text-[#D97706]' : 'text-[var(--color-border)]'}`}>★</span>
+            ))}
+          </div>
+          <span className="text-xs text-[var(--color-text-muted)]">({product.reviewCount})</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className={`text-base font-semibold ${product.isSale ? 'text-[var(--color-danger)]' : 'text-[var(--color-text)]'}`}>
             {formatPrice(product.price)}
           </span>
           {product.compareAtPrice && (
-            <span className="text-sm text-gray-400 line-through">
-              {formatPrice(product.compareAtPrice)}
-            </span>
+          <span className="text-sm line-through text-[var(--color-text-muted)]">
+            {formatPrice(product.compareAtPrice)}
+          </span>
           )}
         </div>
 
         <button
           onClick={() => add(product)}
           disabled={product.stock === 0}
-          className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+          className="btn btn-primary btn-sm w-full mt-1"
+          style={{ opacity: product.stock === 0 ? 0.5 : 1 }}
+          aria-label={`Add ${product.name} to cart`}
         >
-          {product.stock === 0
-            ? 'Sold Out'
-            : isInCart(product.id)
-            ? 'Added to Cart ✓'
-            : 'Add to Cart'}
+          <ShoppingCart size={14} />
+          {product.stock === 0 ? 'Sold Out' : isInCart(product.id) ? 'Added' : 'Add to Cart'}
         </button>
-      </div>
-
-      {/* HOVER OVERLAY WITH BLUR EFFECT */}
-      <div className="absolute inset-0 flex flex-col justify-end bg-black/80 p-5 opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100">
-        <div className="translate-y-8 transform transition-transform duration-500 group-hover:translate-y-0">
-          <h3 className="mb-2 line-clamp-2 text-base font-bold text-white">
-            {product.name}
-          </h3>
-          
-          <div className="mb-3 flex items-center gap-2">
-            <span className="text-xl font-bold text-amber-400">
-              {formatPrice(product.price)}
-            </span>
-            {product.compareAtPrice && (
-              <span className="text-sm text-gray-300 line-through">
-                {formatPrice(product.compareAtPrice)}
-              </span>
-            )}
-          </div>
-
-          <Link href={`/products/${product.slug}`}>
-            <button className="mb-2 w-full rounded-lg bg-white py-2.5 text-sm font-semibold text-gray-900 transition-all duration-300 hover:bg-gray-100">
-              View Details
-            </button>
-          </Link>
-          
-          <button
-            onClick={() => add(product)}
-            disabled={product.stock === 0}
-            className="w-full rounded-lg bg-amber-500 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {product.stock === 0
-              ? 'Sold Out'
-              : isInCart(product.id)
-              ? 'Added to Cart ✓'
-              : 'Quick Add'}
-          </button>
-        </div>
       </div>
     </div>
   )
@@ -197,11 +153,11 @@ export default function Products() {
             </h2>
           </div>
 
-          <Link 
-            href="/shop" 
+          <Link
+            href="/shop"
             className="inline-flex items-center gap-1 text-sm font-semibold uppercase tracking-wide text-amber-700 transition-all hover:gap-2 hover:text-amber-900"
           >
-            View all 
+            View all
             <span aria-hidden="true">→</span>
           </Link>
         </div>
