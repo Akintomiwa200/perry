@@ -260,6 +260,13 @@
   /* Products */
   .product-grid {
     display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.8rem;
+  }
+
+
+  .product-gridhome {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.8rem;
   }
@@ -367,6 +374,8 @@
 
   /* Products */
   .product-grid { grid-template-columns: repeat(2, 1fr); }
+.product-gridhome { grid-template-columns: repeat(2, 1fr); }
+
 
   /* About */
   .about-grid { grid-template-columns: 1fr; }
@@ -395,6 +404,7 @@
 
   /* Products */
   .product-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.product-gridhome{ grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 
   /* Testimonials */
   .testimonials-grid { grid-template-columns: 1fr; }
