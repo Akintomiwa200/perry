@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, ShoppingCart } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { useCart } from '@/hooks/useCart'
 import { mockProducts } from '@/lib/db'
 import { Product } from '@/types/product.types'
@@ -21,7 +21,7 @@ function ProductCard({
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl">
-      {/* IMAGE CONTAINER - Always visible */}
+      {/* IMAGE CONTAINER - Clickable to product page */}
       <Link 
         href={`/products/${product.slug}`} 
         className="relative block overflow-hidden"
@@ -41,7 +41,7 @@ function ProductCard({
           </div>
         )}
 
-        {/* BADGES - Always visible */}
+        {/* BADGES */}
         <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
           {(product.isNew || isNewAuto) && (
             <span className="rounded-full bg-blue-600 px-2.5 py-1 text-xs font-bold uppercase text-white shadow-md">
@@ -59,21 +59,61 @@ function ProductCard({
             </span>
           )}
         </div>
+
+        {/* WISHLIST BUTTON */}
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            // Add wishlist logic here
+          }}
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-110 group-hover:opacity-100"
+          aria-label="Add to wishlist"
+        >
+          <Heart size={16} className="text-gray-700 hover:text-red-500" />
+        </button>
       </Link>
 
-      {/* HOVER OVERLAY - Shows ALL product info on hover with blur effect */}
-      <div className="absolute inset-0 flex flex-col justify-center bg-black/85 p-6 opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100">
-        <div className="translate-y-4 transform transition-transform duration-500 group-hover:translate-y-0">
-          {/* Product Name */}
-          <Link href={`/products/${product.slug}`}>
-            <h3 className="mb-3 text-center text-lg font-bold text-white hover:underline line-clamp-2">
-              {product.name}
-            </h3>
-          </Link>
+      {/* PRODUCT INFO (Always visible below image) */}
+      <div className="p-4">
+        <Link href={`/products/${product.slug}`}>
+          <h3 className="mb-2 line-clamp-2 text-base font-semibold text-gray-900 transition-colors hover:text-amber-700">
+            {product.name}
+          </h3>
+        </Link>
+        
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-lg font-bold text-gray-900">
+            {formatPrice(product.price)}
+          </span>
+          {product.compareAtPrice && (
+            <span className="text-sm text-gray-400 line-through">
+              {formatPrice(product.compareAtPrice)}
+            </span>
+          )}
+        </div>
+
+        <button
+          onClick={() => add(product)}
+          disabled={product.stock === 0}
+          className="w-full rounded-lg bg-gray-900 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-gray-800 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {product.stock === 0
+            ? 'Sold Out'
+            : isInCart(product.id)
+            ? 'Added to Cart ✓'
+            : 'Add to Cart'}
+        </button>
+      </div>
+
+      {/* HOVER OVERLAY WITH BLUR EFFECT */}
+      <div className="absolute inset-0 flex flex-col justify-end bg-black/80 p-5 opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100">
+        <div className="translate-y-8 transform transition-transform duration-500 group-hover:translate-y-0">
+          <h3 className="mb-2 line-clamp-2 text-base font-bold text-white">
+            {product.name}
+          </h3>
           
-          {/* Price */}
-          <div className="mb-3 flex items-center justify-center gap-2">
-            <span className="text-2xl font-bold text-amber-400">
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-xl font-bold text-amber-400">
               {formatPrice(product.price)}
             </span>
             {product.compareAtPrice && (
@@ -83,67 +123,23 @@ function ProductCard({
             )}
           </div>
 
-          {/* Rating */}
-          {product.rating > 0 && (
-            <div className="mb-4 flex items-center justify-center gap-1">
-              <div className="flex text-amber-400">
-                {'★'.repeat(Math.floor(product.rating))}
-                {'☆'.repeat(5 - Math.floor(product.rating))}
-              </div>
-              <span className="text-xs text-gray-300">({product.reviewCount})</span>
-            </div>
-          )}
-
-          {/* Short Description */}
-          {product.description && (
-            <p className="mb-4 text-center text-xs text-gray-300 line-clamp-2">
-              {product.description}
-            </p>
-          )}
-
-          {/* Stock Status */}
-          {product.stock > 0 && product.stock < 10 && (
-            <p className="mb-3 text-center text-xs text-amber-400">
-              Only {product.stock} left in stock
-            </p>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            {/* Add to Cart Button */}
-            <button
-              onClick={() => add(product)}
-              disabled={product.stock === 0}
-              className="flex-1 rounded-lg bg-amber-500 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              <ShoppingCart size={16} />
-              {product.stock === 0
-                ? 'Sold Out'
-                : isInCart(product.id)
-                ? 'Added ✓'
-                : 'Add to Cart'}
-            </button>
-
-            {/* Wishlist Button */}
-            <button
-              onClick={(e) => {
-                e.preventDefault()
-                // Add wishlist logic here
-              }}
-              className="rounded-lg bg-white/20 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/30 flex items-center justify-center gap-2"
-              aria-label="Add to wishlist"
-            >
-              <Heart size={16} />
-              <span className="hidden sm:inline">Wishlist</span>
-            </button>
-          </div>
-
-          {/* View Details Link */}
           <Link href={`/products/${product.slug}`}>
-            <p className="mt-3 text-center text-xs text-gray-300 hover:text-white transition-colors">
-              View Full Details →
-            </p>
+            <button className="mb-2 w-full rounded-lg bg-white py-2.5 text-sm font-semibold text-gray-900 transition-all duration-300 hover:bg-gray-100">
+              View Details
+            </button>
           </Link>
+          
+          <button
+            onClick={() => add(product)}
+            disabled={product.stock === 0}
+            className="w-full rounded-lg bg-amber-500 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {product.stock === 0
+              ? 'Sold Out'
+              : isInCart(product.id)
+              ? 'Added to Cart ✓'
+              : 'Quick Add'}
+          </button>
         </div>
       </div>
     </div>
@@ -210,7 +206,7 @@ export default function Products() {
           </Link>
         </div>
 
-        {/* PRODUCT GRID - Responsive: 1 on mobile, 2 on tablet, 3 on desktop, 4 on large */}
+        {/* PRODUCT GRID - Responsive: 1 on mobile, 2 on tablet, 3-4 on desktop */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {finalProducts.map(p => (
             <ProductCard
