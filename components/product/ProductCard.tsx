@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Heart } from 'lucide-react';
@@ -12,13 +13,11 @@ interface ProductCardProps {
   isNewAuto?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, isPopular, isNewAuto }: ProductCardProps) {
   const { add, isInCart } = useCart();
 
   return (
-    <div
-      className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
-    >
+    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1">
       <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--color-secondary)' }}>
           {product.images?.[0] ? (
@@ -34,7 +33,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
 
-        {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1">
           {(product.isNew || isNewAuto) && <span className="badge badge-primary">New</span>}
           {isPopular && <span className="badge badge-warning">Popular</span>}
@@ -47,16 +45,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.stock > 0 && product.stock <= 3 && (
             <span className="badge badge-warning">Only {product.stock} left</span>
           )}
-      </div>
+        </div>
 
-      {/* Wishlist */}
-      <button
-        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface-raised)] shadow-sm"
-        aria-label="Add to wishlist"
-      >
-        <Heart size={14} className="text-[var(--color-text-muted)]" />
-      </button>
-    </Link>
+        <button
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity bg-[var(--color-surface-raised)] shadow-sm"
+          aria-label="Add to wishlist"
+        >
+          <Heart size={14} className="text-[var(--color-text-muted)]" />
+        </button>
+      </Link>
 
       <div className="flex flex-col gap-2 p-4">
         <Link href={`/products/${product.slug}`}>
@@ -65,15 +62,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           </h3>
         </Link>
 
-          <div className="flex items-center gap-1">
-            <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className={`text-xs ${i < Math.floor(product.rating) ? 'text-[#D97706]' : 'text-[var(--color-border)]'}`}>★</span>
-              ))}
-            </div>
-            <span className="text-xs text-[var(--color-text-muted)]">({product.reviewCount})</span>
+        <div className="flex items-center gap-1">
+          <div className="flex" aria-label={`Rating: ${product.rating} out of 5`}>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className={`text-xs ${i < Math.floor(product.rating) ? 'text-[#D97706]' : 'text-[var(--color-border)]'}`}>★</span>
+            ))}
           </div>
-          <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>({product.reviewCount})</span>
+          <span className="text-xs text-[var(--color-text-muted)]">({product.reviewCount})</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -81,9 +76,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             {formatPrice(product.price)}
           </span>
           {product.compareAtPrice && (
-          <span className="text-sm line-through text-[var(--color-text-muted)]">
-            {formatPrice(product.compareAtPrice)}
-          </span>
+            <span className="text-sm line-through text-[var(--color-text-muted)]">
+              {formatPrice(product.compareAtPrice)}
+            </span>
           )}
         </div>
 
