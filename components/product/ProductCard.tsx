@@ -14,7 +14,19 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { add, isInCart } = useCart();
 
   return (
-    <div className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]">
+    <div
+      className="group relative flex flex-col overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-[var(--radius-lg)]"
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLDivElement;
+        el.style.transform = 'translateY(-2px)';
+        el.style.boxShadow = 'var(--shadow-md)';
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLDivElement;
+        el.style.transform = 'translateY(0)';
+        el.style.boxShadow = 'var(--shadow-sm)';
+      }}
+    >
       <Link href={`/products/${product.slug}`} className="block relative overflow-hidden" style={{ aspectRatio: '3/4' }}>
         <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--color-secondary)' }}>
           {product.images?.[0] ? (
