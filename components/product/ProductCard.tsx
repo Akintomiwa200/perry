@@ -20,7 +20,7 @@ export default function ProductCard({ product, isPopular, isNewAuto }: ProductCa
   const soldOut = product.stock === 0;
 
   return (
-    <div className="group flex flex-col w-full rounded-2xl overflow-hidden bg-white shadow-[0_2px_12px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_8px_28px_rgba(0,0,0,0.13)] hover:-translate-y-1">
+    <div className="group flex flex-col w-full rounded-2xl overflow-hidden bg-[var(--color-surface-raised)] border border-[var(--color-border)] shadow-[var(--shadow-sm)] transition-all duration-300 hover:shadow-[var(--shadow-md)] hover:-translate-y-1">
 
       {/* ── Image area ── */}
       <Link

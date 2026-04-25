@@ -1,5 +1,3 @@
-'use client';
-
 type StatusVariant = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
 interface StatusBadgeProps {

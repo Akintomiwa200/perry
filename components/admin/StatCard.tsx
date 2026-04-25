@@ -1,12 +1,10 @@
-'use client';
-
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatCardProps {
   title: string;
   value: string;
   change?: string;
-  changeType?: 'positive' | 'negative' | 'neutral';
+  changeType?: 'positive' | 'negative' | 'warning' | 'neutral';
   icon: LucideIcon;
   accentColor?: string;
 }
@@ -38,6 +36,7 @@ export default function StatCard({
           <div className="flex items-center gap-1">
             {changeType === 'positive' && <TrendingUp size={12} style={{ color: 'var(--color-success)' }} />}
             {changeType === 'negative' && <TrendingDown size={12} style={{ color: 'var(--color-danger)' }} />}
+            {changeType === 'warning' && <TrendingDown size={12} style={{ color: 'var(--color-warning)' }} />}
             <span
               className="text-xs font-medium"
               style={{
@@ -46,6 +45,8 @@ export default function StatCard({
                     ? 'var(--color-success)'
                     : changeType === 'negative'
                     ? 'var(--color-danger)'
+                    : changeType === 'warning'
+                    ? 'var(--color-warning)'
                     : 'var(--color-text-muted)',
               }}
             >

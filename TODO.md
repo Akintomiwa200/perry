@@ -1,19 +1,12 @@
- firt ,# Fix Scattered Auth UI (login, signup, forgot-password)
-
-## Plan Overview
-- Create shared auth components for consistency
-- Remove inline styles → use CSS classes/CSS vars
-- Unify forms with artisan boutique theme
-- Ensure responsive/mobile-first
+# Admin Auth Pages Implementation
 
 ## Steps
-- [x] Step 1: Create new shared components (AuthCard.tsx, AuthInput.tsx, ErrorAlert.tsx)
-- [x] Step 2: Update ui/Input.tsx and ui/Button.tsx (remove inline styles)
-- [x] Step 3: Refactor app/(auth)/layout.tsx (pure classes)
-- [x] Step 4: Refactor login/page.tsx using new components
-- [x] Step 5: Refactor register/page.tsx
-- [ ] Step 6: Refactor forgot-password/page.tsx
-- [ ] Step 7: Test UI (pnpm dev, check all pages/states)
-- [ ] Step 8: Minor globals.css tweaks if needed
 
-**Current Progress: Step 6 ✅ Complete. All auth pages refactored with unified UI. Step 7: Test (run `pnpm dev`, check /login, /register, /forgot-password for consistent artisan theme, no scattered styles). No globals.css changes needed.**
+1. [x] Update `types/user.types.ts` — add optional `role` to `User` and admin auth types
+2. [x] Update `services/authService.ts` — add `adminLogin` and `adminRegister` methods
+3. [x] Update `lib/api.ts` — improve 401 interceptor to distinguish admin vs user routes
+4. [x] Create `app/(auth)/auth/admin/login/page.tsx` — admin login page with same UI as normal login
+5. [x] Create `app/(auth)/auth/admin/register/page.tsx` — admin signup page with same UI as normal register
+6. [x] Update `hooks/useAuth.ts` — add admin login/register helpers that redirect to `/admin`
+7. [ ] Verify pages compile and routes resolve correctly
+

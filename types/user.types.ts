@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   avatar?: string;
   phone?: string;
+  role?: 'user' | 'admin';
   createdAt: string;
 }
 
@@ -35,6 +36,23 @@ export interface RegisterData {
 }
 
 export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+export interface AdminLoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface AdminRegisterData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export interface AdminAuthResponse {
   user: User;
   token: string;
 }

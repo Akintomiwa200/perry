@@ -17,7 +17,8 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        const isAdminRoute = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/auth/admin');
+        window.location.href = isAdminRoute ? '/auth/admin/login' : '/login';
       }
     }
     return Promise.reject(error);
