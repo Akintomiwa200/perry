@@ -9,7 +9,7 @@ import { mockProducts } from "@/lib/db";
 // CONSTANTS & HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const fmt = (n) =>
+const fmt = (n: number): string =>
   new Intl.NumberFormat("en-NG", {
     style: "currency",
     currency: "NGN",
