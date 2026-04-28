@@ -1,8 +1,7 @@
 'use client';
 
-import DataTable from '@/components/admin/DataTable';
-import StatusBadge from '@/components/admin/StatusBadge';
 import { Package, Plus, Search } from 'lucide-react';
+import StatusBadge from '@/components/admin/StatusBadge';
 
 interface ProductRow {
   id: string;
@@ -27,6 +26,50 @@ const statusMap: Record<string, 'success' | 'warning' | 'neutral'> = {
   draft: 'neutral',
   out_of_stock: 'warning',
 };
+
+function ProductRow({ product, idx, total }: { product: ProductRow; idx: number; total: number }) {
+  return (
+    <tr
+      key={product.id}
+      className="transition-colors"
+      style={{
+        background: 'var(--color-surface-raised)',
+        borderBottom: idx < total - 1 ? '1px solid var(--color-border)' : undefined,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'var(--color-surface)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'var(--color-surface-raised)';
+      }}
+    >
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+            style={{ background: 'var(--color-secondary)' }}
+          >
+            <Package size={16} style={{ color: 'var(--color-primary)' }} />
+          </div>
+          <div>
+            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{product.name}</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{product.id}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{product.category}</td>
+      <td className="px-4 py-3.5 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+        ₦{product.price.toLocaleString()}
+      </td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: product.stock === 0 ? 'var(--color-danger)' : product.stock <= 5 ? 'var(--color-warning)' : 'var(--color-success)' }}>
+        {product.stock === 0 ? 'Out of stock' : product.stock}
+      </td>
+      <td className="px-4 py-3.5">
+        <StatusBadge label={product.status.replace('_', ' ')} variant={statusMap[product.status] || 'neutral'} />
+      </td>
+    </tr>
+  );
+}
 
 export default function AdminProductsTable() {
   return (
@@ -99,66 +142,28 @@ export default function AdminProductsTable() {
         </select>
       </div>
 
-      {/* Table */}
-      <DataTable
-        columns={[
-          {
-            key: 'name',
-            header: 'Product',
-            render: (row: ProductRow) => (
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ background: 'var(--color-secondary)' }}
-                >
-                  <Package size={16} style={{ color: 'var(--color-primary)' }} />
-                </div>
-                <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                    {row.name}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                    {row.id}
-                  </p>
-                </div>
-              </div>
-            ),
-          },
-          { key: 'category', header: 'Category' },
-          {
-            key: 'price',
-            header: 'Price',
-            render: (row: ProductRow) => (
-              <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-                ₦{row.price.toLocaleString()}
-              </span>
-            ),
-          },
-          {
-            key: 'stock',
-            header: 'Stock',
-            render: (row: ProductRow) => (
-              <span
-                className="text-sm font-medium"
-                style={{
-                  color: row.stock === 0 ? 'var(--color-danger)' : row.stock <= 5 ? 'var(--color-warning)' : 'var(--color-success)',
-                }}
-              >
-                {row.stock === 0 ? 'Out of stock' : row.stock}
-              </span>
-            ),
-          },
-          {
-            key: 'status',
-            header: 'Status',
-            render: (row: ProductRow) => (
-              <StatusBadge label={row.status.replace('_', ' ')} variant={statusMap[row.status] || 'neutral'} />
-            ),
-          },
-        ]}
-        data={PRODUCTS}
-        keyExtractor={(row) => row.id}
-      />
+       {/* Table */}
+       <div
+         className="overflow-x-auto rounded-xl"
+         style={{ border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}
+       >
+         <table className="w-full text-left border-collapse">
+           <thead>
+             <tr style={{ background: 'var(--color-surface)' }}>
+               {['Product', 'Category', 'Price', 'Stock', 'Status'].map((h) => (
+                 <th key={h} className="px-4 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+                   {h}
+                 </th>
+               ))}
+             </tr>
+           </thead>
+           <tbody>
+             {PRODUCTS.map((product, idx) => (
+               <ProductRow key={product.id} product={product} idx={idx} total={PRODUCTS.length} />
+             ))}
+           </tbody>
+         </table>
+       </div>
     </div>
   );
 }

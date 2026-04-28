@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
 import StatCard from '@/components/admin/StatCard';
-import StatusBadge from '@/components/admin/StatusBadge';
 import {
   DollarSign,
   ShoppingBag,
@@ -9,23 +8,17 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
+import RecentOrderRow from '@/components/admin/RecentOrderRow';
 
 export const metadata: Metadata = { title: 'Admin Dashboard — Perry Collectibles' };
 
 const RECENT_ORDERS = [
-  { id: 'ORD-001', customer: 'Amara Okafor', date: 'Mar 15, 2024', total: 124.5, status: 'delivered' as const },
-  { id: 'ORD-002', customer: 'Chioma Nwosu', date: 'Mar 14, 2024', total: 89.0, status: 'shipped' as const },
-  { id: 'ORD-003', customer: 'Bolanle Ade', date: 'Mar 14, 2024', total: 245.0, status: 'processing' as const },
-  { id: 'ORD-004', customer: 'Ngozi Eze', date: 'Mar 13, 2024', total: 56.99, status: 'pending' as const },
-  { id: 'ORD-005', customer: 'Funmi Bakare', date: 'Mar 12, 2024', total: 178.25, status: 'delivered' as const },
+  { id: 'ORD-001', customer: 'Amara Okafor', date: 'Mar 15, 2024', total: 124.5, status: 'delivered' },
+  { id: 'ORD-002', customer: 'Chioma Nwosu', date: 'Mar 14, 2024', total: 89.0, status: 'shipped' },
+  { id: 'ORD-003', customer: 'Bolanle Ade', date: 'Mar 14, 2024', total: 245.0, status: 'processing' },
+  { id: 'ORD-004', customer: 'Ngozi Eze', date: 'Mar 13, 2024', total: 56.99, status: 'pending' },
+  { id: 'ORD-005', customer: 'Funmi Bakare', date: 'Mar 12, 2024', total: 178.25, status: 'delivered' },
 ];
-
-const statusVariantMap: Record<string, 'success' | 'warning' | 'info' | 'neutral'> = {
-  delivered: 'success',
-  shipped: 'info',
-  processing: 'warning',
-  pending: 'neutral',
-};
 
 export default function AdminDashboardPage() {
   return (
@@ -117,40 +110,12 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody>
               {RECENT_ORDERS.map((order, idx) => (
-                <tr
+                <RecentOrderRow
                   key={order.id}
-                  className="transition-colors"
-                  style={{
-                    background: 'var(--color-surface-raised)',
-                    borderBottom:
-                      idx < RECENT_ORDERS.length - 1 ? '1px solid var(--color-border)' : undefined,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'var(--color-surface)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'var(--color-surface-raised)';
-                  }}
-                >
-                  <td className="px-4 py-3.5 text-sm font-medium" style={{ color: 'var(--color-text)' }}>
-                    {order.id}
-                  </td>
-                  <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>
-                    {order.customer}
-                  </td>
-                  <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    {order.date}
-                  </td>
-                  <td className="px-4 py-3.5 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-                    ₦{order.total.toFixed(2)}
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <StatusBadge
-                      label={order.status}
-                      variant={statusVariantMap[order.status] || 'neutral'}
-                    />
-                  </td>
-                </tr>
+                  order={order}
+                  idx={idx}
+                  total={RECENT_ORDERS.length}
+                />
               ))}
             </tbody>
           </table>

@@ -1,8 +1,7 @@
 'use client';
 
-import DataTable from '@/components/admin/DataTable';
-import StatusBadge from '@/components/admin/StatusBadge';
 import { Search, Filter } from 'lucide-react';
+import StatusBadge from '@/components/admin/StatusBadge';
 
 interface OrderRow {
   id: string;
@@ -30,7 +29,37 @@ const statusMap: Record<string, 'success' | 'info' | 'warning' | 'neutral' | 'da
   cancelled: 'danger',
 };
 
-export default function AdminOrdersTable() {
+function OrderRow({ order, idx, total }: { order: OrderRow; idx: number; total: number }) {
+  return (
+    <tr
+      key={order.id}
+      className="transition-colors"
+      style={{
+        background: 'var(--color-surface-raised)',
+        borderBottom: idx < total - 1 ? '1px solid var(--color-border)' : undefined,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = 'var(--color-surface)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'var(--color-surface-raised)';
+      }}
+    >
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{order.id}</td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{order.customer}</td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>{order.date}</td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        {order.items} item{order.items > 1 ? 's' : ''}
+      </td>
+      <td className="px-4 py-3.5 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+        ₦{order.total.toFixed(2)}
+      </td>
+      <td className="px-4 py-3.5">
+        <StatusBadge label={order.status} variant={statusMap[order.status] || 'neutral'} />
+      </td>
+    </tr>
+  );
+}
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -108,41 +137,28 @@ export default function AdminOrdersTable() {
         </button>
       </div>
 
-      {/* Table */}
-      <DataTable
-        columns={[
-          { key: 'id', header: 'Order ID' },
-          { key: 'customer', header: 'Customer' },
-          { key: 'date', header: 'Date' },
-          {
-            key: 'items',
-            header: 'Items',
-            render: (row: OrderRow) => (
-              <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                {row.items} item{row.items > 1 ? 's' : ''}
-              </span>
-            ),
-          },
-          {
-            key: 'total',
-            header: 'Total',
-            render: (row: OrderRow) => (
-              <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-                ₦{row.total.toFixed(2)}
-              </span>
-            ),
-          },
-          {
-            key: 'status',
-            header: 'Status',
-            render: (row: OrderRow) => (
-              <StatusBadge label={row.status} variant={statusMap[row.status] || 'neutral'} />
-            ),
-          },
-        ]}
-        data={ORDERS}
-        keyExtractor={(row) => row.id}
-      />
+       {/* Table */}
+       <div
+         className="overflow-x-auto rounded-xl"
+         style={{ border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}
+       >
+         <table className="w-full text-left border-collapse">
+           <thead>
+             <tr style={{ background: 'var(--color-surface)' }}>
+               {['Order ID', 'Customer', 'Date', 'Items', 'Total', 'Status'].map((h) => (
+                 <th key={h} className="px-4 py-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+                   {h}
+                 </th>
+               ))}
+             </tr>
+           </thead>
+           <tbody>
+             {ORDERS.map((order, idx) => (
+               <OrderRow key={order.id} order={order} idx={idx} total={ORDERS.length} />
+             ))}
+           </tbody>
+         </table>
+       </div>
     </div>
   );
 }
