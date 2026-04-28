@@ -60,6 +60,8 @@ function OrderRow({ order, idx, total }: { order: OrderRow; idx: number; total: 
     </tr>
   );
 }
+
+export default function AdminOrdersTable() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}

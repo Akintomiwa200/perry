@@ -74,24 +74,6 @@ function CustomerRow({ customer, idx, total }: { customer: CustomerRow; idx: num
   );
 }
 
-interface CustomerRow {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  orders: number;
-  spent: number;
-  joined: string;
-}
-
-const CUSTOMERS: CustomerRow[] = [
-  { id: 'CUS-001', name: 'Amara Okafor', email: 'amara.okafor@email.com', phone: '+234 801 234 5678', orders: 8, spent: 425000, joined: 'Jan 2024' },
-  { id: 'CUS-002', name: 'Chioma Nwosu', email: 'chioma.n@email.com', phone: '+234 802 345 6789', orders: 5, spent: 210000, joined: 'Feb 2024' },
-  { id: 'CUS-003', name: 'Bolanle Ade', email: 'bolanle.ade@email.com', phone: '+234 803 456 7890', orders: 12, spent: 890000, joined: 'Nov 2023' },
-  { id: 'CUS-004', name: 'Ngozi Eze', email: 'ngozi.eze@email.com', phone: '+234 804 567 8901', orders: 3, spent: 95000, joined: 'Mar 2024' },
-  { id: 'CUS-005', name: 'Funmi Bakare', email: 'funmi.b@email.com', phone: '+234 805 678 9012', orders: 6, spent: 340000, joined: 'Dec 2023' },
-  { id: 'CUS-006', name: 'Adeola Martins', email: 'adeola.m@email.com', phone: '+234 806 789 0123', orders: 2, spent: 67000, joined: 'Mar 2024' },
-];
 
 export default function AdminCustomersTable() {
   return (
