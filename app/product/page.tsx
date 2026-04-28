@@ -1,13 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-} from "framer-motion";
 import { mockProducts } from "@/lib/db";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -42,18 +37,165 @@ const CATEGORIES = [
   "clothing",
 ];
 
-// ─── Star rating ─────────────────────────────────────────────────────────────
+const CARD_W = 192; // w-48
+const GAP    = 14;
+const STEP   = CARD_W + GAP;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL STYLES  (injected once — pure CSS animations, no package needed)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const GLOBAL_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  .font-display { font-family: 'DM Serif Display', serif !important; }
+  body, input, button { font-family: 'Outfit', sans-serif; }
+
+  /* ── Panel slide-up / fade ── */
+  @keyframes panelUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  @keyframes backdropIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes panelDown {
+    from { transform: translateY(0); }
+    to   { transform: translateY(100%); }
+  }
+  @keyframes backdropOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  .panel-enter  { animation: panelUp      0.38s cubic-bezier(0.22,1,0.36,1) both; }
+  .panel-exit   { animation: panelDown    0.30s cubic-bezier(0.55,0,1,0.45) both; }
+  .bd-enter     { animation: backdropIn   0.25s ease both; }
+  .bd-exit      { animation: backdropOut  0.28s ease both; }
+
+  /* ── Desktop card reveal ── */
+  @keyframes cardReveal {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  .card-reveal {
+    animation: cardReveal 0.45s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  /* ── Dot pill width transition ── */
+  .dot-pill {
+    height: 6px;
+    border-radius: 9999px;
+    transition: width 0.22s ease, background-color 0.22s ease;
+    cursor: pointer;
+    border: none;
+    padding: 0;
+  }
+
+  /* ── Slider track ── */
+  .slider-track {
+    display: flex;
+    gap: ${GAP}px;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+  }
+  .slider-track.is-dragging { cursor: grabbing; }
+  .slider-track.snap {
+    transition: transform 0.38s cubic-bezier(0.22,1,0.36,1);
+  }
+
+  /* ── Card active ring ── */
+  .mob-card-active { outline: 2px solid var(--ring-color); }
+
+  /* ── Plus button pop ── */
+  .plus-btn {
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .plus-btn:hover  { transform: scale(1.14); }
+  .plus-btn:active { transform: scale(0.88); }
+
+  /* ── Desktop card hover ── */
+  .desk-card {
+    transition: box-shadow 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1);
+  }
+  .desk-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.13) !important;
+  }
+  .desk-card:hover .desk-img { transform: scale(1.06); }
+  .desk-img { transition: transform 0.5s ease; }
+
+  /* ── Category pill ── */
+  .cat-pill {
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+  }
+  .cat-pill:active { transform: scale(0.95); }
+
+  /* ── Offer thumb ── */
+  .offer-thumb {
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .offer-thumb:hover  { transform: scale(1.05); }
+  .offer-thumb:active { transform: scale(0.95); }
+
+  /* ── Color swatch ── */
+  .swatch {
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .swatch:active { transform: scale(0.88); }
+
+  /* ── Scrollbar hide ── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+
+  /* ── Add to cart button ── */
+  .add-btn {
+    transition: opacity 0.18s ease, transform 0.14s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .add-btn:hover  { opacity: 0.88; }
+  .add-btn:active { transform: scale(0.96); }
+
+  /* ── Back / icon buttons ── */
+  .icon-btn {
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .icon-btn:hover  { transform: scale(1.07); }
+  .icon-btn:active { transform: scale(0.93); }
+
+  /* ── Size button ── */
+  .size-btn {
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  }
+  .size-btn:active { transform: scale(0.92); }
+
+  /* ── Dot rating ── */
+  .rating-dot {
+    transition: transform 0.18s ease;
+  }
+  .desk-card:hover .rating-dot { transform: scale(1.25); }
+
+  /* ── Panel close animation trigger ── */
+  .panel-overlay.closing .panel-sheet { animation: panelDown   0.30s cubic-bezier(0.55,0,1,0.45) both; }
+  .panel-overlay.closing .panel-bd    { animation: backdropOut 0.28s ease both; }
+`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SMALL SHARED ATOMS
+// ─────────────────────────────────────────────────────────────────────────────
+
 const StarRating = ({ rating }) => (
   <span className="text-xs tracking-wider">
     {[1, 2, 3, 4, 5].map((s) => (
-      <span key={s} style={{ color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" }}>
-        ★
-      </span>
+      <span key={s} style={{ color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" }}>★</span>
     ))}
   </span>
 );
 
-// ─── Sale / New badge ─────────────────────────────────────────────────────────
 const Badge = ({ product }) => {
   if (product.isSale)
     return (
@@ -71,130 +213,96 @@ const Badge = ({ product }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE EXPANDED PANEL  (matches right side of Image 1)
+// MOBILE EXPANDED PANEL  — pure CSS slide-up / fade, no framer-motion
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MobileExpandedPanel = ({ product, onClose }) => {
+  const [closing, setClosing] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedColor, setSelectedColor] = useState(0);
-  const colors = ["#111111", "#0EA5E9"];
-  const sizes = ["5", "6", "7", "8", "9"];
+  const colors  = ["#111111", "#0EA5E9"];
+  const sizes   = ["5", "6", "7", "8", "9"];
   const { hex, accent } = CATEGORY_COLORS[product.category] || DEFAULT_COLOR;
 
+  // Trigger exit animation then unmount
+  const handleClose = useCallback(() => {
+    setClosing(true);
+    setTimeout(onClose, 300);
+  }, [onClose]);
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") handleClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [handleClose]);
+
   return (
-    <motion.div
-      className="fixed inset-0 z-50 flex items-end justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
+    <div className={`panel-overlay fixed inset-0 z-50 flex items-end justify-center ${closing ? "closing" : ""}`}>
       {/* Backdrop */}
-      <motion.div
-        className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
-        onClick={onClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+      <div
+        className="panel-bd absolute inset-0 bg-black/40 backdrop-blur-[2px] bd-enter"
+        onClick={handleClose}
       />
 
-      {/* Sliding panel */}
-      <motion.div
-        className="relative w-full max-w-md bg-white rounded-t-[2rem] overflow-hidden z-10"
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 340 }}
-      >
-        {/* Hero image area */}
-        <div
-          className="relative h-64 overflow-hidden"
-          style={{ background: hex }}
-        >
-          {/* Back button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-lg font-light hover:scale-105 transition-transform"
-          >
+      {/* Sheet */}
+      <div className="panel-sheet relative w-full max-w-md bg-white rounded-t-[2rem] overflow-hidden z-10 panel-enter">
+
+        {/* Hero image */}
+        <div className="relative h-64 overflow-hidden flex items-center justify-center" style={{ background: hex }}>
+          <button onClick={handleClose} className="icon-btn absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-lg font-light">
             ←
           </button>
 
-          {/* Wishlist button */}
           <div className="absolute top-4 right-4 z-10">
-            <button className="w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-base hover:scale-105 transition-transform relative">
+            <button className="icon-btn w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-base relative">
               ♡
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                2
-              </span>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
             </button>
           </div>
 
-          {/* Product image */}
           {product.images?.[0] ? (
             <div className="absolute inset-4">
-              <Image
-                src={product.images[0]}
-                alt={product.name}
-                fill
-                className="object-contain"
-              />
+              <Image src={product.images[0]} alt={product.name} fill className="object-contain" />
             </div>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="w-28 h-28 rounded-full flex items-center justify-center text-5xl font-bold"
-                style={{ background: accent + "33", color: accent }}
-              >
-                {product.name[0]}
-              </div>
+            <div className="w-28 h-28 rounded-full flex items-center justify-center text-5xl font-bold" style={{ background: accent + "33", color: accent }}>
+              {product.name[0]}
             </div>
           )}
 
-          {/* 3D badge */}
-          <div className="absolute bottom-3 right-3 w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-white text-lg shadow-lg">
-            ⬡
-          </div>
+          <div className="absolute bottom-3 right-3 w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-white text-lg shadow-lg">⬡</div>
         </div>
 
-        {/* Body content */}
+        {/* Content */}
         <div className="px-5 pt-5 pb-8">
-          {/* Name + Price row */}
           <div className="flex items-start justify-between gap-3 mb-1">
             <div>
-              <h2 className="font-display text-xl font-bold text-zinc-900 leading-tight">
-                {product.name}
-              </h2>
-              <p className="text-xs text-zinc-400 capitalize mt-0.5">
-                {product.category.replace(/-/g, " ")}
-              </p>
+              <h2 className="font-display text-xl font-bold text-zinc-900 leading-tight">{product.name}</h2>
+              <p className="text-xs text-zinc-400 capitalize mt-0.5">{product.category.replace(/-/g, " ")}</p>
             </div>
-            <p className="font-display text-xl font-bold text-zinc-900 whitespace-nowrap">
-              {fmt(product.price)}
-            </p>
+            <p className="font-display text-xl font-bold text-zinc-900 whitespace-nowrap">{fmt(product.price)}</p>
           </div>
 
-          {/* Stars */}
           <div className="flex items-center gap-2 mb-3">
             <StarRating rating={product.rating} />
             <span className="text-[11px] text-zinc-400">({product.reviewCount} reviews)</span>
           </div>
 
-          {/* Description */}
-          <p className="text-[13px] text-zinc-500 leading-relaxed mb-4">
-            {product.description}
-          </p>
+          <p className="text-[13px] text-zinc-500 leading-relaxed mb-4">{product.description}</p>
 
-          {/* Sizes – only for footwear & clothing */}
+          {/* Sizes */}
           {["footwear", "clothing"].includes(product.category) && (
             <div className="flex gap-2 mb-4">
               {sizes.map((s) => (
                 <button
                   key={s}
                   onClick={() => setSelectedSize(s)}
-                  className="w-9 h-9 rounded-full text-sm font-medium transition-all duration-150 border border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400"
+                  className="size-btn w-9 h-9 rounded-full text-sm font-medium border"
                   style={
                     selectedSize === s
                       ? { background: accent, borderColor: accent, color: "#fff" }
-                      : {}
+                      : { background: "#fff", borderColor: "#E5E7EB", color: "#52525B" }
                   }
                 >
                   {s}
@@ -206,38 +314,29 @@ const MobileExpandedPanel = ({ product, onClose }) => {
           {/* Color swatches */}
           <div className="flex items-center gap-3 mb-6">
             {colors.map((c, i) => (
-              <motion.button
+              <button
                 key={i}
-                onClick={() => setSelectedColor(i)}
-                className="w-7 h-7 rounded-full border-2 border-white"
+                className="swatch w-7 h-7 rounded-full border-2 border-white"
                 style={{
                   background: c,
-                  boxShadow:
-                    selectedColor === i
-                      ? `0 0 0 2px #fff, 0 0 0 4px ${c}`
-                      : "none",
+                  boxShadow: selectedColor === i ? `0 0 0 2px #fff, 0 0 0 4px ${c}` : "none",
                 }}
-                whileTap={{ scale: 0.9 }}
+                onClick={() => setSelectedColor(i)}
               />
             ))}
           </div>
 
-          {/* Add to cart */}
-          <motion.button
-            className="w-full py-4 rounded-full bg-zinc-900 text-white text-sm font-semibold tracking-wide"
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ opacity: 0.88 }}
-          >
+          <button className="add-btn w-full py-4 rounded-full bg-zinc-900 text-white text-sm font-semibold tracking-wide">
             Add to cart
-          </motion.button>
+          </button>
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE CARD  (single card inside the slider)
+// MOBILE CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MobileCard = ({ product, onExpand, isActive }) => {
@@ -245,81 +344,100 @@ const MobileCard = ({ product, onExpand, isActive }) => {
 
   return (
     <div
-      className="relative bg-white rounded-2xl overflow-hidden flex-shrink-0 w-48 select-none"
+      className="relative bg-white rounded-2xl overflow-hidden flex-shrink-0 select-none"
       style={{
+        width: CARD_W,
         boxShadow: isActive
           ? `0 0 0 2px ${accent}, 0 4px 16px rgba(0,0,0,0.10)`
           : "0 2px 12px rgba(0,0,0,0.06)",
-        transition: "box-shadow 0.2s",
+        transition: "box-shadow 0.22s ease",
       }}
     >
       <Link href={`/products/${product.slug}`} className="block no-underline">
-        {/* Image area */}
-        <div
-          className="relative h-44 flex items-center justify-center"
-          style={{ background: hex }}
-        >
+        <div className="relative flex items-center justify-center" style={{ height: 176, background: hex }}>
           <Badge product={product} />
           {product.images?.[0] ? (
-            <Image
-              src={product.images[0]}
-              alt={product.name}
-              fill
-              className="object-contain p-4"
-            />
+            <Image src={product.images[0]} alt={product.name} fill className="object-contain p-4" />
           ) : (
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-bold"
-              style={{ background: accent + "33", color: accent }}
-            >
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-bold" style={{ background: accent + "33", color: accent }}>
               {product.name[0]}
             </div>
           )}
         </div>
-
-        {/* Info */}
         <div className="px-3.5 pt-3 pb-10">
-          <p className="font-display text-[15px] font-bold text-zinc-900 leading-tight mb-1">
-            {product.name}
-          </p>
+          <p className="font-display text-[15px] font-bold text-zinc-900 leading-tight mb-1">{product.name}</p>
           <p className="text-sm font-semibold text-zinc-700">{fmt(product.price)}</p>
         </div>
       </Link>
 
-      {/* Plus button */}
-      <motion.button
-        className="absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white flex items-center justify-center text-xl text-zinc-800 font-light leading-none"
+      <button
+        className="plus-btn absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white flex items-center justify-center text-xl text-zinc-800 font-light leading-none"
         style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
-        onClick={(e) => {
-          e.preventDefault();
-          onExpand(product);
-        }}
-        whileTap={{ scale: 0.88 }}
-        whileHover={{ scale: 1.12 }}
+        onClick={(e) => { e.preventDefault(); onExpand(product); }}
       >
         +
-      </motion.button>
+      </button>
     </div>
   );
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE SLIDER  (drag + snap, matches figma scroll behaviour)
+// MOBILE SLIDER  — pointer-events drag, CSS spring transition, no framer-motion
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CARD_W = 192; // w-48
-const GAP    = 14;  // gap-3.5
-const STEP   = CARD_W + GAP;
-
 const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
-  const [index, setIndex] = useState(0);
+  const [index, setIndex]         = useState(0);
+  const [snapping, setSnapping]   = useState(true);   // CSS transition on/off
+  const [dragX, setDragX]         = useState(0);      // live drag offset
+  const dragging   = useRef(false);
+  const startX     = useRef(0);
+  const startTime  = useRef(0);
+  const trackRef   = useRef(null);
 
   const clamp = (v) => Math.max(0, Math.min(v, products.length - 1));
 
-  const handleDragEnd = (_, info) => {
-    const { offset, velocity } = info;
-    if (offset.x < -40 || velocity.x < -300) setIndex((i) => clamp(i + 1));
-    else if (offset.x > 40 || velocity.x > 300) setIndex((i) => clamp(i - 1));
+  // Current translate = snapped position + live drag delta
+  const baseX   = -(index * STEP);
+  const totalX  = baseX + dragX;
+
+  // ── Pointer down ──
+  const onPointerDown = (e) => {
+    // Ignore if clicking a link/button directly
+    if (e.target.closest("a, button")) return;
+    dragging.current = true;
+    startX.current   = e.clientX;
+    startTime.current = Date.now();
+    setSnapping(false);
+    trackRef.current?.setPointerCapture(e.pointerId);
+  };
+
+  // ── Pointer move ──
+  const onPointerMove = (e) => {
+    if (!dragging.current) return;
+    const delta = e.clientX - startX.current;
+    // Rubber-band at edges
+    const maxLeft  = (products.length - 1) * STEP;
+    if ((baseX + delta > 0) || (baseX + delta < -maxLeft)) {
+      setDragX(delta * 0.25);
+    } else {
+      setDragX(delta);
+    }
+  };
+
+  // ── Pointer up ──
+  const onPointerUp = (e) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    const elapsed = Date.now() - startTime.current;
+    const velocity = dragX / elapsed; // px/ms
+
+    let next = index;
+    if (dragX < -40 || velocity < -0.35) next = clamp(index + 1);
+    else if (dragX > 40 || velocity > 0.35) next = clamp(index - 1);
+
+    setSnapping(true);
+    setDragX(0);
+    setIndex(next);
   };
 
   return (
@@ -328,25 +446,21 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
       <div className="flex items-center justify-between px-5 mb-3">
         <h2 className="font-display text-lg font-bold text-zinc-900">{title}</h2>
         {showSeeAll && (
-          <button className="text-xs text-zinc-400 font-medium hover:text-zinc-600 transition-colors">
-            See All
-          </button>
+          <button className="cat-pill text-xs text-zinc-400 font-medium hover:text-zinc-600">See All</button>
         )}
       </div>
 
-      {/* Track */}
+      {/* Track container */}
       <div className="overflow-hidden pl-5">
-        <motion.div
-          className="flex gap-3.5 cursor-grab active:cursor-grabbing"
-          drag="x"
-          dragConstraints={{
-            left: -((products.length - 1) * STEP),
-            right: 0,
-          }}
-          dragElastic={0.12}
-          animate={{ x: -(index * STEP) }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          onDragEnd={handleDragEnd}
+        <div
+          ref={trackRef}
+          className={`slider-track${snapping ? " snap" : ""}${dragging.current ? " is-dragging" : ""}`}
+          style={{ transform: `translateX(${totalX}px)` }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerUp}
+          onPointerCancel={onPointerUp}
         >
           {products.map((p, i) => (
             <MobileCard
@@ -356,24 +470,23 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
               isActive={i === index}
             />
           ))}
-          {/* Trailing spacer so last card doesn't sit at edge */}
-          <div className="w-5 flex-shrink-0" />
-        </motion.div>
+          {/* trailing spacer */}
+          <div style={{ width: 20, flexShrink: 0 }} />
+        </div>
       </div>
 
       {/* Pill indicators */}
       {products.length > 1 && (
         <div className="flex justify-center items-center gap-1.5 mt-3.5">
           {products.map((_, i) => (
-            <motion.button
+            <button
               key={i}
-              className="h-1.5 rounded-full"
-              animate={{
+              className="dot-pill"
+              style={{
                 width: i === index ? 20 : 6,
                 backgroundColor: i === index ? "#111111" : "#D1D5DB",
               }}
-              transition={{ duration: 0.22 }}
-              onClick={() => setIndex(i)}
+              onClick={() => { setSnapping(true); setIndex(i); }}
             />
           ))}
         </div>
@@ -383,27 +496,23 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE OFFERS ROW  (small thumbnail row)
+// MOBILE OFFERS ROW
 // ─────────────────────────────────────────────────────────────────────────────
 
 const MobileOffersRow = ({ products }) => (
   <section className="mb-7">
     <div className="flex items-center justify-between px-5 mb-3">
       <h2 className="font-display text-lg font-bold text-zinc-900">Offers</h2>
-      <button className="text-xs text-zinc-400 font-medium hover:text-zinc-600 transition-colors">
-        See All
-      </button>
+      <button className="text-xs text-zinc-400 font-medium hover:text-zinc-600 transition-colors">See All</button>
     </div>
-    <div className="flex gap-3 px-5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+    <div className="flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
       {products.map((p) => {
         const { hex } = CATEGORY_COLORS[p.category] || DEFAULT_COLOR;
         return (
           <Link key={p.id} href={`/products/${p.slug}`} className="flex-shrink-0">
-            <motion.div
-              className="w-[88px] h-[88px] rounded-2xl overflow-hidden relative"
-              style={{ background: hex }}
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+            <div
+              className="offer-thumb rounded-2xl overflow-hidden relative"
+              style={{ width: 88, height: 88, background: hex }}
             >
               {p.images?.[0] ? (
                 <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
@@ -412,7 +521,7 @@ const MobileOffersRow = ({ products }) => (
                   {p.name[0]}
                 </div>
               )}
-            </motion.div>
+            </div>
           </Link>
         );
       })}
@@ -421,7 +530,7 @@ const MobileOffersRow = ({ products }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DESKTOP CARD  (3-per-row, matches Image 2)
+// DESKTOP CARD  — CSS card-reveal animation, pure hover transitions
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DesktopCard = ({ product, index }) => {
@@ -429,95 +538,74 @@ const DesktopCard = ({ product, index }) => {
   const filled = Math.round(product.rating);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.055, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    <Link
+      href={`/products/${product.slug}`}
+      className="block no-underline card-reveal"
+      style={{ animationDelay: `${index * 0.055}s` }}
     >
-      <Link href={`/products/${product.slug}`} className="block group no-underline">
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 relative">
+      <div className="desk-card bg-white rounded-2xl overflow-hidden shadow-sm relative">
 
-          {/* Coloured top section */}
-          <div
-            className="relative px-5 pt-5 pb-16 overflow-hidden min-h-[190px]"
-            style={{ background: hex }}
-          >
-            {/* Category + name + description */}
-            <div className="max-w-[56%]">
-              <p className="text-[9px] font-bold tracking-[2px] text-zinc-400 uppercase mb-1">
-                {product.category.replace(/-/g, " ")}
-              </p>
-              <h3 className="font-display text-[17px] font-bold text-zinc-900 leading-tight mb-2">
-                {product.name}
-              </h3>
-              <p className="text-[11px] text-zinc-500 leading-snug line-clamp-2">
-                {product.description}
-              </p>
-            </div>
-
-            {/* Price badge (top right) */}
-            <div className="absolute top-3.5 right-3.5 bg-white rounded-full px-3.5 py-1.5 shadow-md">
-              <span className="font-display text-[15px] font-bold text-zinc-900">
-                {fmt(product.price)}
-              </span>
-            </div>
-
-            {/* Circular product image (overlaps bottom edge) */}
-            <div className="absolute -bottom-6 right-3 w-[110px] h-[110px] rounded-full overflow-hidden bg-white shadow-lg ring-4 ring-white">
-              {product.images?.[0] ? (
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-3xl font-bold"
-                  style={{ background: accent + "33", color: accent }}
-                >
-                  {product.name[0]}
-                </div>
-              )}
-            </div>
-
-            <Badge product={product} />
+        {/* Coloured top */}
+        <div className="relative px-5 pt-5 pb-16 min-h-[190px]" style={{ background: hex }}>
+          <div className="max-w-[56%]">
+            <p className="text-[9px] font-bold tracking-[2px] text-zinc-400 uppercase mb-1">
+              {product.category.replace(/-/g, " ")}
+            </p>
+            <h3 className="font-display text-[17px] font-bold text-zinc-900 leading-tight mb-2">
+              {product.name}
+            </h3>
+            <p className="text-[11px] text-zinc-500 leading-snug line-clamp-2">
+              {product.description}
+            </p>
           </div>
 
-          {/* White bottom section */}
-          <div className="flex items-center justify-between px-5 pt-8 pb-5 bg-white">
-            {/* Dot rating */}
-            <div className="flex items-center gap-1.5">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <span
-                  key={i}
-                  className="w-2 h-2 rounded-full inline-block transition-transform group-hover:scale-110"
-                  style={{ background: i <= filled ? accent : "#E5E7EB" }}
-                />
-              ))}
-            </div>
-
-            {/* CTA */}
-            <motion.button
-              className="text-[10px] font-bold tracking-[1.5px] text-white px-4 py-2 rounded-full"
-              style={{ background: "#1A3560" }}
-              whileTap={{ scale: 0.95 }}
-              whileHover={{ opacity: 0.88 }}
-              onClick={(e) => e.preventDefault()}
-            >
-              ADD TO CART
-            </motion.button>
+       {/* Price badge */}
+          <div className="absolute top-3.5 right-3.5 bg-white rounded-full px-3.5 py-1.5 shadow-md">
+            <span className="font-display text-[15px] font-bold text-zinc-900">{fmt(product.price)}</span>
           </div>
 
-          {/* Strike-through compare price */}
-          {product.compareAtPrice && (
-            <div className="absolute bottom-[54px] right-5 text-[10px] text-zinc-400 line-through">
-              {fmt(product.compareAtPrice)}
-            </div>
-          )}
+          {/* Circular image */}
+          <div className="absolute -bottom-6 right-3 w-[110px] h-[110px] rounded-full overflow-hidden bg-white shadow-lg ring-4 ring-white">
+            {product.images?.[0] ? (
+              <Image src={product.images[0]} alt={product.name} fill className="desk-img object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ background: accent + "33", color: accent }}>
+                {product.name[0]}
+              </div>
+            )}
+          </div>
+
+          <Badge product={product} />
         </div>
-      </Link>
-    </motion.div>
+
+        {/* White bottom */}
+        <div className="flex items-center justify-between px-5 pt-8 pb-5 bg-white">
+          <div className="flex items-center gap-1.5">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <span
+                key={i}
+                className="rating-dot w-2 h-2 rounded-full inline-block"
+                style={{ background: i <= filled ? accent : "#E5E7EB" }}
+              />
+            ))}
+          </div>
+          <button
+            className="add-btn text-[10px] font-bold tracking-[1.5px] text-white px-4 py-2 rounded-full"
+            style={{ background: "#1A3560" }}
+            onClick={(e) => e.preventDefault()}
+          >
+            ADD TO CART
+          </button>
+        </div>
+
+        {/* Compare price */}
+        {product.compareAtPrice && (
+          <div className="absolute bottom-[54px] right-5 text-[10px] text-zinc-400 line-through">
+            {fmt(product.compareAtPrice)}
+          </div>
+        )}
+      </div>
+    </Link>
   );
 };
 
@@ -528,23 +616,16 @@ const DesktopCard = ({ product, index }) => {
 const Header = ({ search, setSearch }) => (
   <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-100">
     <div className="px-5 py-3.5 md:px-12">
-      {/* Top row */}
       <div className="flex items-center justify-between mb-3.5">
-        <button className="text-2xl text-zinc-700 hover:text-zinc-900 transition-colors">☰</button>
-        <span className="font-display text-xl font-bold text-zinc-900 hidden md:block">
-          Shop
-        </span>
+        <button className="icon-btn text-2xl text-zinc-700 hover:text-zinc-900">☰</button>
+        <span className="font-display text-xl font-bold text-zinc-900 hidden md:block">Shop</span>
         <div className="relative">
-          <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-lg hover:scale-105 transition-transform relative">
+          <button className="icon-btn w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-lg relative">
             ♡
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-              2
-            </span>
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
           </button>
         </div>
       </div>
-
-      {/* Search bar */}
       <div className="flex items-center gap-2 bg-zinc-100 rounded-2xl px-4 py-2.5">
         <span className="text-zinc-400 text-base">🔍</span>
         <input
@@ -559,4 +640,109 @@ const Header = ({ search, setSearch }) => (
   </header>
 );
 
-// ─────
+// ─────────────────────────────────────────────────────────────────────────────
+// CATEGORY PILLS
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CategoryPills = ({ active, setActive }) => (
+  <div className="flex gap-2 px-5 py-3.5 md:px-12 overflow-x-auto no-scrollbar">
+    {CATEGORIES.map((c) => (
+      <button
+        key={c}
+        onClick={() => setActive(c)}
+        className={`cat-pill flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold capitalize border ${
+          active === c
+            ? "bg-zinc-900 text-white border-zinc-900"
+            : "bg-white text-zinc-500 border-zinc-200 hover:border-zinc-400"
+        }`}
+      >
+        {c === "all" ? "All" : c.replace(/-/g, " ")}
+      </button>
+    ))}
+  </div>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN PAGE
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function ProductPage() {
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [expandedProduct, setExpandedProduct] = useState(null);
+  const [search, setSearch]                   = useState("");
+
+  const filtered = mockProducts.filter((p) => {
+    const matchCat    = activeCategory === "all" || p.category === activeCategory;
+    const matchSearch =
+      !search ||
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.description.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  const featured    = filtered.filter((p) => p.featured);
+  const offers      = filtered.filter((p) => p.isSale).slice(0, 6);
+  const newArrivals = filtered.filter((p) => p.isNew);
+
+  const displayFeatured = featured.length    ? featured    : filtered.slice(0, 5);
+  const displayNew      = newArrivals.length ? newArrivals : filtered.slice(0, 5);
+  const displayOffers   = offers.length      ? offers      : filtered.slice(0, 4);
+
+  const empty = (
+    <div className="flex flex-col items-center justify-center h-60 text-zinc-400 gap-3">
+      <span className="text-5xl">🔍</span>
+      <p className="text-sm font-medium">No products found</p>
+    </div>
+  );
+
+  return (
+    <>
+      {/* Inject global CSS once */}
+      <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
+
+      <div className="min-h-screen bg-[#F8F8FB]">
+        <Header search={search} setSearch={setSearch} />
+        <CategoryPills active={activeCategory} setActive={setActiveCategory} />
+
+        {/* ══════════════ MOBILE  (< md) ══════════════ */}
+        <main className="block md:hidden pb-16">
+          {filtered.length === 0 ? empty : (
+            <>
+              <MobileSlider title="Featured" products={displayFeatured} onExpand={setExpandedProduct} />
+              <MobileOffersRow products={displayOffers} />
+              {displayNew.length > 0 && (
+                <MobileSlider title="New Arrivals" products={displayNew} onExpand={setExpandedProduct} />
+              )}
+              <MobileSlider title="All Products" products={filtered} onExpand={setExpandedProduct} showSeeAll={false} />
+            </>
+          )}
+        </main>
+
+        {/* ═════════════ DESKTOP  (≥ md) ═════════════ */}
+        <main className="hidden md:block">
+          <div className="max-w-7xl mx-auto px-12 py-10 pb-24">
+            <div className="flex items-baseline gap-3 mb-8">
+              <h1 className="font-display text-3xl font-bold text-zinc-900 capitalize">
+                {activeCategory === "all" ? "All Products" : activeCategory.replace(/-/g, " ")}
+              </h1>
+              <span className="text-base text-zinc-400 font-medium">({filtered.length})</span>
+            </div>
+            {filtered.length === 0 ? empty : (
+              <div className="grid grid-cols-3 gap-6 xl:gap-8">
+                {filtered.map((p, i) => <DesktopCard key={p.id} product={p} index={i} />)}
+              </div>
+            )}
+          </div>
+        </main>
+
+        {/* Mobile expanded panel */}
+        {expandedProduct && (
+          <MobileExpandedPanel
+            product={expandedProduct}
+            onClose={() => setExpandedProduct(null)}
+          />
+        )}
+      </div>
+    </>
+  );
+}
