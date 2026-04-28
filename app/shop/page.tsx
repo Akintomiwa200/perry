@@ -80,7 +80,7 @@ export default function ShopPage() {
           Showing {sorted.length} products
         </div>
 
-         <ProductList products={sorted} gridCols={3} />
+         <ProductList products={sorted} gridCols={4} />
       </main>
       <Footer />
     </>
