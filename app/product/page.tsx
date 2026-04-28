@@ -188,13 +188,23 @@ const GLOBAL_CSS = `
 // SMALL SHARED ATOMS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const StarRating = ({ rating }) => (
+const StarRating = ({ rating }: { rating: number }) => (
   <span className="text-xs tracking-wider">
     {[1, 2, 3, 4, 5].map((s) => (
-      <span key={s} style={{ color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" }}>★</span>
+      <span 
+        key={s} 
+        style={{ 
+          color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" 
+        }}
+      >
+        ★
+      </span>
     ))}
   </span>
 );
+
+
+
 
 const Badge = ({ product }) => {
   if (product.isSale)
