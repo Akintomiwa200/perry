@@ -7,6 +7,7 @@ interface StatCardProps {
   changeType?: 'positive' | 'negative' | 'warning' | 'neutral';
   icon: LucideIcon;
   accentColor?: string;
+  iconBg?: string;
 }
 
 export default function StatCard({
@@ -15,53 +16,32 @@ export default function StatCard({
   change,
   changeType = 'neutral',
   icon: Icon,
-  accentColor = 'var(--terracotta)',
+  accentColor = '#F97316',
+  iconBg,
 }: StatCardProps) {
+  const changeColor =
+    changeType === 'positive'
+      ? '#22C55E'
+      : changeType === 'negative'
+      ? '#EF4444'
+      : changeType === 'warning'
+      ? '#F59E0B'
+      : '#94A3B8';
+
   return (
-    <div
-      className="card flex items-start justify-between"
-      style={{ background: 'var(--color-surface-raised)', padding: '20px' }}
-    >
-      <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
-          {title}
-        </p>
-        <p
-          className="text-2xl font-bold"
-          style={{ color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}
-        >
-          {value}
-        </p>
-        {change && (
-          <div className="flex items-center gap-1">
-            {changeType === 'positive' && <TrendingUp size={12} style={{ color: 'var(--color-success)' }} />}
-            {changeType === 'negative' && <TrendingDown size={12} style={{ color: 'var(--color-danger)' }} />}
-            {changeType === 'warning' && <TrendingDown size={12} style={{ color: 'var(--color-warning)' }} />}
-            <span
-              className="text-xs font-medium"
-              style={{
-                color:
-                  changeType === 'positive'
-                    ? 'var(--color-success)'
-                    : changeType === 'negative'
-                    ? 'var(--color-danger)'
-                    : changeType === 'warning'
-                    ? 'var(--color-warning)'
-                    : 'var(--color-text-muted)',
-              }}
-            >
-              {change}
-            </span>
-          </div>
-        )}
+    <div className="stat-card">
+      <div className="stat-card__icon" style={{ background: iconBg || `${accentColor}18` }}>
+        <Icon size={20} color={accentColor} />
       </div>
-      <div
-        className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-        style={{ background: `${accentColor}15` }}
-      >
-        <Icon size={18} style={{ color: accentColor }} />
-      </div>
+      <p className="stat-card__title">{title}</p>
+      <p className="stat-card__value">{value}</p>
+      {change && (
+        <div className="stat-card__change">
+          {changeType === 'positive' && <TrendingUp size={12} color={changeColor} />}
+          {changeType === 'negative' && <TrendingDown size={12} color={changeColor} />}
+          <span style={{ color: changeColor }}>{change}</span>
+        </div>
+      )}
     </div>
   );
 }
-
