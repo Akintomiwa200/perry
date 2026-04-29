@@ -1,12 +1,16 @@
-# Admin Auth Pages Implementation
+# ProductCard Styling Fix — TODO
+
+## Goal
+Fix obstructed styling, wrong arrangement, and sizing in ProductCard to match design system.
 
 ## Steps
-
-1. [x] Update `types/user.types.ts` — add optional `role` to `User` and admin auth types
-2. [x] Update `services/authService.ts` — add `adminLogin` and `adminRegister` methods
-3. [x] Update `lib/api.ts` — improve 401 interceptor to distinguish admin vs user routes
-4. [x] Create `app/(auth)/auth/admin/login/page.tsx` — admin login page with same UI as normal login
-5. [x] Create `app/(auth)/auth/admin/register/page.tsx` — admin signup page with same UI as normal register
-6. [x] Update `hooks/useAuth.ts` — add admin login/register helpers that redirect to `/admin`
-7. [ ] Verify pages compile and routes resolve correctly
+- [ ] Replace `aspect-[4/5]` with `aspect-[3/4]` on card and expanded images.
+- [ ] Replace all hardcoded hex colors with CSS custom properties (`var(--color-*)`).
+- [ ] Replace `'Jost'` font with `var(--font-primary)`.
+- [ ] Fix card container: use `var(--color-surface-raised)`, `var(--color-border)`, `var(--shadow-sm)`, `var(--radius-lg)`.
+- [ ] Fix badge styles: `11px`, weight `600`, `letter-spacing: 0.5px`.
+- [ ] Fix price font-weight from `700` to `600`.
+- [ ] Replace category pastel backgrounds with `var(--color-secondary)`.
+- [ ] Add `:focus-visible` rings to all interactive buttons.
+- [ ] Apply all fixes to expanded modal overlay.
 

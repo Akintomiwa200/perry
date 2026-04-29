@@ -32,8 +32,9 @@ const MOCK_ORDER = {
   ],
 };
 
-export default function OrderDetailPage({ params }: { params: { orderId: string } }) {
-  const order = MOCK_ORDER; // In production: fetch by params.orderId
+export default async function OrderDetailPage({ params }: { params: Promise<{ orderId: string }> }) {
+  const { orderId } = await params;
+  const order = MOCK_ORDER; // In production: fetch by orderId
   const statusStyle = STATUS_STYLES[order.status] || STATUS_STYLES.pending;
   const currentStep = STATUS_STEPS.indexOf(order.status);
 

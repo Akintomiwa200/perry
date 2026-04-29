@@ -6,6 +6,31 @@ import Image from "next/image";
 import { mockProducts } from "@/lib/db";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TYPES
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface Product {
+  id: string | number;
+  name: string;
+  slug: string;
+  category: string;
+  price: number;
+  compareAtPrice?: number;
+  description: string;
+  rating: number;
+  reviewCount: number;
+  images?: string[];
+  featured?: boolean;
+  isSale?: boolean;
+  isNew?: boolean;
+}
+
+interface CategoryColor {
+  hex: string;
+  accent: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // CONSTANTS & HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -16,7 +41,7 @@ const fmt = (n: number): string =>
     maximumFractionDigits: 0,
   }).format(n);
 
-const CATEGORY_COLORS = {
+const CATEGORY_COLORS: Record<string, CategoryColor> = {
   accessories: { hex: "#FEF3C7", accent: "#F59E0B" },
   footwear:    { hex: "#E0F2FE", accent: "#0EA5E9" },
   "wigs-hair": { hex: "#FCE7F3", accent: "#EC4899" },
@@ -25,7 +50,7 @@ const CATEGORY_COLORS = {
   clothing:    { hex: "#EDE9FE", accent: "#8B5CF6" },
 };
 
-const DEFAULT_COLOR = { hex: "#DBEAFE", accent: "#3B82F6" };
+const DEFAULT_COLOR: CategoryColor = { hex: "#DBEAFE", accent: "#3B82F6" };
 
 const CATEGORIES = [
   "all",
@@ -42,7 +67,7 @@ const GAP    = 14;
 const STEP   = CARD_W + GAP;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GLOBAL STYLES  (injected once — pure CSS animations, no package needed)
+// GLOBAL STYLES
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GLOBAL_CSS = `
@@ -53,7 +78,6 @@ const GLOBAL_CSS = `
   .font-display { font-family: 'DM Serif Display', serif !important; }
   body, input, button { font-family: 'Outfit', sans-serif; }
 
-  /* ── Panel slide-up / fade ── */
   @keyframes panelUp {
     from { transform: translateY(100%); }
     to   { transform: translateY(0); }
@@ -76,7 +100,6 @@ const GLOBAL_CSS = `
   .bd-enter     { animation: backdropIn   0.25s ease both; }
   .bd-exit      { animation: backdropOut  0.28s ease both; }
 
-  /* ── Desktop card reveal ── */
   @keyframes cardReveal {
     from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0);    }
@@ -85,7 +108,6 @@ const GLOBAL_CSS = `
     animation: cardReveal 0.45s cubic-bezier(0.22,1,0.36,1) both;
   }
 
-  /* ── Dot pill width transition ── */
   .dot-pill {
     height: 6px;
     border-radius: 9999px;
@@ -95,7 +117,6 @@ const GLOBAL_CSS = `
     padding: 0;
   }
 
-  /* ── Slider track ── */
   .slider-track {
     display: flex;
     gap: ${GAP}px;
@@ -109,17 +130,14 @@ const GLOBAL_CSS = `
     transition: transform 0.38s cubic-bezier(0.22,1,0.36,1);
   }
 
-  /* ── Card active ring ── */
   .mob-card-active { outline: 2px solid var(--ring-color); }
 
-  /* ── Plus button pop ── */
   .plus-btn {
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
   .plus-btn:hover  { transform: scale(1.14); }
   .plus-btn:active { transform: scale(0.88); }
 
-  /* ── Desktop card hover ── */
   .desk-card {
     transition: box-shadow 0.28s ease, transform 0.28s cubic-bezier(0.22,1,0.36,1);
   }
@@ -130,56 +148,47 @@ const GLOBAL_CSS = `
   .desk-card:hover .desk-img { transform: scale(1.06); }
   .desk-img { transition: transform 0.5s ease; }
 
-  /* ── Category pill ── */
   .cat-pill {
     transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
   }
   .cat-pill:active { transform: scale(0.95); }
 
-  /* ── Offer thumb ── */
   .offer-thumb {
     transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
   }
   .offer-thumb:hover  { transform: scale(1.05); }
   .offer-thumb:active { transform: scale(0.95); }
 
-  /* ── Color swatch ── */
   .swatch {
     transition: box-shadow 0.2s ease, transform 0.15s ease;
   }
   .swatch:active { transform: scale(0.88); }
 
-  /* ── Scrollbar hide ── */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { scrollbar-width: none; }
 
-  /* ── Add to cart button ── */
   .add-btn {
     transition: opacity 0.18s ease, transform 0.14s cubic-bezier(0.34,1.56,0.64,1);
   }
   .add-btn:hover  { opacity: 0.88; }
   .add-btn:active { transform: scale(0.96); }
 
-  /* ── Back / icon buttons ── */
   .icon-btn {
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
   .icon-btn:hover  { transform: scale(1.07); }
   .icon-btn:active { transform: scale(0.93); }
 
-  /* ── Size button ── */
   .size-btn {
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
   }
   .size-btn:active { transform: scale(0.92); }
 
-  /* ── Dot rating ── */
   .rating-dot {
     transition: transform 0.18s ease;
   }
   .desk-card:hover .rating-dot { transform: scale(1.25); }
 
-  /* ── Panel close animation trigger ── */
   .panel-overlay.closing .panel-sheet { animation: panelDown   0.30s cubic-bezier(0.55,0,1,0.45) both; }
   .panel-overlay.closing .panel-bd    { animation: backdropOut 0.28s ease both; }
 `;
@@ -191,11 +200,9 @@ const GLOBAL_CSS = `
 const StarRating = ({ rating }: { rating: number }) => (
   <span className="text-xs tracking-wider">
     {[1, 2, 3, 4, 5].map((s) => (
-      <span 
-        key={s} 
-        style={{ 
-          color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" 
-        }}
+      <span
+        key={s}
+        style={{ color: s <= Math.round(rating) ? "#FFB800" : "#D1D5DB" }}
       >
         ★
       </span>
@@ -203,10 +210,7 @@ const StarRating = ({ rating }: { rating: number }) => (
   </span>
 );
 
-
-
-
-const Badge = ({ product }) => {
+const Badge = ({ product }: { product: Product }) => {
   if (product.isSale)
     return (
       <span className="absolute top-2.5 left-2.5 z-10 bg-red-500 text-white text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-full">
@@ -223,32 +227,42 @@ const Badge = ({ product }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE EXPANDED PANEL  — pure CSS slide-up / fade, no framer-motion
+// MOBILE EXPANDED PANEL
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MobileExpandedPanel = ({ product, onClose }) => {
-  const [closing, setClosing] = useState(false);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(0);
-  const colors  = ["#111111", "#0EA5E9"];
-  const sizes   = ["5", "6", "7", "8", "9"];
-  const { hex, accent } = CATEGORY_COLORS[product.category] || DEFAULT_COLOR;
+interface MobileExpandedPanelProps {
+  product: Product;
+  onClose: () => void;
+}
 
-  // Trigger exit animation then unmount
+const MobileExpandedPanel = ({ product, onClose }: MobileExpandedPanelProps) => {
+  const [closing, setClosing]         = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState(0);
+
+  const colors = ["#111111", "#0EA5E9"];
+  const sizes  = ["5", "6", "7", "8", "9"];
+  const { hex, accent } = CATEGORY_COLORS[product.category] ?? DEFAULT_COLOR;
+
   const handleClose = useCallback(() => {
     setClosing(true);
     setTimeout(onClose, 300);
   }, [onClose]);
 
-  // Close on Escape
   useEffect(() => {
-    const handler = (e) => { if (e.key === "Escape") handleClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [handleClose]);
 
   return (
-    <div className={`panel-overlay fixed inset-0 z-50 flex items-end justify-center ${closing ? "closing" : ""}`}>
+    <div
+      className={`panel-overlay fixed inset-0 z-50 flex items-end justify-center ${
+        closing ? "closing" : ""
+      }`}
+    >
       {/* Backdrop */}
       <div
         className="panel-bd absolute inset-0 bg-black/40 backdrop-blur-[2px] bd-enter"
@@ -259,47 +273,75 @@ const MobileExpandedPanel = ({ product, onClose }) => {
       <div className="panel-sheet relative w-full max-w-md bg-white rounded-t-[2rem] overflow-hidden z-10 panel-enter">
 
         {/* Hero image */}
-        <div className="relative h-64 overflow-hidden flex items-center justify-center" style={{ background: hex }}>
-          <button onClick={handleClose} className="icon-btn absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-lg font-light">
+        <div
+          className="relative h-64 overflow-hidden flex items-center justify-center"
+          style={{ background: hex }}
+        >
+          <button
+            onClick={handleClose}
+            className="icon-btn absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-lg font-light"
+          >
             ←
           </button>
 
           <div className="absolute top-4 right-4 z-10">
             <button className="icon-btn w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center text-base relative">
               ♡
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                2
+              </span>
             </button>
           </div>
 
           {product.images?.[0] ? (
             <div className="absolute inset-4">
-              <Image src={product.images[0]} alt={product.name} fill className="object-contain" />
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className="object-contain"
+              />
             </div>
           ) : (
-            <div className="w-28 h-28 rounded-full flex items-center justify-center text-5xl font-bold" style={{ background: accent + "33", color: accent }}>
+            <div
+              className="w-28 h-28 rounded-full flex items-center justify-center text-5xl font-bold"
+              style={{ background: `${accent}33`, color: accent }}
+            >
               {product.name[0]}
             </div>
           )}
 
-          <div className="absolute bottom-3 right-3 w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-white text-lg shadow-lg">⬡</div>
+          <div className="absolute bottom-3 right-3 w-11 h-11 rounded-full bg-zinc-900 flex items-center justify-center text-white text-lg shadow-lg">
+            ⬡
+          </div>
         </div>
 
         {/* Content */}
         <div className="px-5 pt-5 pb-8">
           <div className="flex items-start justify-between gap-3 mb-1">
             <div>
-              <h2 className="font-display text-xl font-bold text-zinc-900 leading-tight">{product.name}</h2>
-              <p className="text-xs text-zinc-400 capitalize mt-0.5">{product.category.replace(/-/g, " ")}</p>
+              <h2 className="font-display text-xl font-bold text-zinc-900 leading-tight">
+                {product.name}
+              </h2>
+              <p className="text-xs text-zinc-400 capitalize mt-0.5">
+                {product.category.replace(/-/g, " ")}
+              </p>
             </div>
-            <p className="font-display text-xl font-bold text-zinc-900 whitespace-nowrap">{fmt(product.price)}</p>
+            <p className="font-display text-xl font-bold text-zinc-900 whitespace-nowrap">
+              {fmt(product.price)}
+            </p>
           </div>
 
           <div className="flex items-center gap-2 mb-3">
             <StarRating rating={product.rating} />
-            <span className="text-[11px] text-zinc-400">({product.reviewCount} reviews)</span>
+            <span className="text-[11px] text-zinc-400">
+              ({product.reviewCount} reviews)
+            </span>
           </div>
 
-          <p className="text-[13px] text-zinc-500 leading-relaxed mb-4">{product.description}</p>
+          <p className="text-[13px] text-zinc-500 leading-relaxed mb-4">
+            {product.description}
+          </p>
 
           {/* Sizes */}
           {["footwear", "clothing"].includes(product.category) && (
@@ -329,7 +371,10 @@ const MobileExpandedPanel = ({ product, onClose }) => {
                 className="swatch w-7 h-7 rounded-full border-2 border-white"
                 style={{
                   background: c,
-                  boxShadow: selectedColor === i ? `0 0 0 2px #fff, 0 0 0 4px ${c}` : "none",
+                  boxShadow:
+                    selectedColor === i
+                      ? `0 0 0 2px #fff, 0 0 0 4px ${c}`
+                      : "none",
                 }}
                 onClick={() => setSelectedColor(i)}
               />
@@ -349,8 +394,14 @@ const MobileExpandedPanel = ({ product, onClose }) => {
 // MOBILE CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MobileCard = ({ product, onExpand, isActive }) => {
-  const { hex, accent } = CATEGORY_COLORS[product.category] || DEFAULT_COLOR;
+interface MobileCardProps {
+  product: Product;
+  onExpand: (product: Product) => void;
+  isActive: boolean;
+}
+
+const MobileCard = ({ product, onExpand, isActive }: MobileCardProps) => {
+  const { hex, accent } = CATEGORY_COLORS[product.category] ?? DEFAULT_COLOR;
 
   return (
     <div
@@ -364,18 +415,31 @@ const MobileCard = ({ product, onExpand, isActive }) => {
       }}
     >
       <Link href={`/products/${product.slug}`} className="block no-underline">
-        <div className="relative flex items-center justify-center" style={{ height: 176, background: hex }}>
+        <div
+          className="relative flex items-center justify-center"
+          style={{ height: 176, background: hex }}
+        >
           <Badge product={product} />
           {product.images?.[0] ? (
-            <Image src={product.images[0]} alt={product.name} fill className="object-contain p-4" />
+            <Image
+              src={product.images[0]}
+              alt={product.name}
+              fill
+              className="object-contain p-4"
+            />
           ) : (
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-bold" style={{ background: accent + "33", color: accent }}>
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center text-4xl font-bold"
+              style={{ background: `${accent}33`, color: accent }}
+            >
               {product.name[0]}
             </div>
           )}
         </div>
         <div className="px-3.5 pt-3 pb-10">
-          <p className="font-display text-[15px] font-bold text-zinc-900 leading-tight mb-1">{product.name}</p>
+          <p className="font-display text-[15px] font-bold text-zinc-900 leading-tight mb-1">
+            {product.name}
+          </p>
           <p className="text-sm font-semibold text-zinc-700">{fmt(product.price)}</p>
         </div>
       </Link>
@@ -383,7 +447,10 @@ const MobileCard = ({ product, onExpand, isActive }) => {
       <button
         className="plus-btn absolute bottom-3 right-3 w-9 h-9 rounded-full bg-white flex items-center justify-center text-xl text-zinc-800 font-light leading-none"
         style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}
-        onClick={(e) => { e.preventDefault(); onExpand(product); }}
+        onClick={(e) => {
+          e.preventDefault();
+          onExpand(product);
+        }}
       >
         +
       </button>
@@ -392,54 +459,62 @@ const MobileCard = ({ product, onExpand, isActive }) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MOBILE SLIDER  — pointer-events drag, CSS spring transition, no framer-motion
+// MOBILE SLIDER
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
-  const [index, setIndex]         = useState(0);
-  const [snapping, setSnapping]   = useState(true);   // CSS transition on/off
-  const [dragX, setDragX]         = useState(0);      // live drag offset
-  const dragging   = useRef(false);
-  const startX     = useRef(0);
-  const startTime  = useRef(0);
-  const trackRef   = useRef(null);
+interface MobileSliderProps {
+  title: string;
+  products: Product[];
+  onExpand: (product: Product) => void;
+  showSeeAll?: boolean;
+}
 
-  const clamp = (v) => Math.max(0, Math.min(v, products.length - 1));
+const MobileSlider = ({
+  title,
+  products,
+  onExpand,
+  showSeeAll = true,
+}: MobileSliderProps) => {
+  const [index, setIndex]       = useState(0);
+  const [snapping, setSnapping] = useState(true);
+  const [dragX, setDragX]       = useState(0);
 
-  // Current translate = snapped position + live drag delta
-  const baseX   = -(index * STEP);
-  const totalX  = baseX + dragX;
+  const dragging  = useRef(false);
+  const startX    = useRef(0);
+  const startTime = useRef(0);
+  const trackRef  = useRef<HTMLDivElement>(null);
 
-  // ── Pointer down ──
-  const onPointerDown = (e) => {
-    // Ignore if clicking a link/button directly
-    if (e.target.closest("a, button")) return;
-    dragging.current = true;
-    startX.current   = e.clientX;
+  const clamp = (v: number) => Math.max(0, Math.min(v, products.length - 1));
+
+  const baseX  = -(index * STEP);
+  const totalX = baseX + dragX;
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if ((e.target as HTMLElement).closest("a, button")) return;
+    dragging.current  = true;
+    startX.current    = e.clientX;
     startTime.current = Date.now();
     setSnapping(false);
     trackRef.current?.setPointerCapture(e.pointerId);
   };
 
-  // ── Pointer move ──
-  const onPointerMove = (e) => {
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!dragging.current) return;
-    const delta = e.clientX - startX.current;
-    // Rubber-band at edges
-    const maxLeft  = (products.length - 1) * STEP;
-    if ((baseX + delta > 0) || (baseX + delta < -maxLeft)) {
+    const delta   = e.clientX - startX.current;
+    const maxLeft = (products.length - 1) * STEP;
+    if (baseX + delta > 0 || baseX + delta < -maxLeft) {
       setDragX(delta * 0.25);
     } else {
       setDragX(delta);
     }
   };
 
-  // ── Pointer up ──
-  const onPointerUp = (e) => {
+  const onPointerUp = () => {
     if (!dragging.current) return;
     dragging.current = false;
-    const elapsed = Date.now() - startTime.current;
-    const velocity = dragX / elapsed; // px/ms
+
+    const elapsed  = Date.now() - startTime.current;
+    const velocity = dragX / elapsed;
 
     let next = index;
     if (dragX < -40 || velocity < -0.35) next = clamp(index + 1);
@@ -452,19 +527,21 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
 
   return (
     <section className="mb-7">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 mb-3">
         <h2 className="font-display text-lg font-bold text-zinc-900">{title}</h2>
         {showSeeAll && (
-          <button className="cat-pill text-xs text-zinc-400 font-medium hover:text-zinc-600">See All</button>
+          <button className="cat-pill text-xs text-zinc-400 font-medium hover:text-zinc-600">
+            See All
+          </button>
         )}
       </div>
 
-      {/* Track container */}
       <div className="overflow-hidden pl-5">
         <div
           ref={trackRef}
-          className={`slider-track${snapping ? " snap" : ""}${dragging.current ? " is-dragging" : ""}`}
+          className={`slider-track${snapping ? " snap" : ""}${
+            dragging.current ? " is-dragging" : ""
+          }`}
           style={{ transform: `translateX(${totalX}px)` }}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -480,12 +557,10 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
               isActive={i === index}
             />
           ))}
-          {/* trailing spacer */}
           <div style={{ width: 20, flexShrink: 0 }} />
         </div>
       </div>
 
-      {/* Pill indicators */}
       {products.length > 1 && (
         <div className="flex justify-center items-center gap-1.5 mt-3.5">
           {products.map((_, i) => (
@@ -496,7 +571,10 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
                 width: i === index ? 20 : 6,
                 backgroundColor: i === index ? "#111111" : "#D1D5DB",
               }}
-              onClick={() => { setSnapping(true); setIndex(i); }}
+              onClick={() => {
+                setSnapping(true);
+                setIndex(i);
+              }}
             />
           ))}
         </div>
@@ -509,15 +587,17 @@ const MobileSlider = ({ title, products, onExpand, showSeeAll = true }) => {
 // MOBILE OFFERS ROW
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MobileOffersRow = ({ products }) => (
+const MobileOffersRow = ({ products }: { products: Product[] }) => (
   <section className="mb-7">
     <div className="flex items-center justify-between px-5 mb-3">
       <h2 className="font-display text-lg font-bold text-zinc-900">Offers</h2>
-      <button className="text-xs text-zinc-400 font-medium hover:text-zinc-600 transition-colors">See All</button>
+      <button className="text-xs text-zinc-400 font-medium hover:text-zinc-600 transition-colors">
+        See All
+      </button>
     </div>
     <div className="flex gap-3 px-5 overflow-x-auto no-scrollbar pb-1">
       {products.map((p) => {
-        const { hex } = CATEGORY_COLORS[p.category] || DEFAULT_COLOR;
+        const { hex } = CATEGORY_COLORS[p.category] ?? DEFAULT_COLOR;
         return (
           <Link key={p.id} href={`/products/${p.slug}`} className="flex-shrink-0">
             <div
@@ -540,11 +620,16 @@ const MobileOffersRow = ({ products }) => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// DESKTOP CARD  — CSS card-reveal animation, pure hover transitions
+// DESKTOP CARD
 // ─────────────────────────────────────────────────────────────────────────────
 
-const DesktopCard = ({ product, index }) => {
-  const { hex, accent } = CATEGORY_COLORS[product.category] || DEFAULT_COLOR;
+interface DesktopCardProps {
+  product: Product;
+  index: number;
+}
+
+const DesktopCard = ({ product, index }: DesktopCardProps) => {
+  const { hex, accent } = CATEGORY_COLORS[product.category] ?? DEFAULT_COLOR;
   const filled = Math.round(product.rating);
 
   return (
@@ -556,7 +641,10 @@ const DesktopCard = ({ product, index }) => {
       <div className="desk-card bg-white rounded-2xl overflow-hidden shadow-sm relative">
 
         {/* Coloured top */}
-        <div className="relative px-5 pt-5 pb-16 min-h-[190px]" style={{ background: hex }}>
+        <div
+          className="relative px-5 pt-5 pb-16 min-h-[190px]"
+          style={{ background: hex }}
+        >
           <div className="max-w-[56%]">
             <p className="text-[9px] font-bold tracking-[2px] text-zinc-400 uppercase mb-1">
               {product.category.replace(/-/g, " ")}
@@ -569,17 +657,27 @@ const DesktopCard = ({ product, index }) => {
             </p>
           </div>
 
-       {/* Price badge */}
+          {/* Price badge */}
           <div className="absolute top-3.5 right-3.5 bg-white rounded-full px-3.5 py-1.5 shadow-md">
-            <span className="font-display text-[15px] font-bold text-zinc-900">{fmt(product.price)}</span>
+            <span className="font-display text-[15px] font-bold text-zinc-900">
+              {fmt(product.price)}
+            </span>
           </div>
 
           {/* Circular image */}
           <div className="absolute -bottom-6 right-3 w-[110px] h-[110px] rounded-full overflow-hidden bg-white shadow-lg ring-4 ring-white">
             {product.images?.[0] ? (
-              <Image src={product.images[0]} alt={product.name} fill className="desk-img object-cover" />
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                className="desk-img object-cover"
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl font-bold" style={{ background: accent + "33", color: accent }}>
+              <div
+                className="w-full h-full flex items-center justify-center text-3xl font-bold"
+                style={{ background: `${accent}33`, color: accent }}
+              >
                 {product.name[0]}
               </div>
             )}
@@ -623,7 +721,12 @@ const DesktopCard = ({ product, index }) => {
 // SHARED HEADER
 // ─────────────────────────────────────────────────────────────────────────────
 
-const Header = ({ search, setSearch }) => (
+interface HeaderProps {
+  search: string;
+  setSearch: (v: string) => void;
+}
+
+const Header = ({ search, setSearch }: HeaderProps) => (
   <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-zinc-100">
     <div className="px-5 py-3.5 md:px-12">
       <div className="flex items-center justify-between mb-3.5">
@@ -632,7 +735,9 @@ const Header = ({ search, setSearch }) => (
         <div className="relative">
           <button className="icon-btn w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-lg relative">
             ♡
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              2
+            </span>
           </button>
         </div>
       </div>
@@ -654,7 +759,12 @@ const Header = ({ search, setSearch }) => (
 // CATEGORY PILLS
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CategoryPills = ({ active, setActive }) => (
+interface CategoryPillsProps {
+  active: string;
+  setActive: (c: string) => void;
+}
+
+const CategoryPills = ({ active, setActive }: CategoryPillsProps) => (
   <div className="flex gap-2 px-5 py-3.5 md:px-12 overflow-x-auto no-scrollbar">
     {CATEGORIES.map((c) => (
       <button
@@ -678,10 +788,10 @@ const CategoryPills = ({ active, setActive }) => (
 
 export default function ProductPage() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const [expandedProduct, setExpandedProduct] = useState(null);
-  const [search, setSearch]                   = useState("");
+  const [expandedProduct, setExpandedProduct] = useState<Product | null>(null);
+  const [search, setSearch] = useState("");
 
-  const filtered = mockProducts.filter((p) => {
+  const filtered = (mockProducts as Product[]).filter((p) => {
     const matchCat    = activeCategory === "all" || p.category === activeCategory;
     const matchSearch =
       !search ||
@@ -707,7 +817,6 @@ export default function ProductPage() {
 
   return (
     <>
-      {/* Inject global CSS once */}
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
 
       <div className="min-h-screen bg-[#F8F8FB]">
@@ -716,14 +825,29 @@ export default function ProductPage() {
 
         {/* ══════════════ MOBILE  (< md) ══════════════ */}
         <main className="block md:hidden pb-16">
-          {filtered.length === 0 ? empty : (
+          {filtered.length === 0 ? (
+            empty
+          ) : (
             <>
-              <MobileSlider title="Featured" products={displayFeatured} onExpand={setExpandedProduct} />
+              <MobileSlider
+                title="Featured"
+                products={displayFeatured}
+                onExpand={setExpandedProduct}
+              />
               <MobileOffersRow products={displayOffers} />
               {displayNew.length > 0 && (
-                <MobileSlider title="New Arrivals" products={displayNew} onExpand={setExpandedProduct} />
+                <MobileSlider
+                  title="New Arrivals"
+                  products={displayNew}
+                  onExpand={setExpandedProduct}
+                />
               )}
-              <MobileSlider title="All Products" products={filtered} onExpand={setExpandedProduct} showSeeAll={false} />
+              <MobileSlider
+                title="All Products"
+                products={filtered}
+                onExpand={setExpandedProduct}
+                showSeeAll={false}
+              />
             </>
           )}
         </main>
@@ -733,13 +857,21 @@ export default function ProductPage() {
           <div className="max-w-7xl mx-auto px-12 py-10 pb-24">
             <div className="flex items-baseline gap-3 mb-8">
               <h1 className="font-display text-3xl font-bold text-zinc-900 capitalize">
-                {activeCategory === "all" ? "All Products" : activeCategory.replace(/-/g, " ")}
+                {activeCategory === "all"
+                  ? "All Products"
+                  : activeCategory.replace(/-/g, " ")}
               </h1>
-              <span className="text-base text-zinc-400 font-medium">({filtered.length})</span>
+              <span className="text-base text-zinc-400 font-medium">
+                ({filtered.length})
+              </span>
             </div>
-            {filtered.length === 0 ? empty : (
+            {filtered.length === 0 ? (
+              empty
+            ) : (
               <div className="grid grid-cols-3 gap-6 xl:gap-8">
-                {filtered.map((p, i) => <DesktopCard key={p.id} product={p} index={i} />)}
+                {filtered.map((p, i) => (
+                  <DesktopCard key={p.id} product={p} index={i} />
+                ))}
               </div>
             )}
           </div>

@@ -4,18 +4,20 @@ import { mockProducts } from '@/lib/db';
 import { CATEGORIES } from '@/lib/constants';
 import type { Metadata } from 'next';
 
-interface Props { params: { category: string } }
+interface Props { params: Promise<{ category: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const cat = CATEGORIES.find((c) => c.slug === params.category);
+  const { category } = await params;
+  const cat = CATEGORIES.find((c) => c.slug === category);
   return { title: cat ? `${cat.name} Collectibles` : 'Category' };
 }
 
-export default function CategoryPage({ params }: Props) {
-  const cat = CATEGORIES.find((c) => c.slug === params.category);
+export default async function CategoryPage({ params }: Props) {
+  const { category } = await params;
+  const cat = CATEGORIES.find((c) => c.slug === category);
   if (!cat) notFound();
 
-  const products = mockProducts.filter((p) => p.category === params.category);
+  const products = mockProducts.filter((p) => p.category === category);
 
   return (
     <div>

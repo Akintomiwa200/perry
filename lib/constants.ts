@@ -1,16 +1,14 @@
-export const APP_NAME = 'Perry Collectibles';
-export const APP_DESCRIPTION = 'Your premier destination for rare and unique collectibles.';
+export const APP_NAME = 'Perry';
+export const APP_DESCRIPTION = 'Your premier destination for fashion, beauty, and accessories.';
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 
 export const CATEGORIES = [
-  { id: 'action-figures', name: 'Action Figures', slug: 'action-figures', icon: '🦸' },
-  { id: 'comics', name: 'Comics', slug: 'comics', icon: '📚' },
-  { id: 'vintage-toys', name: 'Vintage Toys', slug: 'vintage-toys', icon: '🧸' },
-  { id: 'trading-cards', name: 'Trading Cards', slug: 'trading-cards', icon: '🃏' },
-  { id: 'statues', name: 'Statues & Busts', slug: 'statues', icon: '🗿' },
-  { id: 'memorabilia', name: 'Memorabilia', slug: 'memorabilia', icon: '🏆' },
-  { id: 'art-prints', name: 'Art Prints', slug: 'art-prints', icon: '🖼️' },
-  { id: 'diecast', name: 'Diecast Models', slug: 'diecast', icon: '🚗' },
+  { id: 'accessories', name: 'Accessories', slug: 'accessories', icon: '💍' },
+  { id: 'footwear', name: 'Footwear', slug: 'footwear', icon: '👠' },
+  { id: 'wigs-hair', name: 'Wigs & Hair', slug: 'wigs-hair', icon: '💆‍♀️' },
+  { id: 'beauty', name: 'Beauty', slug: 'beauty', icon: '💄' },
+  { id: 'handbags', name: 'Handbags', slug: 'handbags', icon: '👜' },
+  { id: 'clothing', name: 'Clothing', slug: 'clothing', icon: '👗' },
 ];
 
 export const SHIPPING_OPTIONS = [

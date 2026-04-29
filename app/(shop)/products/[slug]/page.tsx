@@ -6,11 +6,12 @@ import ProductList from '@/components/product/ProductList';
 import type { Metadata } from 'next';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = mockProducts.find((p) => p.slug === params.slug);
+  const { slug } = await params;
+  const product = mockProducts.find((p) => p.slug === slug);
   if (!product) return { title: 'Product Not Found' };
   return {
     title: product.name,
@@ -18,8 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function ProductPage({ params }: Props) {
-  const product = mockProducts.find((p) => p.slug === params.slug);
+export default async function ProductPage({ params }: Props) {
+  const { slug } = await params;
+  const product = mockProducts.find((p) => p.slug === slug);
   if (!product) notFound();
 
   const related = mockProducts
