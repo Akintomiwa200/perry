@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Search, Bell, User } from 'lucide-react';
+import { Search, Bell } from 'lucide-react';
 
 const breadcrumbMap: Record<string, string> = {
   '/admin': 'Dashboard',
@@ -13,88 +13,47 @@ const breadcrumbMap: Record<string, string> = {
 
 export default function AdminHeader() {
   const pathname = usePathname();
-  const title = breadcrumbMap[pathname] || 'Admin';
+  const title = breadcrumbMap[pathname] || 'Dashboard';
 
   return (
     <header
-      className="flex items-center justify-between h-16 px-8 sticky top-0 z-30"
+      className="flex items-center justify-between h-16 px-6 lg:px-10"
       style={{
-        background: 'var(--color-surface-raised)',
+        background: 'var(--cream)',
         borderBottom: '1px solid var(--color-border)',
-        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Breadcrumb / Title */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-          Admin
-        </span>
-        <span style={{ color: 'var(--color-text-muted)' }}>/</span>
-        <h1 className="text-base font-semibold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}>
-          {title}
-        </h1>
-      </div>
+      {/* TITLE */}
+      <h1
+        className="text-lg font-semibold"
+        style={{ color: 'var(--deep)' }}
+      >
+        {title}
+      </h1>
 
-      {/* Actions */}
-      <div className="flex items-center gap-3">
-        {/* Search */}
-        <div
-          className="hidden sm:flex items-center gap-2 px-3 h-9 rounded-lg"
-          style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
-        >
-          <Search size={14} style={{ color: 'var(--color-text-muted)' }} />
+      {/* RIGHT SIDE */}
+      <div className="flex items-center gap-4">
+        {/* SEARCH */}
+        <div className="hidden md:flex items-center bg-white border rounded-full px-4 h-10">
+          <Search size={14} className="opacity-50" />
           <input
-            type="text"
-            placeholder="Search..."
-            className="bg-transparent text-sm outline-none w-40"
-            style={{ color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}
+            placeholder="Search something..."
+            className="ml-2 text-sm outline-none bg-transparent w-40"
           />
         </div>
 
-        {/* Notifications */}
-        <button
-          className="relative w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
-          style={{ color: 'var(--color-text-muted)' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--color-secondary)';
-            e.currentTarget.style.color = 'var(--color-primary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.color = 'var(--color-text-muted)';
-          }}
-          aria-label="Notifications"
-        >
-          <Bell size={16} />
-          <span
-            className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
-            style={{ background: 'var(--color-danger)' }}
-          />
+        {/* NOTIFICATION */}
+        <button className="relative">
+          <Bell size={18} />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
-        {/* Profile */}
-        <button
-          className="flex items-center gap-2 pl-2 pr-3 h-9 rounded-lg transition-colors"
-          style={{ border: '1px solid var(--color-border)' }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--color-secondary)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent';
-          }}
-        >
-          <div
-            className="w-6 h-6 rounded-full flex items-center justify-center"
-            style={{ background: 'var(--color-primary)' }}
-          >
-            <User size={12} color="#fff" />
-          </div>
-          <span className="text-xs font-medium hidden md:block" style={{ color: 'var(--color-text)' }}>
-            Admin
-          </span>
-        </button>
+        {/* PROFILE */}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-gray-300" />
+          <span className="hidden md:block text-sm">Admin</span>
+        </div>
       </div>
     </header>
   );
 }
-
