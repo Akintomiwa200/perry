@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Plus, ArrowLeft, Star, X } from 'lucide-react';
+import { Heart, Plus, Check, ArrowLeft, Star, X } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { Product } from '@/types/product.types';
 import { formatPrice, calculateDiscount } from '@/lib/utils';
@@ -173,15 +173,15 @@ export default function ProductCard({ product, isPopular, isNewAuto }: ProductCa
         <button
           onClick={() => setExpanded(true)}
           disabled={soldOut}
-          className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200"
+className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full transition-all duration-200"
           style={{
-            background: soldOut ? '#e2e8f0' : '#1a1a2e',
+            background: soldOut ? '#e2e8f0' : (inCart ? '#10b981' : '#1a1a2e'),
             color: soldOut ? '#94a3b8' : '#fff',
             cursor: soldOut ? 'not-allowed' : 'pointer',
           }}
-          aria-label={`Quick view ${product.name}`}
+          aria-label={`Quick view ${product.name}${inCart ? ' (Added)' : ''}`}
         >
-          <Plus size={18} strokeWidth={2.5} />
+          {inCart ? <Check size={18} strokeWidth={2.5} /> : <Plus size={18} strokeWidth={2.5} />}
         </button>
       </div>
     </div>

@@ -42,11 +42,11 @@ export default function ProductList({
           <p className="text-base font-medium">{emptyMessage}</p>
         </div>
       ) : (
-        <div className={`grid grid-cols-2 md:grid-cols-3 ${lgCols} gap-3 sm:gap-4 md:gap-5`}>
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+  {products.map((product) => (
+    <ProductCard key={product.id} product={product} />
+  ))}
+</div>
       )}
     </section>
   );
