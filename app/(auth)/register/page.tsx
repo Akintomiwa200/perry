@@ -34,7 +34,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '420px', padding: '2rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)' }}>
+    <div >
       {error && <ErrorAlert message={error} />}
       <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

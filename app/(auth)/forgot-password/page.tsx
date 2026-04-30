@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '420px', padding: '2rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)' }}>
+    <div >
       {sent ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
           <CheckCircle size={48} style={{ color: 'var(--color-success)', marginBottom: '1rem' }} />

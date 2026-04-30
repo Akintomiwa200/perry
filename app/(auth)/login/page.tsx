@@ -29,7 +29,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '420px', padding: '2rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)' }}>
+    <div     >
       {error && <ErrorAlert message={error} />}
       <form onSubmit={handleSubmit} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <AuthInput label="Email Address" type="email" value={email} onChange={(v) => { setEmail(v); setErrors(e => { delete e.email; return { ...e }; }); }} error={errors.email} placeholder="jane@example.com" autoComplete="email" />
