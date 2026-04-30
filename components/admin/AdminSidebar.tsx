@@ -270,7 +270,7 @@ export default function AdminSidebar() {
       </div>
 
       {/* ── NAV ── */}
-      <nav className="flex-1 overflow-hidden px-3 py-3 space-y-0.5">
+ <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-0.5 no-scrollbar">
         {NAV.map((item, idx) => {
 
           // Section divider / label
