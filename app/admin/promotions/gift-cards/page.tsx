@@ -1,111 +1,90 @@
-import {
-  Ticket,
-  Plus,
-  Tag,
-  TrendingDown,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
+import { Gift, Plus, CreditCard, CheckCircle, RefreshCw } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
-type CouponType = "% Off" | "Fixed" | "Free Shipping";
-type CouponStatus = "active" | "expired" | "scheduled" | "paused";
+type GiftCardStatus = "active" | "redeemed" | "expired" | "pending";
 
-interface Coupon {
+interface GiftCard {
   code: string;
-  type: CouponType;
-  value: string;
-  minOrder: string;
-  used: number;
-  limit: number;
+  recipient: string;
+  initialValue: number;
+  balance: number;
+  issuedDate: string;
   expiry: string;
-  status: CouponStatus;
+  status: GiftCardStatus;
 }
 
-const COUPONS: Coupon[] = [
+const GIFT_CARDS: GiftCard[] = [
   {
-    code: "PERRY10",
-    type: "% Off",
-    value: "10%",
-    minOrder: "₦5,000",
-    used: 248,
-    limit: 500,
-    expiry: "Dec 31, 2025",
+    code: "GC-PY-4821",
+    recipient: "Amara Okafor",
+    initialValue: 10000,
+    balance: 7500,
+    issuedDate: "May 1, 2025",
+    expiry: "May 1, 2026",
     status: "active",
   },
   {
-    code: "WELCOME20",
-    type: "% Off",
-    value: "20%",
-    minOrder: "₦3,000",
-    used: 91,
-    limit: 200,
-    expiry: "Jul 31, 2025",
+    code: "GC-PY-3309",
+    recipient: "Chioma Nwosu",
+    initialValue: 25000,
+    balance: 0,
+    issuedDate: "Feb 14, 2025",
+    expiry: "Feb 14, 2026",
+    status: "redeemed",
+  },
+  {
+    code: "GC-PY-5517",
+    recipient: "Bolanle Ade",
+    initialValue: 15000,
+    balance: 15000,
+    issuedDate: "Jun 5, 2025",
+    expiry: "Jun 5, 2026",
     status: "active",
   },
   {
-    code: "FREESHIP",
-    type: "Free Shipping",
-    value: "—",
-    minOrder: "₦8,000",
-    used: 430,
-    limit: 1000,
-    expiry: "Jun 30, 2025",
+    code: "GC-PY-2248",
+    recipient: "Ngozi Eze",
+    initialValue: 5000,
+    balance: 0,
+    issuedDate: "Mar 20, 2025",
+    expiry: "Mar 20, 2026",
+    status: "redeemed",
+  },
+  {
+    code: "GC-PY-7764",
+    recipient: "Funmi Bakare",
+    initialValue: 20000,
+    balance: 12000,
+    issuedDate: "Apr 10, 2025",
+    expiry: "Apr 10, 2026",
     status: "active",
   },
   {
-    code: "FESTIVE500",
-    type: "Fixed",
-    value: "₦500",
-    minOrder: "₦10,000",
-    used: 175,
-    limit: 300,
-    expiry: "Jan 15, 2025",
-    status: "expired",
-  },
-  {
-    code: "ILEYA30",
-    type: "% Off",
-    value: "30%",
-    minOrder: "₦15,000",
-    used: 0,
-    limit: 150,
-    expiry: "Aug 20, 2025",
-    status: "scheduled",
-  },
-  {
-    code: "NAIJA1K",
-    type: "Fixed",
-    value: "₦1,000",
-    minOrder: "₦20,000",
-    used: 62,
-    limit: 100,
-    expiry: "May 10, 2025",
+    code: "GC-PY-1102",
+    recipient: "Adeola Martins",
+    initialValue: 8000,
+    balance: 8000,
+    issuedDate: "Dec 25, 2024",
+    expiry: "Dec 25, 2025",
     status: "expired",
   },
 ];
 
 const statusVariant: Record<
-  CouponStatus,
-  "success" | "danger" | "info" | "neutral"
+  GiftCardStatus,
+  "success" | "neutral" | "danger" | "warning"
 > = {
   active: "success",
+  redeemed: "neutral",
   expired: "danger",
-  scheduled: "info",
-  paused: "neutral",
+  pending: "warning",
 };
 
-const typeColors: Record<CouponType, { bg: string; color: string }> = {
-  "% Off": { bg: "#EDE9FE", color: "#7C3AED" },
-  Fixed: { bg: "#DCFCE7", color: "#15803D" },
-  "Free Shipping": { bg: "#DBEAFE", color: "#1D4ED8" },
-};
-
-export default function CouponsPage() {
-  const active = COUPONS.filter((c) => c.status === "active").length;
-  const expired = COUPONS.filter((c) => c.status === "expired").length;
-  const usedToday = 34;
-  const revenueSaved = "₦284,500";
+export default function GiftCardsPage() {
+  const totalIssued = GIFT_CARDS.length;
+  const active = GIFT_CARDS.filter((g) => g.status === "active").length;
+  const redeemed = GIFT_CARDS.filter((g) => g.status === "redeemed").length;
+  const totalValue = GIFT_CARDS.reduce((acc, g) => acc + g.initialValue, 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,21 +98,28 @@ export default function CouponsPage() {
               fontFamily: "'Cormorant Garamond', serif",
             }}
           >
-            Coupons
+            Gift Cards
           </h1>
           <p className="text-sm" style={{ color: "var(--mid)" }}>
-            Create and manage promotional coupon codes
+            Issue and track Perry Collectibles gift cards
           </p>
         </div>
         <button className="btn btn-primary flex items-center gap-2 self-start sm:self-auto">
           <Plus size={14} />
-          Create Coupon
+          Issue Gift Card
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
+          {
+            label: "Total Issued",
+            value: totalIssued,
+            icon: CreditCard,
+            color: "#2563EB",
+            bg: "#DBEAFE",
+          },
           {
             label: "Active",
             value: active,
@@ -142,25 +128,18 @@ export default function CouponsPage() {
             bg: "#DCFCE7",
           },
           {
-            label: "Expired",
-            value: expired,
-            icon: Clock,
-            color: "var(--color-danger)",
+            label: "Redeemed",
+            value: redeemed,
+            icon: RefreshCw,
+            color: "var(--color-text-muted)",
+            bg: "var(--color-secondary)",
+          },
+          {
+            label: "Total Value",
+            value: `₦${totalValue.toLocaleString()}`,
+            icon: Gift,
+            color: "var(--terracotta)",
             bg: "#FEE2E2",
-          },
-          {
-            label: "Used Today",
-            value: usedToday,
-            icon: Ticket,
-            color: "#7C3AED",
-            bg: "#EDE9FE",
-          },
-          {
-            label: "Revenue Saved",
-            value: revenueSaved,
-            icon: TrendingDown,
-            color: "var(--color-warning)",
-            bg: "#FEF3C7",
           },
         ].map(({ label, value, icon: Icon, color, bg }) => (
           <div
@@ -204,7 +183,7 @@ export default function CouponsPage() {
           boxShadow: "var(--shadow-sm)",
         }}
       >
-        <table className="w-full text-left border-collapse min-w-[820px]">
+        <table className="w-full text-left border-collapse min-w-[860px]">
           <thead>
             <tr
               style={{
@@ -213,11 +192,11 @@ export default function CouponsPage() {
               }}
             >
               {[
-                "Code",
-                "Type",
-                "Value",
-                "Min Order",
-                "Usage",
+                "Gift Card Code",
+                "Recipient",
+                "Initial Value",
+                "Balance Remaining",
+                "Issued Date",
                 "Expiry",
                 "Status",
               ].map((h) => (
@@ -232,16 +211,17 @@ export default function CouponsPage() {
             </tr>
           </thead>
           <tbody>
-            {COUPONS.map((coupon, idx) => {
-              const pct = Math.round((coupon.used / coupon.limit) * 100);
-              const typeStyle = typeColors[coupon.type];
+            {GIFT_CARDS.map((card, idx) => {
+              const usedPct = Math.round(
+                ((card.initialValue - card.balance) / card.initialValue) * 100,
+              );
               return (
                 <tr
-                  key={coupon.code}
+                  key={card.code}
                   style={{
                     background: "var(--color-surface-raised)",
                     borderBottom:
-                      idx < COUPONS.length - 1
+                      idx < GIFT_CARDS.length - 1
                         ? "1px solid var(--color-border)"
                         : undefined,
                   }}
@@ -249,52 +229,61 @@ export default function CouponsPage() {
                   {/* Code */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
-                      <Tag size={13} style={{ color: "var(--terracotta)" }} />
+                      <Gift size={13} style={{ color: "var(--gold)" }} />
                       <code
-                        className="text-sm font-mono font-semibold tracking-widest px-2 py-0.5 rounded"
+                        className="text-sm font-mono font-semibold tracking-wider px-2 py-0.5 rounded"
                         style={{
                           background: "var(--color-secondary)",
                           color: "var(--deep)",
                         }}
                       >
-                        {coupon.code}
+                        {card.code}
                       </code>
                     </div>
                   </td>
-                  {/* Type */}
+                  {/* Recipient */}
                   <td className="px-5 py-4">
-                    <span
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-                      style={{
-                        background: typeStyle.bg,
-                        color: typeStyle.color,
-                      }}
-                    >
-                      {coupon.type}
-                    </span>
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold"
+                        style={{
+                          background: "var(--color-secondary)",
+                          color: "var(--color-primary)",
+                        }}
+                      >
+                        {card.recipient
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </div>
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: "var(--color-text)" }}
+                      >
+                        {card.recipient}
+                      </span>
+                    </div>
                   </td>
-                  {/* Value */}
+                  {/* Initial Value */}
                   <td
-                    className="px-5 py-4 text-sm font-bold"
+                    className="px-5 py-4 text-sm font-semibold"
                     style={{ color: "var(--color-text)" }}
                   >
-                    {coupon.value}
+                    ₦{card.initialValue.toLocaleString()}
                   </td>
-                  {/* Min Order */}
-                  <td
-                    className="px-5 py-4 text-sm"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    {coupon.minOrder}
-                  </td>
-                  {/* Usage */}
+                  {/* Balance */}
                   <td className="px-5 py-4">
                     <div className="flex flex-col gap-1">
                       <span
-                        className="text-xs font-medium"
-                        style={{ color: "var(--color-text)" }}
+                        className="text-sm font-bold"
+                        style={{
+                          color:
+                            card.balance === 0
+                              ? "var(--color-text-muted)"
+                              : "var(--color-success)",
+                        }}
                       >
-                        {coupon.used} / {coupon.limit}
+                        ₦{card.balance.toLocaleString()}
                       </span>
                       <div
                         className="h-1.5 rounded-full overflow-hidden"
@@ -306,33 +295,38 @@ export default function CouponsPage() {
                         <div
                           className="h-full rounded-full"
                           style={{
-                            width: `${pct}%`,
+                            width: `${usedPct}%`,
                             background:
-                              pct >= 90
-                                ? "var(--color-danger)"
-                                : pct >= 60
-                                  ? "var(--color-warning)"
-                                  : "var(--color-success)",
+                              usedPct === 100
+                                ? "var(--color-text-muted)"
+                                : "var(--gold)",
                           }}
                         />
                       </div>
                     </div>
+                  </td>
+                  {/* Issued Date */}
+                  <td
+                    className="px-5 py-4 text-sm"
+                    style={{ color: "var(--color-text-muted)" }}
+                  >
+                    {card.issuedDate}
                   </td>
                   {/* Expiry */}
                   <td
                     className="px-5 py-4 text-sm"
                     style={{ color: "var(--color-text-muted)" }}
                   >
-                    {coupon.expiry}
+                    {card.expiry}
                   </td>
                   {/* Status */}
                   <td className="px-5 py-4">
                     <StatusBadge
                       label={
-                        coupon.status.charAt(0).toUpperCase() +
-                        coupon.status.slice(1)
+                        card.status.charAt(0).toUpperCase() +
+                        card.status.slice(1)
                       }
-                      variant={statusVariant[coupon.status]}
+                      variant={statusVariant[card.status]}
                     />
                   </td>
                 </tr>

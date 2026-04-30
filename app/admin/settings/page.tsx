@@ -1,7 +1,4 @@
-import { Metadata } from 'next';
-import AdminSettingsClient from './AdminSettingsClient';
-
-export const metadata: Metadata = { title: 'Settings — Admin' };
+import AdminSettingsClient from "./AdminSettingsClient";
 
 export default function AdminSettingsPage() {
   return <AdminSettingsClient />;

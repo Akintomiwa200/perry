@@ -1,7 +1,4 @@
-import { Metadata } from 'next';
-import AdminCustomersTable from './AdminCustomersTable';
-
-export const metadata: Metadata = { title: 'Customers — Admin' };
+import AdminCustomersTable from "./AdminCustomersTable";
 
 export default function AdminCustomersPage() {
   return <AdminCustomersTable />;
