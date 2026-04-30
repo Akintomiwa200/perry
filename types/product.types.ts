@@ -16,6 +16,10 @@ export interface Product {
   featured: boolean;
   isNew: boolean;
   isSale: boolean;
+  categoryId?: string;
+  categoryName?: string;
+  categorySlug?: string;
+  status: "active" | "draft" | "archived";
   createdAt: string;
   updatedAt: string;
 }
@@ -25,7 +29,7 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   tags?: string[];
-  sortBy?: 'price-asc' | 'price-desc' | 'newest' | 'rating' | 'popular';
+  sortBy?: "price-asc" | "price-desc" | "newest" | "rating" | "popular";
   search?: string;
   page?: number;
   limit?: number;

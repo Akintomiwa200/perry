@@ -5,7 +5,9 @@ export interface User {
   lastName: string;
   avatar?: string;
   phone?: string;
-  role?: 'user' | 'admin';
+  role: "user" | "admin" | "super_admin";
+  isActive: boolean;
+  emailVerified: boolean;
   createdAt: string;
 }
 
@@ -55,4 +57,11 @@ export interface AdminRegisterData {
 export interface AdminAuthResponse {
   user: User;
   token: string;
+}
+
+export interface UpdateProfileData {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  avatar?: string;
 }

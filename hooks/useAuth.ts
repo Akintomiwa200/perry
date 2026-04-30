@@ -1,13 +1,13 @@
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '@/store/store';
-import { setUser, logout, setLoading, setError } from '@/store/authSlice';
-import { authService } from '@/services/authService';
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { setUser, logout, setLoading, setError } from "@/store/authSlice";
+import { authService } from "@/services/authService";
 import {
   LoginCredentials,
   RegisterData,
   AdminLoginCredentials,
   AdminRegisterData,
-} from '@/types/user.types';
+} from "@/types/user.types";
 
 export function useAuth() {
   const dispatch = useDispatch();
@@ -19,8 +19,10 @@ export function useAuth() {
       const { user, token } = await authService.login(credentials);
       dispatch(setUser({ user, token }));
       return { success: true };
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Invalid email or password';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Invalid email or password";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -32,8 +34,10 @@ export function useAuth() {
       const { user, token } = await authService.register(data);
       dispatch(setUser({ user, token }));
       return { success: true };
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Registration failed. Please try again.';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Registration failed. Please try again.";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -45,8 +49,10 @@ export function useAuth() {
       const { user, token } = await authService.adminLogin(credentials);
       dispatch(setUser({ user, token }));
       return { success: true };
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Invalid admin credentials';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Invalid admin credentials";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -58,8 +64,10 @@ export function useAuth() {
       const { user, token } = await authService.adminRegister(data);
       dispatch(setUser({ user, token }));
       return { success: true };
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Admin registration failed. Please try again.';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Admin registration failed. Please try again.";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -68,6 +76,22 @@ export function useAuth() {
   const signOut = async () => {
     await authService.logout();
     dispatch(logout());
+  };
+
+  const getMe = async () => {
+    dispatch(setLoading(true));
+    try {
+      const user = await authService.getMe();
+      // token is managed by cookies server-side; store empty string as sentinel
+      dispatch(setUser({ user, token: auth.token ?? "" }));
+      return { success: true, user };
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Failed to fetch user";
+      dispatch(setError(msg));
+      return { success: false, error: msg };
+    }
   };
 
   return {
@@ -81,5 +105,6 @@ export function useAuth() {
     adminLogin,
     adminRegister,
     signOut,
+    getMe,
   };
 }

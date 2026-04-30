@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Product, ProductFilters, ProductsResponse } from '@/types/product.types';
-import { mockProducts } from '@/lib/db';
+import { useState, useEffect, useCallback } from "react";
+import { Product, ProductFilters } from "@/types/product.types";
+import { productService } from "@/services/productService";
 
 export function useProducts(filters?: ProductFilters) {
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,22 +13,29 @@ export function useProducts(filters?: ProductFilters) {
     setIsLoading(true);
     setError(null);
     try {
-      // In production, replace with: const data = await productService.getProducts(filters);
-      let data = [...mockProducts];
-      if (filters?.category) data = data.filter((p) => p.category === filters.category);
-      if (filters?.search) data = data.filter((p) => p.name.toLowerCase().includes(filters.search!.toLowerCase()));
-      setProducts(data);
-      setTotal(data.length);
+      const data = await productService.getProducts(filters);
+      setProducts(data.products);
+      setTotal(data.total);
+      setTotalPages(data.totalPages);
     } catch {
-      setError('Failed to load products. Please try again.');
+      setError("Failed to load products. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [filters?.category, filters?.search]);
+  }, [filters?.category, filters?.search, filters?.page, filters?.limit]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
-  return { products, total, isLoading, error, refetch: fetchProducts };
+  return {
+    products,
+    total,
+    totalPages,
+    isLoading,
+    error,
+    refetch: fetchProducts,
+  };
 }
 
 export function useProduct(slug: string) {
@@ -36,12 +44,35 @@ export function useProduct(slug: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!slug) return;
     setIsLoading(true);
-    const found = mockProducts.find((p) => p.slug === slug) || null;
-    setProduct(found);
-    if (!found) setError('Product not found');
-    setIsLoading(false);
+    setError(null);
+
+    productService
+      .getProductBySlug(slug)
+      .then((p) => setProduct(p))
+      .catch(() => setError("Product not found"))
+      .finally(() => setIsLoading(false));
   }, [slug]);
 
   return { product, isLoading, error };
+}
+
+export function useFeaturedProducts() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+
+    productService
+      .getFeaturedProducts()
+      .then((data) => setProducts(data))
+      .catch(() => setError("Failed to load featured products"))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  return { products, isLoading, error };
 }

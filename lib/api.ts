@@ -1,28 +1,20 @@
-import axios from 'axios';
-import { getToken } from './auth';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
-  headers: { 'Content-Type': 'application/json' },
-});
-
-api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
+  baseURL: "/api",
+  headers: { "Content-Type": "application/json" },
+  withCredentials: true, // send httpOnly cookies automatically
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        const isAdminRoute = window.location.pathname.startsWith('/admin') || window.location.pathname.startsWith('/auth/admin');
-        window.location.href = isAdminRoute ? '/auth/admin/login' : '/login';
-      }
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      const isAdmin = window.location.pathname.startsWith("/admin");
+      window.location.href = isAdmin ? "/auth/admin/login" : "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

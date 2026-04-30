@@ -1,18 +1,36 @@
-import api from '@/lib/api';
-import { Cart } from '@/types/cart.types';
+import api from "@/lib/api";
+import { ServerCartItem } from "@/types/cart.types";
 
 export const cartService = {
-  async getCart(): Promise<Cart> {
-    const { data } = await api.get('/cart');
+  async getCart(): Promise<ServerCartItem[]> {
+    const { data } = await api.get<ServerCartItem[]>("/cart");
     return data;
   },
 
-  async syncCart(items: Cart['items']): Promise<Cart> {
-    const { data } = await api.post('/cart/sync', { items });
+  async addItem(productId: string, quantity: number): Promise<ServerCartItem> {
+    const { data } = await api.post<ServerCartItem>("/cart/items", {
+      productId,
+      quantity,
+    });
     return data;
+  },
+
+  async updateItem(
+    productId: string,
+    quantity: number,
+  ): Promise<ServerCartItem> {
+    const { data } = await api.patch<ServerCartItem>(
+      `/cart/items/${productId}`,
+      { quantity },
+    );
+    return data;
+  },
+
+  async removeItem(productId: string): Promise<void> {
+    await api.delete(`/cart/items/${productId}`);
   },
 
   async clearCart(): Promise<void> {
-    await api.delete('/cart');
+    await api.delete("/cart");
   },
 };

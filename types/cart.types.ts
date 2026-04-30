@@ -1,4 +1,4 @@
-import { Product } from './product.types';
+import { Product } from "./product.types";
 
 export interface CartItem {
   id: string;
@@ -13,4 +13,11 @@ export interface Cart {
   tax: number;
   shipping: number;
   total: number;
+}
+
+export interface ServerCartItem {
+  id: string;
+  productId: string;
+  product: Product;
+  quantity: number;
 }

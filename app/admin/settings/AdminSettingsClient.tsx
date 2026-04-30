@@ -15,10 +15,6 @@ import {
   EyeOff,
   Shield,
   ChevronDown,
-  Download,
-  RotateCcw,
-  Trash2,
-  PowerOff,
   Camera,
 } from "lucide-react";
 

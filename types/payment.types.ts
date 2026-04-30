@@ -1,6 +1,6 @@
 export interface PaymentMethod {
   id: string;
-  type: 'card' | 'paypal';
+  type: "card" | "paypal";
   last4?: string;
   brand?: string;
   expiryMonth?: number;
@@ -15,7 +15,7 @@ export interface PaymentIntent {
 }
 
 export interface CheckoutSession {
-  shippingAddress?: import('./user.types').Address;
+  shippingAddress?: import("./user.types").Address;
   paymentMethod?: PaymentMethod;
   shippingOption?: ShippingOption;
 }
@@ -26,4 +26,11 @@ export interface ShippingOption {
   description: string;
   price: number;
   estimatedDays: string;
+}
+
+export interface PaystackPaymentData {
+  email: string;
+  amount: number;
+  reference: string;
+  currency?: string;
 }
