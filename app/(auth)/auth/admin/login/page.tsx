@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '420px', padding: '2rem', borderRadius: 8, background: 'var(--cream)', border: '1px solid var(--blush)' }}>
+    <div >
       <h1
         style={{
           fontFamily: "'Cormorant Garamond', serif",
