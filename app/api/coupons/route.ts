@@ -28,8 +28,12 @@ export const POST = withAdmin(async (request: Request) => {
     if (!parsed.success) return err(parsed.error, 400);
 
     const {
-      code, discount_type, discount_value, min_order,
-      usage_limit, expires_at,
+      code,
+      type,
+      value,
+      minOrder,
+      usageLimit,
+      expiresAt,
     } = parsed.data;
 
     const coupon = await queryOne(
@@ -38,11 +42,11 @@ export const POST = withAdmin(async (request: Request) => {
        RETURNING *`,
       [
         code.trim().toUpperCase(),
-        discount_type,
-        discount_value,
-        min_order ?? 0,
-        usage_limit ?? null,
-        expires_at ?? null,
+        type,
+        value,
+        minOrder ?? 0,
+        usageLimit ?? null,
+        expiresAt ?? null,
       ],
     );
 

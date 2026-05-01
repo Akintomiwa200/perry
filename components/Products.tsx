@@ -1,11 +1,44 @@
-'use client'
-
 import Link from 'next/link'
 import ProductCard from '@/components/product/ProductCard'
-import { mockProducts } from '@/lib/db'
 import { Product } from '@/types/product.types'
+import { query } from '@/lib/db'
 
-export default function Products() {
+export default async function Products() {
+  let products: Product[] = []
+  try {
+    products = await query<Product>(
+      `SELECT
+         p.id::text AS id,
+         p.name,
+         p.slug,
+         p.description,
+         p.price,
+         p.compare_at_price AS "compareAtPrice",
+         COALESCE(p.images, ARRAY[]::text[]) AS images,
+         COALESCE(c.slug, 'uncategorized') AS category,
+         COALESCE(p.stock, 0) AS stock,
+         COALESCE(p.sku, '') AS sku,
+         COALESCE(p.rating, 0) AS rating,
+         COALESCE(p.review_count, 0) AS "reviewCount",
+         COALESCE(p.featured, false) AS featured,
+         COALESCE(p.is_new, false) AS "isNew",
+         COALESCE(p.is_sale, false) AS "isSale",
+         c.id::text AS "categoryId",
+         c.name AS "categoryName",
+         c.slug AS "categorySlug",
+         p.status,
+         p.created_at AS "createdAt",
+         p.updated_at AS "updatedAt"
+       FROM products p
+       LEFT JOIN categories c ON c.id = p.category_id
+       WHERE p.status = 'active'
+       ORDER BY p.created_at DESC
+       LIMIT 24`,
+    )
+  } catch (error) {
+    console.error('[Products] failed to fetch products', error)
+  }
+
   const now = new Date()
 
   const isRecentlyAdded = (date: string) => {
@@ -17,11 +50,11 @@ export default function Products() {
   const popularityScore = (p: Product) =>
     p.reviewCount * 0.7 + p.rating * 20
 
-  const sortedByDate = [...mockProducts].sort(
+  const sortedByDate = [...products].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
-  const sortedByPopularity = [...mockProducts].sort(
+  const sortedByPopularity = [...products].sort(
     (a, b) => popularityScore(b) - popularityScore(a)
   )
 
@@ -30,7 +63,7 @@ export default function Products() {
 
   const selectedIds = new Set([...latest, ...popular].map(p => p.id))
 
-  const others = mockProducts
+  const others = products
     .filter(p => !selectedIds.has(p.id))
     .slice(0, 2)
 

@@ -32,10 +32,29 @@ export async function POST(request: Request) {
 
     const { password_hash, ...safeUser } = user;
 
-    const token = await signToken({ id: safeUser.id, email: safeUser.email, role: safeUser.role });
+    const token = await signToken({
+      userId: String(safeUser.id),
+      email: safeUser.email,
+      role: safeUser.role as 'user' | 'admin' | 'super_admin',
+    });
+    const [first = '', ...rest] = (safeUser.name ?? '').trim().split(/\s+/);
+    const mappedUser = {
+      id: String(safeUser.id),
+      email: safeUser.email,
+      firstName: first,
+      lastName: rest.join(' '),
+      role: safeUser.role,
+      isActive: true,
+      emailVerified: true,
+      createdAt: safeUser.created_at,
+    };
 
-    const res = ok({ user: safeUser, token });
-    createUserSession(res, { id: safeUser.id, email: safeUser.email, role: safeUser.role });
+    const res = ok({ user: mappedUser, token });
+    createUserSession(res, {
+      userId: String(safeUser.id),
+      email: safeUser.email,
+      role: safeUser.role as 'user' | 'admin' | 'super_admin',
+    });
     return res;
   } catch (e) {
     console.error('[POST /api/auth/login]', e);

@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ProductList from '@/components/product/ProductList'
-import { mockProducts } from '@/lib/db'
+import { Product } from '@/types/product.types'
 
 const categories = [
   { id: 'all', name: 'All Products', icon: '✨' },
@@ -17,8 +17,46 @@ const categories = [
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [sortBy, setSortBy] = useState('newest')
+  const [products, setProducts] = useState<Product[]>([])
 
-  const filtered = mockProducts.filter(p =>
+  useEffect(() => {
+    let mounted = true
+    fetch('/api/products?limit=100')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return
+        const mapped = (data.products ?? []).map((p: any): Product => ({
+          id: String(p.id),
+          name: p.name,
+          slug: p.slug,
+          description: p.description ?? '',
+          price: Number(p.price ?? 0),
+          compareAtPrice: p.compare_at_price ?? undefined,
+          images: p.images ?? [],
+          category: p.category_slug ?? p.category_name ?? 'uncategorized',
+          stock: Number(p.stock ?? 0),
+          sku: p.sku ?? '',
+          rating: Number(p.rating ?? 0),
+          reviewCount: Number(p.review_count ?? 0),
+          featured: Boolean(p.featured),
+          isNew: Boolean(p.is_new),
+          isSale: Boolean(p.is_sale),
+          status: p.status ?? 'active',
+          createdAt: p.created_at ?? new Date().toISOString(),
+          updatedAt: p.updated_at ?? p.created_at ?? new Date().toISOString(),
+          tags: [],
+        }))
+        setProducts(mapped)
+      })
+      .catch(() => {
+        if (mounted) setProducts([])
+      })
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const filtered = products.filter(p =>
     activeCategory === 'all' ||
     p.category.toLowerCase().replace(/[\s&]+/g, '-') === activeCategory
   )

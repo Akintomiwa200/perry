@@ -41,7 +41,9 @@ export const POST = withAdmin(async (request: Request) => {
     const parsed = parseBody(inventoryAdjustmentSchema, body);
     if (!parsed.success) return err(parsed.error, 400);
 
-    const { product_id, adjustment_type, quantity, reason } = parsed.data;
+    const { productId, type, quantity, reason } = parsed.data;
+    const product_id = Number(productId);
+    const adjustment_type = type;
 
     const product = await queryOne<{ id: number; stock: number }>(
       'SELECT id, stock FROM products WHERE id = $1',
@@ -65,7 +67,7 @@ export const POST = withAdmin(async (request: Request) => {
     await client.query(
       `INSERT INTO inventory_adjustments (product_id, admin_id, adjustment_type, quantity, reason, stock_before, stock_after)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [product_id, session.id, adjustment_type, quantity, reason ?? null, product.stock, newStock],
+      [product_id, session.userId, adjustment_type, quantity, reason ?? null, product.stock, newStock],
     );
 
     await client.query(

@@ -1,8 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Search, Bell, Settings, LogOut, User, ChevronDown, X, Check } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 const breadcrumbMap: Record<string, string> = {
   '/admin': 'Dashboard',
@@ -12,53 +13,48 @@ const breadcrumbMap: Record<string, string> = {
   '/admin/settings': 'Settings',
 };
 
-const NOTIFICATIONS = [
-  {
-    id: 1,
-    title: 'New order received',
-    desc: 'Order #4821 was placed by James O.',
-    time: '2m ago',
-    read: false,
-    icon: '🛒',
-  },
-  {
-    id: 2,
-    title: 'Low stock alert',
-    desc: 'Product "Wireless Headset" has 3 units left.',
-    time: '18m ago',
-    read: false,
-    icon: '⚠️',
-  },
-  {
-    id: 3,
-    title: 'Customer review',
-    desc: 'Ada M. left a 5-star review.',
-    time: '1h ago',
-    read: true,
-    icon: '⭐',
-  },
-  {
-    id: 4,
-    title: 'Payment confirmed',
-    desc: 'Invoice #INV-0291 was paid in full.',
-    time: '3h ago',
-    read: true,
-    icon: '✅',
-  },
-];
-
 export default function AdminHeader() {
+  const router = useRouter();
   const pathname = usePathname();
+  const { user, signOut } = useAuth();
   const title = breadcrumbMap[pathname] || 'Dashboard';
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchNotifications = () => {
+      fetch('/api/admin/notifications')
+        .then((res) => res.json())
+        .then((data) => {
+          if (!mounted) return;
+          setNotifications(
+            (data.notifications ?? []).map((n: any, idx: number) => ({
+              ...n,
+              id: n.id ?? idx,
+              icon: idx === 0 ? '🛒' : idx === 1 ? '⚠️' : '⭐',
+              read: false,
+            })),
+          );
+        })
+        .catch(() => {
+          if (mounted) setNotifications([]);
+        });
+    };
+    fetchNotifications();
+    const t = setInterval(fetchNotifications, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(t);
+    };
+  }, []);
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -74,15 +70,32 @@ export default function AdminHeader() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markAllRead = () =>
+  const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    const unread = notifications.filter((n) => !n.read);
+    await Promise.all(
+      unread.map((n) =>
+        fetch('/api/admin/notifications', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notificationId: n.id, markAs: true }),
+        }).catch(() => {})
+      ),
+    );
+  };
 
-  const markRead = (id: number) =>
+  const markRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
+    await fetch('/api/admin/notifications', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notificationId: id, markAs: true }),
+    }).catch(() => {});
+  };
 
-  const dismiss = (id: number) =>
+  const dismiss = (id: string) =>
     setNotifications((prev) => prev.filter((n) => n.id !== id));
 
   return (
@@ -181,7 +194,10 @@ export default function AdminHeader() {
                     key={n.id}
                     className="flex items-start gap-3 px-4 py-3 group transition hover:bg-[var(--color-surface-raised)] cursor-pointer"
                     style={{ opacity: n.read ? 0.6 : 1 }}
-                    onClick={() => markRead(n.id)}
+                    onClick={() => {
+                      markRead(n.id);
+                      if (n.href) router.push(n.href);
+                    }}
                   >
                     <span className="text-lg mt-0.5 shrink-0">{n.icon}</span>
                     <div className="flex-1 min-w-0">
@@ -209,12 +225,9 @@ export default function AdminHeader() {
               </ul>
 
               {/* Footer */}
-              <div
-                className="px-4 py-2.5 text-center"
-                style={{ borderTop: '1px solid var(--color-border)' }}
-              >
-                <button className="text-xs opacity-40 hover:opacity-80 transition" style={{ color: 'var(--deep)' }}>
-                  View all notifications →
+              <div className="px-4 py-2.5 text-center" style={{ borderTop: '1px solid var(--color-border)' }}>
+                <button className="text-xs opacity-40 hover:opacity-80 transition" style={{ color: 'var(--deep)' }} onClick={() => router.push('/admin')}>
+                  Refresh notifications
                 </button>
               </div>
             </div>
@@ -231,10 +244,10 @@ export default function AdminHeader() {
             className="flex items-center gap-2 rounded-full px-2 py-1 transition hover:bg-[var(--color-surface-raised)]"
           >
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-              MG
+              {(user?.firstName?.[0] ?? 'A')}{(user?.lastName?.[0] ?? 'D')}
             </div>
             <span className="hidden md:block text-sm font-medium" style={{ color: 'var(--deep)' }}>
-              Marcus George
+              {user ? `${user.firstName} ${user.lastName}` : 'Admin'}
             </span>
             <ChevronDown
               size={13}
@@ -254,14 +267,14 @@ export default function AdminHeader() {
               {/* User Info */}
               <div className="px-4 py-4 flex items-center gap-3" style={{ borderBottom: '1px solid var(--color-border)' }}>
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                  MG
+                  {(user?.firstName?.[0] ?? 'A')}{(user?.lastName?.[0] ?? 'D')}
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate" style={{ color: 'var(--deep)' }}>
-                    Marcus George
+                    {user ? `${user.firstName} ${user.lastName}` : 'Admin'}
                   </p>
                   <p className="text-xs opacity-40 truncate" style={{ color: 'var(--deep)' }}>
-                    marcus@admin.com
+                    {user?.email ?? ''}
                   </p>
                 </div>
               </div>
@@ -269,13 +282,17 @@ export default function AdminHeader() {
               {/* Menu Items */}
               <div className="py-2">
                 {[
-                  { icon: User, label: 'My Profile' },
-                  { icon: Settings, label: 'Settings' },
-                ].map(({ icon: Icon, label }) => (
+                  { icon: User, label: 'My Profile', href: '/account' },
+                  { icon: Settings, label: 'Settings', href: '/admin/settings' },
+                ].map(({ icon: Icon, label, href }) => (
                   <button
                     key={label}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition hover:bg-[var(--color-surface-raised)]"
                     style={{ color: 'var(--deep)' }}
+                    onClick={() => {
+                      setProfileOpen(false);
+                      router.push(href);
+                    }}
                   >
                     <Icon size={14} className="opacity-50" />
                     {label}
@@ -287,6 +304,10 @@ export default function AdminHeader() {
               <div className="py-2" style={{ borderTop: '1px solid var(--color-border)' }}>
                 <button
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 transition hover:bg-red-50 dark:hover:bg-red-950/20"
+                  onClick={async () => {
+                    await signOut();
+                    router.push('/auth/admin/login');
+                  }}
                 >
                   <LogOut size={14} />
                   Sign out

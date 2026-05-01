@@ -6,6 +6,7 @@ import { addToCart } from "@/store/cartSlice";
 import { Product } from "@/types/product.types";
 import { formatNaira, calculateDiscount } from "@/lib/utils";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useAuth } from "@/hooks/useAuth";
 import {
   ShoppingCart,
   Heart,
@@ -29,6 +30,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     remove: wishlistRemove,
     isInWishlist,
   } = useWishlist();
+  const { isAuthenticated } = useAuth();
   const inWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
@@ -241,11 +243,15 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
                 {added ? "Added!" : "Add to Cart"}
               </button>
               <button
-                onClick={() =>
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    window.location.href = "/login";
+                    return;
+                  }
                   inWishlist
                     ? wishlistRemove(product.id)
-                    : wishlistAdd(product.id)
-                }
+                    : wishlistAdd(product.id);
+                }}
                 className="btn btn-outline btn-icon btn-lg"
                 aria-label={
                   inWishlist ? "Remove from wishlist" : "Add to wishlist"

@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { mockProducts } from "@/lib/db";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -790,8 +789,40 @@ export default function ProductPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [expandedProduct, setExpandedProduct] = useState<Product | null>(null);
   const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const filtered = (mockProducts as Product[]).filter((p) => {
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/products?limit=60")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        const mapped = (data.products ?? []).map((p: any): Product => ({
+          id: String(p.id),
+          name: p.name,
+          slug: p.slug,
+          category: p.category_slug ?? p.category_name ?? "uncategorized",
+          price: Number(p.price ?? 0),
+          compareAtPrice: p.compare_at_price ?? undefined,
+          description: p.description ?? "",
+          rating: Number(p.rating ?? 0),
+          reviewCount: Number(p.review_count ?? 0),
+          images: p.images ?? [],
+          featured: Boolean(p.featured),
+          isSale: Boolean(p.is_sale),
+          isNew: Boolean(p.is_new),
+        }));
+        setProducts(mapped);
+      })
+      .catch(() => {
+        if (mounted) setProducts([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const filtered = products.filter((p) => {
     const matchCat    = activeCategory === "all" || p.category === activeCategory;
     const matchSearch =
       !search ||

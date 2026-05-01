@@ -8,15 +8,16 @@ import {
   useCheckout,
   SHIPPING_OPTIONS,
   ShippingAddress,
+  ShippingOptionId,
 } from "@/hooks/useCheckout";
 import { useAuth } from "@/hooks/useAuth";
 import { formatNaira } from "@/lib/utils";
+import { Cart } from "@/types/cart.types";
 import {
   Check,
   MapPin,
   Truck,
   CreditCard,
-  Package,
   ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
@@ -477,13 +478,7 @@ function PaymentPanel({
   onPay,
   onBack,
 }: {
-  cart: {
-    items: any[];
-    subtotal: number;
-    shipping: number;
-    tax: number;
-    total: number;
-  };
+  cart: Cart;
   isProcessing: boolean;
   error: string | null;
   onPay: () => void;
@@ -774,7 +769,7 @@ function ConfirmationScreen({ orderNumber }: { orderNumber: string | null }) {
           lineHeight: 1.65,
         }}
       >
-        Your order is being prepared. You'll receive updates via email as your
+        Your order is being prepared. You&apos;ll receive updates via email as your
         items make their way to you.
       </p>
 
@@ -818,7 +813,6 @@ export default function CheckoutPage() {
     selectShippingOption,
     shippingOptions,
     placeOrder,
-    orderId,
     orderNumber,
     isProcessing,
     error,
@@ -951,17 +945,17 @@ export default function CheckoutPage() {
           <ShippingSelector
             address={shippingAddress}
             selected={selectedShipping}
-            onSelect={(id) => {
+            onSelect={(id: ShippingOptionId) => {
               const opt = shippingOptions.find((o) => o.id === id);
               if (opt) {
-                // Just update local selection without advancing
-                selectShippingOption(id as any);
-                // selectShippingOption advances step; back it up so user can confirm
-                setStep("shipping");
+                selectShippingOption(id);
               }
             }}
             onBack={() => setStep("address")}
-            onContinue={() => selectShippingOption(selectedShipping)}
+            onContinue={() => {
+              selectShippingOption(selectedShipping);
+              setStep("payment");
+            }}
           />
         </div>
       )}

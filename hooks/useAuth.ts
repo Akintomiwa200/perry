@@ -21,8 +21,11 @@ export function useAuth() {
       return { success: true };
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Invalid email or password";
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.message ||
+        "Invalid email or password";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -36,8 +39,11 @@ export function useAuth() {
       return { success: true };
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Registration failed. Please try again.";
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.message ||
+        "Registration failed. Please try again.";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -51,8 +57,11 @@ export function useAuth() {
       return { success: true };
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Invalid admin credentials";
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.message ||
+        "Invalid admin credentials";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -66,8 +75,11 @@ export function useAuth() {
       return { success: true };
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Admin registration failed. Please try again.";
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.message ||
+        "Admin registration failed. Please try again.";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }
@@ -87,8 +99,11 @@ export function useAuth() {
       return { success: true, user };
     } catch (err: unknown) {
       const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Failed to fetch user";
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.error ||
+        (err as { response?: { data?: { error?: string; message?: string } } })
+          ?.response?.data?.message ||
+        "Failed to fetch user";
       dispatch(setError(msg));
       return { success: false, error: msg };
     }

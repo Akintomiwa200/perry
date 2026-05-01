@@ -22,17 +22,26 @@ export const GET = withAdmin(async (request: Request) => {
 
     const where = `WHERE ${conditions.join(' AND ')}`;
 
-    const baseQuery = `FROM users u ${where}`;
+    const baseQuery = `FROM users u LEFT JOIN orders o ON o.user_id = u.id ${where}`;
 
     const countResult = await queryOne<{ count: string }>(
-      `SELECT COUNT(*) AS count ${baseQuery}`,
+      `SELECT COUNT(DISTINCT u.id) AS count ${baseQuery}`,
       values,
     );
     const total = parseInt(countResult?.count ?? '0', 10);
 
     const customers = await query(
-      `SELECT u.id, u.name, u.email, u.role, u.created_at, u.updated_at
+      `SELECT
+         u.id,
+         u.name,
+         u.email,
+         u.role,
+         u.created_at,
+         u.updated_at,
+         COUNT(o.id)::int AS "ordersCount",
+         COALESCE(SUM(o.total), 0)::float AS "totalSpent"
        ${baseQuery}
+       GROUP BY u.id
        ORDER BY u.created_at DESC
        LIMIT $${idx} OFFSET $${idx + 1}`,
       [...values, limit, offset],

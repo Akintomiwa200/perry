@@ -19,9 +19,14 @@ export async function GET(request: Request) {
     const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '20', 10)));
     const offset = (page - 1) * limit;
 
-    const conditions: string[] = ['p.status = $1'];
-    const values: unknown[] = [status];
-    let idx = 2;
+    const conditions: string[] = [];
+    const values: unknown[] = [];
+    let idx = 1;
+
+    if (status && status !== 'all') {
+      conditions.push(`p.status = $${idx++}`);
+      values.push(status);
+    }
 
     if (category) {
       conditions.push(`c.slug = $${idx++}`);

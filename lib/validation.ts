@@ -39,14 +39,25 @@ export const updateProductSchema = createProductSchema.partial();
 export const createOrderSchema = z.object({
   items: z.array(
     z.object({
-      productId: z.string(),
+      productId: z.string().min(1),
       quantity: z.number().int().min(1),
       price: z.number().positive(),
     }),
   ),
-  shippingAddressId: z.string(),
+  shippingAddress: z.object({
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    email: z.string().email(),
+    phone: z.string().min(1),
+    street: z.string().min(1),
+    city: z.string().min(1),
+    state: z.string().min(1),
+    zip: z.string().min(1),
+    country: z.string().min(1),
+  }),
   shippingOption: z.enum(["standard", "express", "overnight"]),
   paymentMethod: z.string().min(1),
+  notes: z.string().optional(),
 });
 
 // ── Review ────────────────────────────────────────────────────────────────────

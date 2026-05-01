@@ -95,7 +95,6 @@ export function useCheckout() {
     const opt = SHIPPING_OPTIONS.find((o) => o.id === optId)!;
     setSelectedShipping(optId);
     dispatch(setShipping(opt.price));
-    setStep("payment");
   };
 
   // Step 3: full payment flow
@@ -119,7 +118,7 @@ export function useCheckout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: cart.items.map((i) => ({
-            productId: i.product.id,
+            productId: String(i.product.id),
             quantity: i.quantity,
             price: i.price,
           })),

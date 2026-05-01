@@ -1,25 +1,10 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import StatusBadge from '@/components/admin/StatusBadge';
-
-interface OrderRow {
-  id: string;
-  customer: string;
-  date: string;
-  items: number;
-  total: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-}
-
-const ORDERS: OrderRow[] = [
-  { id: 'ORD-001', customer: 'Amara Okafor', date: 'Mar 15, 2024', items: 2, total: 124.5, status: 'delivered' },
-  { id: 'ORD-002', customer: 'Chioma Nwosu', date: 'Mar 14, 2024', items: 1, total: 89.0, status: 'shipped' },
-  { id: 'ORD-003', customer: 'Bolanle Ade', date: 'Mar 14, 2024', items: 4, total: 245.0, status: 'processing' },
-  { id: 'ORD-004', customer: 'Ngozi Eze', date: 'Mar 13, 2024', items: 1, total: 56.99, status: 'pending' },
-  { id: 'ORD-005', customer: 'Funmi Bakare', date: 'Mar 12, 2024', items: 3, total: 178.25, status: 'delivered' },
-  { id: 'ORD-006', customer: 'Adeola Martins', date: 'Mar 12, 2024', items: 2, total: 134.0, status: 'cancelled' },
-];
+import { useAdminOrders } from '@/hooks/useAdmin';
+import { formatNaira } from '@/lib/utils';
 
 const statusMap: Record<string, 'success' | 'info' | 'warning' | 'neutral' | 'danger'> = {
   delivered: 'success',
@@ -29,7 +14,9 @@ const statusMap: Record<string, 'success' | 'info' | 'warning' | 'neutral' | 'da
   cancelled: 'danger',
 };
 
-function OrderRow({ order, idx, total }: { order: OrderRow; idx: number; total: number }) {
+function OrderRow({ order, idx, total }: { order: any; idx: number; total: number }) {
+  const created = order.created_at ? new Date(order.created_at) : null;
+  const customer = order.customer_name ?? order.customer_email ?? 'Customer';
   return (
     <tr
       key={order.id}
@@ -45,14 +32,19 @@ function OrderRow({ order, idx, total }: { order: OrderRow; idx: number; total: 
         e.currentTarget.style.background = 'var(--color-surface-raised)';
       }}
     >
-      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{order.id}</td>
-      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{order.customer}</td>
-      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>{order.date}</td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>
+        {order.order_number ?? `#${order.id}`}
+      </td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{customer}</td>
       <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-        {order.items} item{order.items > 1 ? 's' : ''}
+        {created ? created.toLocaleDateString() : '-'}
+      </td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        {Array.isArray(order.items) ? order.items.length : 0} item
+        {Array.isArray(order.items) && order.items.length > 1 ? 's' : ''}
       </td>
       <td className="px-4 py-3.5 text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
-        ₦{order.total.toFixed(2)}
+        {formatNaira(Number(order.total ?? 0))}
       </td>
       <td className="px-4 py-3.5">
         <StatusBadge label={order.status} variant={statusMap[order.status] || 'neutral'} />
@@ -62,6 +54,28 @@ function OrderRow({ order, idx, total }: { order: OrderRow; idx: number; total: 
 }
 
 export default function AdminOrdersTable() {
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [search, setSearch] = useState('');
+  const [inputSearch, setInputSearch] = useState('');
+  const { orders, total, isLoading, error } = useAdminOrders({
+    status: statusFilter || undefined,
+    search: search || undefined,
+    limit: 50,
+  });
+
+  const counts = useMemo(() => {
+    const out = {
+      pending: 0,
+      processing: 0,
+      shipped: 0,
+      delivered: 0,
+    };
+    for (const o of orders as any[]) {
+      if (o.status in out) out[o.status as keyof typeof out] += 1;
+    }
+    return out;
+  }, [orders]);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -94,7 +108,13 @@ export default function AdminOrdersTable() {
               {s.label}
             </span>
             <span className="text-xl font-bold" style={{ color: s.color, fontFamily: 'var(--font-primary)' }}>
-              {s.value}
+              {s.label === 'Pending'
+                ? counts.pending
+                : s.label === 'Processing'
+                  ? counts.processing
+                  : s.label === 'Shipped'
+                    ? counts.shipped
+                    : counts.delivered}
             </span>
           </div>
         ))}
@@ -112,6 +132,11 @@ export default function AdminOrdersTable() {
             placeholder="Search orders..."
             className="bg-transparent text-sm outline-none w-full"
             style={{ color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}
+            value={inputSearch}
+            onChange={(e) => setInputSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setSearch(inputSearch.trim());
+            }}
           />
         </div>
         <select
@@ -122,17 +147,20 @@ export default function AdminOrdersTable() {
             color: 'var(--color-text)',
             fontFamily: 'var(--font-primary)',
           }}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
         >
-          <option>All Status</option>
-          <option>Pending</option>
-          <option>Processing</option>
-          <option>Shipped</option>
-          <option>Delivered</option>
-          <option>Cancelled</option>
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
         </select>
         <button
           className="flex items-center gap-2 h-10 px-4 rounded-lg text-sm font-medium transition-colors"
           style={{ background: 'var(--color-secondary)', color: 'var(--color-text)' }}
+          onClick={() => setSearch(inputSearch.trim())}
         >
           <Filter size={14} />
           Filter
@@ -155,12 +183,36 @@ export default function AdminOrdersTable() {
              </tr>
            </thead>
            <tbody>
-             {ORDERS.map((order, idx) => (
-               <OrderRow key={order.id} order={order} idx={idx} total={ORDERS.length} />
+             {isLoading && (
+               <tr>
+                 <td colSpan={6} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                   Loading orders…
+                 </td>
+               </tr>
+             )}
+             {!isLoading && error && (
+               <tr>
+                 <td colSpan={6} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-danger)' }}>
+                   {error}
+                 </td>
+               </tr>
+             )}
+             {!isLoading && !error && (orders as any[]).map((order, idx) => (
+               <OrderRow key={order.id} order={order} idx={idx} total={(orders as any[]).length} />
              ))}
+             {!isLoading && !error && (orders as any[]).length === 0 && (
+               <tr>
+                 <td colSpan={6} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                   No orders found.
+                 </td>
+               </tr>
+             )}
            </tbody>
          </table>
        </div>
+      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+        Showing {(orders as any[]).length} of {total} orders
+      </p>
     </div>
   );
 }

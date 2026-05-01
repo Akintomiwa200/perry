@@ -11,7 +11,8 @@ export async function POST(request: Request) {
     const parsed = parseBody(registerSchema, body);
     if (!parsed.success) return err(parsed.error, 400);
 
-    const { email, password, name } = parsed.data;
+    const { email, password, firstName, lastName } = parsed.data;
+    const name = `${firstName} ${lastName}`.trim();
 
     const existing = await queryOne<{ id: number }>(
       'SELECT id FROM users WHERE email = $1',
@@ -36,10 +37,30 @@ export async function POST(request: Request) {
 
     if (!user) return err('Failed to create user', 500);
 
-    const token = await signToken({ id: user.id, email: user.email, role: user.role });
+    const token = await signToken({
+      userId: String(user.id),
+      email: user.email,
+      role: user.role as 'user' | 'admin' | 'super_admin',
+    });
 
-    const res = ok({ user, token }, 201);
-    createUserSession(res, { id: user.id, email: user.email, role: user.role });
+    const [first = '', ...rest] = (user.name ?? '').trim().split(/\s+/);
+    const mappedUser = {
+      id: String(user.id),
+      email: user.email,
+      firstName: first,
+      lastName: rest.join(' '),
+      role: user.role,
+      isActive: true,
+      emailVerified: true,
+      createdAt: user.created_at,
+    };
+
+    const res = ok({ user: mappedUser, token }, 201);
+    createUserSession(res, {
+      userId: String(user.id),
+      email: user.email,
+      role: user.role as 'user' | 'admin' | 'super_admin',
+    });
     return res;
   } catch (e) {
     console.error('[POST /api/auth/register]', e);

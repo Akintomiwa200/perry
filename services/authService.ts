@@ -43,8 +43,8 @@ export const authService = {
   },
 
   async getMe(): Promise<User> {
-    const { data } = await api.get<User>("/auth/me");
-    return data;
+    const { data } = await api.get<{ user: User }>("/auth/me");
+    return data.user;
   },
 
   async forgotPassword(email: string): Promise<void> {

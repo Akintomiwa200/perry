@@ -51,7 +51,7 @@ export const POST = withAuth(async (request: Request) => {
     const parsed = parseBody(createOrderSchema, body);
     if (!parsed.success) return err(parsed.error, 400);
 
-    const { items, shipping_address, notes } = parsed.data;
+    const { items, shippingAddress, shippingOption, notes } = parsed.data;
 
     // Verify products and calculate totals
     let subtotal = 0;
@@ -63,6 +63,11 @@ export const POST = withAuth(async (request: Request) => {
     }> = [];
 
     for (const item of items) {
+      const productId = Number(item.productId);
+      if (!Number.isFinite(productId)) {
+        return err(`Invalid product id: ${item.productId}`, 400);
+      }
+
       const product = await queryOne<{
         id: number;
         price: number;
@@ -70,10 +75,10 @@ export const POST = withAuth(async (request: Request) => {
         name: string;
       }>(
         'SELECT id, price, stock, name FROM products WHERE id = $1 AND status = $2',
-        [item.product_id, 'active'],
+        [productId, 'active'],
       );
 
-      if (!product) return err(`Product ${item.product_id} not found`, 404);
+      if (!product) return err(`Product ${item.productId} not found`, 404);
       if (product.stock < item.quantity) {
         return err(`Insufficient stock for product: ${product.name}`, 400);
       }
@@ -88,7 +93,12 @@ export const POST = withAuth(async (request: Request) => {
     }
 
     const tax = Math.round(subtotal * 0.1 * 100) / 100;
-    const shipping = subtotal > 100 ? 0 : 9.99;
+    const shippingMap: Record<string, number> = {
+      standard: 1500,
+      express: 3500,
+      overnight: 5000,
+    };
+    const shipping = shippingMap[shippingOption] ?? shippingMap.standard;
     const total = Math.round((subtotal + tax + shipping) * 100) / 100;
 
     // Generate order number
@@ -103,7 +113,7 @@ export const POST = withAuth(async (request: Request) => {
        VALUES ($1, $2, 'pending', $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [session.id, order_number, subtotal, tax, shipping, total,
-       JSON.stringify(shipping_address), notes ?? null],
+       JSON.stringify(shippingAddress), notes ?? null],
     );
 
     const createdOrder = order.rows[0];
@@ -120,6 +130,13 @@ export const POST = withAuth(async (request: Request) => {
         [item.quantity, item.product_id],
       );
     }
+
+    await client.query(
+      `UPDATE orders
+          SET payment_reference = $1, updated_at = NOW()
+        WHERE id = $2`,
+      [order_number, createdOrder.id],
+    );
 
     await client.query('COMMIT');
 

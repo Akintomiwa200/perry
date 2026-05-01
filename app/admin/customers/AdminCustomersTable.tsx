@@ -1,27 +1,22 @@
 'use client';
 
+import { useState } from 'react';
 import { Search, Users, Mail, Phone } from 'lucide-react';
+import { useAdminCustomers } from '@/hooks/useAdmin';
+import { formatNaira } from '@/lib/utils';
 
-interface CustomerRow {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  orders: number;
-  spent: number;
-  joined: string;
-}
-
-const CUSTOMERS: CustomerRow[] = [
-  { id: 'CUS-001', name: 'Amara Okafor', email: 'amara.okafor@email.com', phone: '+234 801 234 5678', orders: 8, spent: 425000, joined: 'Jan 2024' },
-  { id: 'CUS-002', name: 'Chioma Nwosu', email: 'chioma.n@email.com', phone: '+234 802 345 6789', orders: 5, spent: 210000, joined: 'Feb 2024' },
-  { id: 'CUS-003', name: 'Bolanle Ade', email: 'bolanle.ade@email.com', phone: '+234 803 456 7890', orders: 12, spent: 890000, joined: 'Nov 2023' },
-  { id: 'CUS-004', name: 'Ngozi Eze', email: 'ngozi.eze@email.com', phone: '+234 804 567 8901', orders: 3, spent: 95000, joined: 'Mar 2024' },
-  { id: 'CUS-005', name: 'Funmi Bakare', email: 'funmi.b@email.com', phone: '+234 805 678 9012', orders: 6, spent: 340000, joined: 'Dec 2023' },
-  { id: 'CUS-006', name: 'Adeola Martins', email: 'adeola.m@email.com', phone: '+234 806 789 0123', orders: 2, spent: 67000, joined: 'Mar 2024' },
-];
-
-function CustomerRow({ customer, idx, total }: { customer: CustomerRow; idx: number; total: number }) {
+function CustomerRow({ customer, idx, total }: { customer: any; idx: number; total: number }) {
+  const name = (customer.name ?? `${customer.firstName ?? ''} ${customer.lastName ?? ''}`.trim()) || 'Customer';
+  const initials = name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+  const joined = customer.created_at ? new Date(customer.created_at).toLocaleDateString() : '-';
+  const orders = Number(customer.ordersCount ?? customer.order_count ?? 0);
+  const spent = Number(customer.totalSpent ?? customer.total_spent ?? 0);
   return (
     <tr
       key={customer.id}
@@ -43,11 +38,11 @@ function CustomerRow({ customer, idx, total }: { customer: CustomerRow; idx: num
             className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-sm font-bold"
             style={{ background: 'var(--color-secondary)', color: 'var(--color-primary)' }}
           >
-            {customer.name.split(' ').map((n) => n[0]).join('')}
+            {initials || 'CU'}
           </div>
           <div>
-            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{customer.name}</p>
-            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{customer.id}</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{name}</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>#{customer.id}</p>
           </div>
         </div>
       </td>
@@ -59,23 +54,29 @@ function CustomerRow({ customer, idx, total }: { customer: CustomerRow; idx: num
           </div>
           <div className="flex items-center gap-1.5">
             <Phone size={12} style={{ color: 'var(--color-text-muted)' }} />
-            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{customer.phone}</span>
+            <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{customer.phone ?? '-'}</span>
           </div>
         </div>
       </td>
       <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>
-        <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{customer.orders}</span>
+        <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{orders}</span>
       </td>
       <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>
-        <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>₦{customer.spent.toLocaleString()}</span>
+        <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>{formatNaira(spent)}</span>
       </td>
-      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{customer.joined}</td>
+      <td className="px-4 py-3.5 text-sm" style={{ color: 'var(--color-text)' }}>{joined}</td>
     </tr>
   );
 }
 
 
 export default function AdminCustomersTable() {
+  const [searchInput, setSearchInput] = useState('');
+  const [search, setSearch] = useState('');
+  const { customers, total, isLoading, error } = useAdminCustomers({
+    search: search || undefined,
+  });
+
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
@@ -101,7 +102,7 @@ export default function AdminCustomersTable() {
               Total
             </p>
             <p className="text-lg font-bold" style={{ color: 'var(--deep)', fontFamily: 'var(--font-primary)' }}>
-              892
+              {total}
             </p>
           </div>
         </div>
@@ -119,6 +120,11 @@ export default function AdminCustomersTable() {
             placeholder="Search customers..."
             className="bg-transparent text-sm outline-none w-full"
             style={{ color: 'var(--color-text)', fontFamily: 'var(--font-primary)' }}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setSearch(searchInput.trim());
+            }}
           />
         </div>
         <select
@@ -135,6 +141,17 @@ export default function AdminCustomersTable() {
           <option>Last Month</option>
           <option>This Year</option>
         </select>
+        <button
+          className="h-10 px-3 text-sm rounded-lg"
+          style={{
+            background: 'var(--color-secondary)',
+            color: 'var(--color-text)',
+            border: '1px solid var(--color-border)',
+          }}
+          onClick={() => setSearch(searchInput.trim())}
+        >
+          Search
+        </button>
       </div>
 
        {/* Table */}
@@ -150,10 +167,24 @@ export default function AdminCustomersTable() {
              </tr>
            </thead>
            <tbody>
-             {CUSTOMERS.map((customer, idx) => (
-               <CustomerRow key={customer.id} customer={customer} idx={idx} total={CUSTOMERS.length} />
+             {isLoading && (
+               <tr>
+                 <td colSpan={5} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                   Loading customers…
+                 </td>
+               </tr>
+             )}
+             {!isLoading && error && (
+               <tr>
+                 <td colSpan={5} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-danger)' }}>
+                   {error}
+                 </td>
+               </tr>
+             )}
+             {!isLoading && !error && customers.map((customer: any, idx: number) => (
+               <CustomerRow key={customer.id} customer={customer} idx={idx} total={customers.length} />
              ))}
-             {CUSTOMERS.length === 0 && (
+             {!isLoading && !error && customers.length === 0 && (
                <tr>
                  <td colSpan={5} className="px-4 py-12 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>
                    No data available yet.

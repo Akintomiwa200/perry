@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 
 export interface SessionPayload extends JWTPayload {
   userId: string;
+  id?: string;
   email: string;
   role: 'user' | 'admin' | 'super_admin';
 }
@@ -28,7 +29,10 @@ export async function signToken(payload: SessionPayload): Promise<string> {
 export async function verifyToken(token: string): Promise<SessionPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    return payload as SessionPayload;
+    const p = payload as SessionPayload;
+    const resolvedId = p.userId ?? p.id;
+    if (!resolvedId || !p.email || !p.role) return null;
+    return { ...p, userId: String(resolvedId), id: String(resolvedId) };
   } catch {
     return null;
   }
@@ -65,7 +69,7 @@ export async function createUserSession(
   response: NextResponse,
   payload: SessionPayload,
 ): Promise<NextResponse> {
-  const token = await signToken(payload);
+  const token = await signToken({ ...payload, id: payload.userId });
   response.cookies.set(USER_COOKIE, token, cookieOptions);
   return response;
 }
@@ -74,7 +78,7 @@ export async function createAdminSession(
   response: NextResponse,
   payload: SessionPayload,
 ): Promise<NextResponse> {
-  const token = await signToken(payload);
+  const token = await signToken({ ...payload, id: payload.userId });
   response.cookies.set(ADMIN_COOKIE, token, cookieOptions);
   return response;
 }

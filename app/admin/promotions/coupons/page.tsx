@@ -1,343 +1,147 @@
-import {
-  Ticket,
-  Plus,
-  Tag,
-  TrendingDown,
-  CheckCircle,
-  Clock,
-} from "lucide-react";
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Ticket, Plus, CheckCircle, Clock } from "lucide-react";
 import StatusBadge from "@/components/admin/StatusBadge";
 
-type CouponType = "% Off" | "Fixed" | "Free Shipping";
-type CouponStatus = "active" | "expired" | "scheduled" | "paused";
-
-interface Coupon {
-  code: string;
-  type: CouponType;
-  value: string;
-  minOrder: string;
-  used: number;
-  limit: number;
-  expiry: string;
-  status: CouponStatus;
-}
-
-const COUPONS: Coupon[] = [
-  {
-    code: "PERRY10",
-    type: "% Off",
-    value: "10%",
-    minOrder: "₦5,000",
-    used: 248,
-    limit: 500,
-    expiry: "Dec 31, 2025",
-    status: "active",
-  },
-  {
-    code: "WELCOME20",
-    type: "% Off",
-    value: "20%",
-    minOrder: "₦3,000",
-    used: 91,
-    limit: 200,
-    expiry: "Jul 31, 2025",
-    status: "active",
-  },
-  {
-    code: "FREESHIP",
-    type: "Free Shipping",
-    value: "—",
-    minOrder: "₦8,000",
-    used: 430,
-    limit: 1000,
-    expiry: "Jun 30, 2025",
-    status: "active",
-  },
-  {
-    code: "FESTIVE500",
-    type: "Fixed",
-    value: "₦500",
-    minOrder: "₦10,000",
-    used: 175,
-    limit: 300,
-    expiry: "Jan 15, 2025",
-    status: "expired",
-  },
-  {
-    code: "ILEYA30",
-    type: "% Off",
-    value: "30%",
-    minOrder: "₦15,000",
-    used: 0,
-    limit: 150,
-    expiry: "Aug 20, 2025",
-    status: "scheduled",
-  },
-  {
-    code: "NAIJA1K",
-    type: "Fixed",
-    value: "₦1,000",
-    minOrder: "₦20,000",
-    used: 62,
-    limit: 100,
-    expiry: "May 10, 2025",
-    status: "expired",
-  },
-];
-
-const statusVariant: Record<
-  CouponStatus,
-  "success" | "danger" | "info" | "neutral"
-> = {
-  active: "success",
-  expired: "danger",
-  scheduled: "info",
-  paused: "neutral",
-};
-
-const typeColors: Record<CouponType, { bg: string; color: string }> = {
-  "% Off": { bg: "#EDE9FE", color: "#7C3AED" },
-  Fixed: { bg: "#DCFCE7", color: "#15803D" },
-  "Free Shipping": { bg: "#DBEAFE", color: "#1D4ED8" },
-};
+type CouponType = "percent" | "fixed" | "free_shipping";
 
 export default function CouponsPage() {
-  const active = COUPONS.filter((c) => c.status === "active").length;
-  const expired = COUPONS.filter((c) => c.status === "expired").length;
-  const usedToday = 34;
-  const revenueSaved = "₦284,500";
+  const [coupons, setCoupons] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [form, setForm] = useState({
+    code: "",
+    type: "percent" as CouponType,
+    value: "",
+    minOrder: "",
+    usageLimit: "",
+    expiresAt: "",
+  });
+
+  const loadCoupons = () => {
+    setIsLoading(true);
+    setError(null);
+    fetch("/api/coupons")
+      .then((r) => r.json())
+      .then((data) => setCoupons(data.coupons ?? []))
+      .catch(() => setError("Failed to load coupons"))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    loadCoupons();
+  }, []);
+
+  const active = useMemo(() => coupons.filter((c) => c.is_active).length, [coupons]);
+  const expired = useMemo(
+    () => coupons.filter((c) => c.expires_at && new Date(c.expires_at).getTime() < Date.now()).length,
+    [coupons],
+  );
+  const totalUsed = useMemo(() => coupons.reduce((sum, c) => sum + Number(c.usage_count ?? 0), 0), [coupons]);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreating(true);
+    setError(null);
+    try {
+      const body = {
+        code: form.code.trim(),
+        type: form.type,
+        value: Number(form.value),
+        minOrder: form.minOrder ? Number(form.minOrder) : 0,
+        usageLimit: form.usageLimit ? Number(form.usageLimit) : undefined,
+        expiresAt: form.expiresAt ? new Date(form.expiresAt).toISOString() : undefined,
+      };
+      const res = await fetch("/api/coupons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create coupon");
+      setForm({ code: "", type: "percent", value: "", minOrder: "", usageLimit: "", expiresAt: "" });
+      loadCoupons();
+    } catch (err: any) {
+      setError(err?.message ?? "Failed to create coupon");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1
-            className="text-3xl font-semibold mb-1"
-            style={{
-              color: "var(--deep)",
-              fontFamily: "'Cormorant Garamond', serif",
-            }}
-          >
+          <h1 className="text-3xl font-semibold mb-1" style={{ color: "var(--deep)", fontFamily: "'Cormorant Garamond', serif" }}>
             Coupons
           </h1>
-          <p className="text-sm" style={{ color: "var(--mid)" }}>
-            Create and manage promotional coupon codes
-          </p>
+          <p className="text-sm" style={{ color: "var(--mid)" }}>Create and manage promotional coupon codes</p>
         </div>
-        <button className="btn btn-primary flex items-center gap-2 self-start sm:self-auto">
-          <Plus size={14} />
-          Create Coupon
-        </button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          {
-            label: "Active",
-            value: active,
-            icon: CheckCircle,
-            color: "var(--color-success)",
-            bg: "#DCFCE7",
-          },
-          {
-            label: "Expired",
-            value: expired,
-            icon: Clock,
-            color: "var(--color-danger)",
-            bg: "#FEE2E2",
-          },
-          {
-            label: "Used Today",
-            value: usedToday,
-            icon: Ticket,
-            color: "#7C3AED",
-            bg: "#EDE9FE",
-          },
-          {
-            label: "Revenue Saved",
-            value: revenueSaved,
-            icon: TrendingDown,
-            color: "var(--color-warning)",
-            bg: "#FEF3C7",
-          },
+          { label: "Active", value: active, icon: CheckCircle, color: "var(--color-success)", bg: "#DCFCE7" },
+          { label: "Expired", value: expired, icon: Clock, color: "var(--color-danger)", bg: "#FEE2E2" },
+          { label: "Total Used", value: totalUsed, icon: Ticket, color: "#7C3AED", bg: "#EDE9FE" },
+          { label: "Total Coupons", value: coupons.length, icon: Ticket, color: "var(--color-warning)", bg: "#FEF3C7" },
         ].map(({ label, value, icon: Icon, color, bg }) => (
-          <div
-            key={label}
-            className="flex items-center gap-3 rounded-xl p-4"
-            style={{
-              background: "var(--color-surface-raised)",
-              border: "1px solid var(--color-border)",
-              boxShadow: "var(--shadow-sm)",
-            }}
-          >
-            <div
-              className="rounded-lg p-2.5 shrink-0"
-              style={{ background: bg }}
-            >
-              <Icon size={17} style={{ color }} />
-            </div>
-            <div>
-              <p
-                className="text-xs uppercase tracking-wide font-medium"
-                style={{ color: "var(--color-text-muted)" }}
-              >
-                {label}
-              </p>
-              <p
-                className="text-xl font-bold mt-0.5"
-                style={{ color: "var(--color-text)" }}
-              >
-                {value}
-              </p>
-            </div>
+          <div key={label} className="flex items-center gap-3 rounded-xl p-4" style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-sm)" }}>
+            <div className="rounded-lg p-2.5 shrink-0" style={{ background: bg }}><Icon size={17} style={{ color }} /></div>
+            <div><p className="text-xs uppercase tracking-wide font-medium" style={{ color: "var(--color-text-muted)" }}>{label}</p><p className="text-xl font-bold mt-0.5" style={{ color: "var(--color-text)" }}>{value}</p></div>
           </div>
         ))}
       </div>
 
-      {/* Table */}
-      <div
-        className="overflow-x-auto rounded-xl"
-        style={{
-          border: "1px solid var(--color-border)",
-          boxShadow: "var(--shadow-sm)",
-        }}
-      >
+      <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-6 gap-3 rounded-xl p-4" style={{ background: "var(--color-surface-raised)", border: "1px solid var(--color-border)" }}>
+        <input className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} placeholder="Code (e.g PERRY10)" value={form.code} onChange={(e) => setForm((p) => ({ ...p, code: e.target.value }))} required />
+        <select className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} value={form.type} onChange={(e) => setForm((p) => ({ ...p, type: e.target.value as CouponType }))}>
+          <option value="percent">Percent</option>
+          <option value="fixed">Fixed</option>
+          <option value="free_shipping">Free Shipping</option>
+        </select>
+        <input className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} placeholder="Value" type="number" min="0" value={form.value} onChange={(e) => setForm((p) => ({ ...p, value: e.target.value }))} required />
+        <input className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} placeholder="Min Order" type="number" min="0" value={form.minOrder} onChange={(e) => setForm((p) => ({ ...p, minOrder: e.target.value }))} />
+        <input className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} placeholder="Usage Limit" type="number" min="1" value={form.usageLimit} onChange={(e) => setForm((p) => ({ ...p, usageLimit: e.target.value }))} />
+        <input className="h-10 px-3 rounded-lg border" style={{ borderColor: "var(--color-border)" }} type="datetime-local" value={form.expiresAt} onChange={(e) => setForm((p) => ({ ...p, expiresAt: e.target.value }))} />
+        <button type="submit" disabled={creating} className="md:col-span-6 btn btn-primary flex items-center justify-center gap-2">
+          <Plus size={14} />
+          {creating ? "Creating..." : "Create Coupon"}
+        </button>
+      </form>
+
+      {error && <p style={{ color: "var(--color-danger)" }}>{error}</p>}
+
+      <div className="overflow-x-auto rounded-xl" style={{ border: "1px solid var(--color-border)", boxShadow: "var(--shadow-sm)" }}>
         <table className="w-full text-left border-collapse min-w-[820px]">
           <thead>
-            <tr
-              style={{
-                background: "var(--color-surface)",
-                borderBottom: "1px solid var(--color-border)",
-              }}
-            >
-              {[
-                "Code",
-                "Type",
-                "Value",
-                "Min Order",
-                "Usage",
-                "Expiry",
-                "Status",
-              ].map((h) => (
-                <th
-                  key={h}
-                  className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: "var(--color-text-muted)" }}
-                >
-                  {h}
-                </th>
+            <tr style={{ background: "var(--color-surface)", borderBottom: "1px solid var(--color-border)" }}>
+              {["Code", "Type", "Value", "Min Order", "Usage", "Expiry", "Status"].map((h) => (
+                <th key={h} className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--color-text-muted)" }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {COUPONS.map((coupon, idx) => {
-              const pct = Math.round((coupon.used / coupon.limit) * 100);
-              const typeStyle = typeColors[coupon.type];
+            {isLoading && <tr><td colSpan={7} className="px-5 py-12 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>Loading coupons…</td></tr>}
+            {!isLoading && !error && coupons.map((c: any, idx: number) => {
+              const expiredNow = c.expires_at && new Date(c.expires_at).getTime() < Date.now();
+              const status = !c.is_active ? "paused" : expiredNow ? "expired" : "active";
+              const statusVariant: any = status === "active" ? "success" : status === "expired" ? "danger" : "neutral";
               return (
-                <tr
-                  key={coupon.code}
-                  style={{
-                    background: "var(--color-surface-raised)",
-                    borderBottom:
-                      idx < COUPONS.length - 1
-                        ? "1px solid var(--color-border)"
-                        : undefined,
-                  }}
-                >
-                  {/* Code */}
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2">
-                      <Tag size={13} style={{ color: "var(--terracotta)" }} />
-                      <code
-                        className="text-sm font-mono font-semibold tracking-widest px-2 py-0.5 rounded"
-                        style={{
-                          background: "var(--color-secondary)",
-                          color: "var(--deep)",
-                        }}
-                      >
-                        {coupon.code}
-                      </code>
-                    </div>
-                  </td>
-                  {/* Type */}
-                  <td className="px-5 py-4">
-                    <span
-                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold"
-                      style={{
-                        background: typeStyle.bg,
-                        color: typeStyle.color,
-                      }}
-                    >
-                      {coupon.type}
-                    </span>
-                  </td>
-                  {/* Value */}
-                  <td
-                    className="px-5 py-4 text-sm font-bold"
-                    style={{ color: "var(--color-text)" }}
-                  >
-                    {coupon.value}
-                  </td>
-                  {/* Min Order */}
-                  <td
-                    className="px-5 py-4 text-sm"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    {coupon.minOrder}
-                  </td>
-                  {/* Usage */}
-                  <td className="px-5 py-4">
-                    <div className="flex flex-col gap-1">
-                      <span
-                        className="text-xs font-medium"
-                        style={{ color: "var(--color-text)" }}
-                      >
-                        {coupon.used} / {coupon.limit}
-                      </span>
-                      <div
-                        className="h-1.5 rounded-full overflow-hidden"
-                        style={{
-                          width: "80px",
-                          background: "var(--color-secondary)",
-                        }}
-                      >
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${pct}%`,
-                            background:
-                              pct >= 90
-                                ? "var(--color-danger)"
-                                : pct >= 60
-                                  ? "var(--color-warning)"
-                                  : "var(--color-success)",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </td>
-                  {/* Expiry */}
-                  <td
-                    className="px-5 py-4 text-sm"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    {coupon.expiry}
-                  </td>
-                  {/* Status */}
-                  <td className="px-5 py-4">
-                    <StatusBadge
-                      label={
-                        coupon.status.charAt(0).toUpperCase() +
-                        coupon.status.slice(1)
-                      }
-                      variant={statusVariant[coupon.status]}
-                    />
-                  </td>
+                <tr key={c.id} style={{ background: "var(--color-surface-raised)", borderBottom: idx < coupons.length - 1 ? "1px solid var(--color-border)" : undefined }}>
+                  <td className="px-5 py-4 text-sm font-semibold"><code>{c.code}</code></td>
+                  <td className="px-5 py-4 text-sm">{c.discount_type}</td>
+                  <td className="px-5 py-4 text-sm font-semibold">{Number(c.discount_value)}</td>
+                  <td className="px-5 py-4 text-sm">{Number(c.min_order)}</td>
+                  <td className="px-5 py-4 text-sm">{Number(c.usage_count ?? 0)} / {c.usage_limit ?? "∞"}</td>
+                  <td className="px-5 py-4 text-sm">{c.expires_at ? new Date(c.expires_at).toLocaleString() : "—"}</td>
+                  <td className="px-5 py-4"><StatusBadge label={status} variant={statusVariant} /></td>
                 </tr>
               );
             })}
+            {!isLoading && !error && coupons.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-sm" style={{ color: "var(--color-text-muted)" }}>No coupons found.</td></tr>}
           </tbody>
         </table>
       </div>
