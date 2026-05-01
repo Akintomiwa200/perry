@@ -120,8 +120,8 @@ export const POST = withAdmin(async (request: Request) => {
     if (!parsed.success) return err(parsed.error, 400);
 
     const {
-      name, slug, description, price, compare_at_price,
-      images, stock, sku, category_id, featured, is_new, is_sale,
+      name, slug, description, price, compareAtPrice,
+      images, stock, sku, category, featured, isNew, isSale,
     } = parsed.data;
 
     const product = await queryOne(
@@ -130,9 +130,9 @@ export const POST = withAdmin(async (request: Request) => {
           category_id, featured, is_new, is_sale, status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,'active')
        RETURNING *`,
-      [name, slug, description, price, compare_at_price ?? null,
-       images ?? [], stock ?? 0, sku ?? null, category_id ?? null,
-       featured ?? false, is_new ?? false, is_sale ?? false],
+      [name, slug, description, price, compareAtPrice ?? null,
+       images ?? [], stock ?? 0, sku ?? null, category ?? null,
+       featured ?? false, isNew ?? false, isSale ?? false],
     );
 
     return ok({ product }, 201);

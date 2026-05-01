@@ -945,10 +945,10 @@ export default function CheckoutPage() {
           <ShippingSelector
             address={shippingAddress}
             selected={selectedShipping}
-            onSelect={(id) => {
+            onSelect={(id: any) => {
               const opt = shippingOptions.find((o) => o.id === id);
               if (opt) {
-                selectShippingOption(id as ShippingOptionId);
+                selectShippingOption(id);
               }
             }}
             onBack={() => setStep("address")}

@@ -11,7 +11,7 @@ function CustomerRow({ customer, idx, total }: { customer: any; idx: number; tot
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
-    .map((n) => n[0])
+    .map((n: string) => n[0])
     .join('')
     .toUpperCase();
   const joined = customer.created_at ? new Date(customer.created_at).toLocaleDateString() : '-';

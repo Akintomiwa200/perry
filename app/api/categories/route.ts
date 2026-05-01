@@ -28,13 +28,13 @@ export const POST = withAdmin(async (request: Request) => {
     const parsed = parseBody(createCategorySchema, body);
     if (!parsed.success) return err(parsed.error, 400);
 
-    const { name, slug, description, image, parent_id } = parsed.data;
+    const { name, slug, description, parentId } = parsed.data;
 
     const category = await queryOne(
-      `INSERT INTO categories (name, slug, description, image, parent_id)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO categories (name, slug, description, parent_id)
+       VALUES ($1, $2, $3, $4)
        RETURNING *`,
-      [name, slug, description ?? null, image ?? null, parent_id ?? null],
+      [name, slug, description ?? null, parentId ?? null],
     );
 
     return ok({ category }, 201);

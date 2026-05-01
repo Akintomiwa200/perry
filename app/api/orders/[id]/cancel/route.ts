@@ -24,7 +24,7 @@ export const POST = withAuth(async (_request: Request, ctx: Ctx) => {
 
     if (!order) return err('Order not found', 404);
 
-    if (order.user_id !== session.id) return err('Forbidden', 403);
+    if (order.user_id !== Number(session.id)) return err('Forbidden', 403);
 
     if (!['pending', 'processing'].includes(order.status)) {
       return err('Only pending or processing orders can be cancelled', 400);

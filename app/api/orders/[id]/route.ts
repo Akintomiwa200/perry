@@ -54,7 +54,7 @@ export const GET = withAuth(async (request: Request, ctx: Ctx) => {
     if (!order) return err('Order not found', 404);
 
     // Only the owner or admin can view
-    if (order.user_id !== session.id && session.role !== 'admin' && session.role !== 'super_admin') {
+    if (order.user_id !== Number(session.id) && session.role !== 'admin' && session.role !== 'super_admin') {
       return err('Forbidden', 403);
     }
 

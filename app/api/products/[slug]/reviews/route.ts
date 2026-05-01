@@ -57,13 +57,13 @@ export const POST = withAuth(async (request: Request, ctx: Ctx) => {
     const parsed = parseBody(createReviewSchema, body);
     if (!parsed.success) return err(parsed.error, 400);
 
-    const { rating, title, review_body } = parsed.data;
+    const { rating, comment } = parsed.data;
 
     const review = await queryOne(
-      `INSERT INTO reviews (user_id, product_id, rating, title, body, is_approved)
-       VALUES ($1, $2, $3, $4, $5, false)
+      `INSERT INTO reviews (user_id, product_id, rating, body, is_approved)
+       VALUES ($1, $2, $3, $4, false)
        RETURNING *`,
-      [session.id, product.id, rating, title ?? null, review_body ?? null],
+      [session.id, product.id, rating, comment ?? null],
     );
 
     return ok({ review }, 201);
